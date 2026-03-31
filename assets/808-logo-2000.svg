@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" width="2000" height="2000">
+  <defs>
+    <style>
+      .bg { fill: #111; }
+      .logo { font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace; }
+    </style>
+    <linearGradient id="808-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2F2E3E" />
+      <stop offset="25%" style="stop-color:#E6E8BF" />
+      <stop offset="50%" style="stop-color:#DDDA00" />
+      <stop offset="75%" style="stop-color:#F27900" />
+      <stop offset="100%" style="stop-color:#DD1D00" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="2000" height="2000"/>
+
+  <!-- 808 ASCII Logo - centered -->
+  <g transform="translate(1000, 1000)">
+    <text class="logo" font-size="108" text-anchor="middle" y="-225" xml:space="preserve" fill="url(#808-gradient)"> █████╗   █████╗   █████╗ </text>
+    <text class="logo" font-size="108" text-anchor="middle" y="-105" xml:space="preserve" fill="url(#808-gradient)">██╔══██╗ ██╔══██╗ ██╔══██╗</text>
+    <text class="logo" font-size="108" text-anchor="middle" y="15" xml:space="preserve" fill="url(#808-gradient)">╚█████╔╝ ██║  ██║ ╚█████╔╝</text>
+    <text class="logo" font-size="108" text-anchor="middle" y="135" xml:space="preserve" fill="url(#808-gradient)">██╔══██╗ ██║  ██║ ██╔══██╗</text>
+    <text class="logo" font-size="108" text-anchor="middle" y="255" xml:space="preserve" fill="url(#808-gradient)">╚█████╔╝ ╚█████╔╝ ╚█████╔╝</text>
+    <text class="logo" font-size="108" text-anchor="middle" y="375" xml:space="preserve" fill="url(#808-gradient)"> ╚════╝   ╚════╝   ╚════╝ </text>
+  </g>
+</svg>

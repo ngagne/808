@@ -72,8 +72,8 @@ ALLOWLIST=(
   'tests/security-scan.test.cjs'
   'tests/security.test.cjs'
   'tests/prompt-injection-scan.test.cjs'
-  'get-shit-done/bin/lib/security.cjs'
-  'hooks/gsd-prompt-guard.js'
+  '808/bin/lib/security.cjs'
+  'hooks/808-prompt-guard.js'
   'SECURITY.md'
 )
 

@@ -19,7 +19,7 @@ const {
   validatePhaseNumber,
   validateFieldName,
   validateShellArg,
-} = require('../get-shit-done/bin/lib/security.cjs');
+} = require('../808/bin/lib/security.cjs');
 
 // ─── Path Traversal Prevention ──────────────────────────────────────────────
 

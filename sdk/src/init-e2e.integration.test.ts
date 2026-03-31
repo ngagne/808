@@ -1,6 +1,6 @@
 /**
  * E2E integration test — proves InitRunner.run() drives real Agent SDK
- * sessions for the gsd-sdk init workflow.
+ * sessions for the 808-sdk init workflow.
  *
  * Requires Claude Code CLI (`claude`) installed and authenticated.
  * Skips gracefully if CLI is unavailable.
@@ -19,10 +19,10 @@ import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
 import { InitRunner } from './init-runner.js';
-import { GSDTools } from './gsd-tools.js';
-import { GSDEventStream } from './event-stream.js';
-import { GSDEventType } from './types.js';
-import type { GSDEvent } from './types.js';
+import { 808Tools } from './808-tools.js';
+import { 808EventStream } from './event-stream.js';
+import { 808EventType } from './types.js';
+import type { 808Event } from './types.js';
 
 // ─── CLI availability check ─────────────────────────────────────────────────
 
@@ -36,16 +36,16 @@ try {
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const sdkPromptsDir = join(__dirname, '..', 'prompts');
-const GSD_TOOLS_PATH = join(homedir(), '.claude', 'get-shit-done', 'bin', 'gsd-tools.cjs');
+const 808_TOOLS_PATH = join(homedir(), '.claude', '808', 'bin', '808-tools.cjs');
 
 // ─── Test suite ──────────────────────────────────────────────────────────────
 
 describe.skipIf(!cliAvailable)('E2E: InitRunner.run() full workflow', () => {
   let tmpDir: string;
-  let events: GSDEvent[];
+  let events: 808Event[];
 
   beforeAll(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'gsd-sdk-init-e2e-'));
+    tmpDir = await mkdtemp(join(tmpdir(), '808-sdk-init-e2e-'));
 
     // Initialize git in the temp dir (required by InitRunner)
     execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
@@ -61,12 +61,12 @@ describe.skipIf(!cliAvailable)('E2E: InitRunner.run() full workflow', () => {
 
   it('InitRunner.run() bootstraps a project without human intervention', async () => {
     events = [];
-    const eventStream = new GSDEventStream();
-    eventStream.on('event', (e: GSDEvent) => events.push(e));
+    const eventStream = new 808EventStream();
+    eventStream.on('event', (e: 808Event) => events.push(e));
 
-    const tools = new GSDTools({
+    const tools = new 808Tools({
       projectDir: tmpDir,
-      gsdToolsPath: GSD_TOOLS_PATH,
+      gsdToolsPath: 808_TOOLS_PATH,
       timeoutMs: 30_000,
     });
 
@@ -112,14 +112,14 @@ describe.skipIf(!cliAvailable)('E2E: InitRunner.run() full workflow', () => {
     }
 
     // ── Assert: events captured include InitStart and at least one InitStepComplete ──
-    const initStartEvents = events.filter(e => e.type === GSDEventType.InitStart);
+    const initStartEvents = events.filter(e => e.type === 808EventType.InitStart);
     expect(initStartEvents.length).toBe(1);
 
-    const stepCompleteEvents = events.filter(e => e.type === GSDEventType.InitStepComplete);
+    const stepCompleteEvents = events.filter(e => e.type === 808EventType.InitStepComplete);
     expect(stepCompleteEvents.length).toBeGreaterThanOrEqual(1);
 
     // ── Assert: InitComplete event emitted ──
-    const initCompleteEvents = events.filter(e => e.type === GSDEventType.InitComplete);
+    const initCompleteEvents = events.filter(e => e.type === 808EventType.InitComplete);
     expect(initCompleteEvents.length).toBe(1);
 
     // ── Assert: cost and duration are tracked ──

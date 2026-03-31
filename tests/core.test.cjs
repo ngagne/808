@@ -1,5 +1,5 @@
 /**
- * GSD Tools Tests - core.cjs
+ * 808 Tools Tests - core.cjs
  *
  * Tests for the foundational module's exports including regressions
  * for known bugs (REG-01: loadConfig model_overrides, REG-02: getRoadmapPhaseInternal export).
@@ -30,7 +30,7 @@ const {
   findPhaseInternal,
   findProjectRoot,
   detectSubRepos,
-} = require('../get-shit-done/bin/lib/core.cjs');
+} = require('../808/bin/lib/core.cjs');
 
 // ─── loadConfig ────────────────────────────────────────────────────────────────
 
@@ -87,9 +87,9 @@ describe('loadConfig', () => {
 
   // Bug: loadConfig previously omitted model_overrides from return value
   test('returns model_overrides when present (REG-01)', () => {
-    writeConfig({ model_overrides: { 'gsd-executor': 'opus' } });
+    writeConfig({ model_overrides: { '808-executor': 'opus' } });
     const config = loadConfig(tmpDir);
-    assert.deepStrictEqual(config.model_overrides, { 'gsd-executor': 'opus' });
+    assert.deepStrictEqual(config.model_overrides, { '808-executor': 'opus' });
   });
 
   test('returns model_overrides as null when not in config', () => {
@@ -186,7 +186,7 @@ describe('loadConfig commit_docs gitignore auto-detection (#1250)', () => {
     // When config.json is missing, loadConfig catches and returns defaults.
     // The gitignore check happens inside the try block, so with no config.json
     // the catch returns defaults (commit_docs: true). This is acceptable since
-    // a project without config.json hasn't been initialized by GSD yet.
+    // a project without config.json hasn't been initialized by 808 yet.
     assert.strictEqual(typeof config.commit_docs, 'boolean');
   });
 });
@@ -213,7 +213,7 @@ describe('resolveModelInternal', () => {
 
   describe('model profile structural validation', () => {
     test('all known agents resolve to a valid string for each profile', () => {
-      const knownAgents = ['gsd-planner', 'gsd-executor', 'gsd-phase-researcher', 'gsd-codebase-mapper'];
+      const knownAgents = ['808-planner', '808-executor', '808-phase-researcher', '808-codebase-mapper'];
       const profiles = ['quality', 'balanced', 'budget', 'inherit'];
       const validValues = ['inherit', 'sonnet', 'haiku', 'opus'];
 
@@ -230,7 +230,7 @@ describe('resolveModelInternal', () => {
     });
 
     test('inherit profile forces all known agents to inherit model', () => {
-      const knownAgents = ['gsd-planner', 'gsd-executor', 'gsd-phase-researcher', 'gsd-codebase-mapper'];
+      const knownAgents = ['808-planner', '808-executor', '808-phase-researcher', '808-codebase-mapper'];
       writeConfig({ model_profile: 'inherit' });
       for (const agent of knownAgents) {
         assert.strictEqual(resolveModelInternal(tmpDir, agent), 'inherit');
@@ -242,68 +242,68 @@ describe('resolveModelInternal', () => {
     test('per-agent override takes precedence over profile', () => {
       writeConfig({
         model_profile: 'balanced',
-        model_overrides: { 'gsd-executor': 'haiku' },
+        model_overrides: { '808-executor': 'haiku' },
       });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-executor'), 'haiku');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-executor'), 'haiku');
     });
 
     test('opus override resolves to opus', () => {
       writeConfig({
-        model_overrides: { 'gsd-executor': 'opus' },
+        model_overrides: { '808-executor': 'opus' },
       });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-executor'), 'opus');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-executor'), 'opus');
     });
 
     test('agents not in override fall back to profile', () => {
       writeConfig({
         model_profile: 'quality',
-        model_overrides: { 'gsd-executor': 'haiku' },
+        model_overrides: { '808-executor': 'haiku' },
       });
-      // gsd-planner not overridden, should use quality profile -> opus
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-planner'), 'opus');
+      // 808-planner not overridden, should use quality profile -> opus
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-planner'), 'opus');
     });
   });
 
   describe('edge cases', () => {
     test('returns sonnet for unknown agent type', () => {
       writeConfig({ model_profile: 'balanced' });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-nonexistent'), 'sonnet');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-nonexistent'), 'sonnet');
     });
 
     test('returns sonnet for unknown agent type even with inherit profile', () => {
       writeConfig({ model_profile: 'inherit' });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-nonexistent'), 'sonnet');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-nonexistent'), 'sonnet');
     });
 
     test('defaults to balanced profile when model_profile missing', () => {
       writeConfig({});
-      // balanced profile, gsd-planner -> opus
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-planner'), 'opus');
+      // balanced profile, 808-planner -> opus
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-planner'), 'opus');
     });
   });
 
   describe('resolve_model_ids: "omit"', () => {
     test('returns empty string for known agents', () => {
       writeConfig({ resolve_model_ids: 'omit' });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-planner'), '');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-planner'), '');
     });
 
     test('returns empty string for unknown agents', () => {
       writeConfig({ resolve_model_ids: 'omit' });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-nonexistent'), '');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-nonexistent'), '');
     });
 
     test('still respects model_overrides even when omit', () => {
       writeConfig({
         resolve_model_ids: 'omit',
-        model_overrides: { 'gsd-planner': 'openai/gpt-5.4' },
+        model_overrides: { '808-planner': 'openai/gpt-5.4' },
       });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-planner'), 'openai/gpt-5.4');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-planner'), 'openai/gpt-5.4');
     });
 
     test('returns empty string with inherit profile', () => {
       writeConfig({ resolve_model_ids: 'omit', model_profile: 'inherit' });
-      assert.strictEqual(resolveModelInternal(tmpDir, 'gsd-planner'), '');
+      assert.strictEqual(resolveModelInternal(tmpDir, '808-planner'), '');
     });
   });
 });
@@ -380,7 +380,7 @@ describe('safeReadFile', () => {
   let tmpDir;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-core-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), '808-core-test-'));
   });
 
   afterEach(() => {
@@ -535,7 +535,7 @@ describe('searchPhaseInDir', () => {
   let phasesDir;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-core-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), '808-core-test-'));
     phasesDir = path.join(tmpDir, 'phases');
     fs.mkdirSync(phasesDir, { recursive: true });
   });
@@ -964,49 +964,49 @@ describe('normalizeMd', () => {
 // ─── Stale hook filter regression (#1200) ─────────────────────────────────────
 
 describe('stale hook filter', () => {
-  test('filter should only match gsd-prefixed .js files', () => {
+  test('filter should only match 808-prefixed .js files', () => {
     const files = [
-      'gsd-check-update.js',
-      'gsd-context-monitor.js',
-      'gsd-prompt-guard.js',
-      'gsd-statusline.js',
-      'gsd-workflow-guard.js',
+      '808-check-update.js',
+      '808-context-monitor.js',
+      '808-prompt-guard.js',
+      '808-statusline.js',
+      '808-workflow-guard.js',
       'guard-edits-outside-project.js',  // user hook
       'my-custom-hook.js',               // user hook
-      'gsd-check-update.js.bak',         // backup file
+      '808-check-update.js.bak',         // backup file
       'README.md',                       // non-js file
     ];
 
-    const gsdFilter = f => f.startsWith('gsd-') && f.endsWith('.js');
+    const gsdFilter = f => f.startsWith('808-') && f.endsWith('.js');
     const filtered = files.filter(gsdFilter);
 
     assert.deepStrictEqual(filtered, [
-      'gsd-check-update.js',
-      'gsd-context-monitor.js',
-      'gsd-prompt-guard.js',
-      'gsd-statusline.js',
-      'gsd-workflow-guard.js',
-    ], 'should only include gsd-prefixed .js files');
+      '808-check-update.js',
+      '808-context-monitor.js',
+      '808-prompt-guard.js',
+      '808-statusline.js',
+      '808-workflow-guard.js',
+    ], 'should only include 808-prefixed .js files');
 
     assert.ok(!filtered.includes('guard-edits-outside-project.js'), 'must not include user hooks');
-    assert.ok(!filtered.includes('my-custom-hook.js'), 'must not include non-gsd hooks');
+    assert.ok(!filtered.includes('my-custom-hook.js'), 'must not include non-808 hooks');
   });
 });
 
 // ─── stale hook path regression (#1249) ──────────────────────────────────────
 
 describe('stale hook path', () => {
-  test('gsd-check-update.js checks get-shit-done/hooks/ not configDir/hooks/', () => {
+  test('808-check-update.js checks 808/hooks/ not configDir/hooks/', () => {
     const content = fs.readFileSync(
-      path.join(__dirname, '..', 'hooks', 'gsd-check-update.js'), 'utf-8'
+      path.join(__dirname, '..', 'hooks', '808-check-update.js'), 'utf-8'
     );
     assert.ok(
-      content.includes("path.join(configDir, 'get-shit-done', 'hooks')"),
-      'stale hook check must look in configDir/get-shit-done/hooks/, not configDir/hooks/'
+      content.includes("path.join(configDir, '808', 'hooks')"),
+      'stale hook check must look in configDir/808/hooks/, not configDir/hooks/'
     );
     assert.ok(
       !content.includes("path.join(configDir, 'hooks')") ||
-      content.indexOf("path.join(configDir, 'get-shit-done', 'hooks')") <
+      content.indexOf("path.join(configDir, '808', 'hooks')") <
       content.indexOf("path.join(configDir, 'hooks')") + 100, // allow the old pattern only if corrected version exists first
       'should not use the wrong hooks path'
     );
@@ -1016,7 +1016,7 @@ describe('stale hook path', () => {
 // ─── resolveWorktreeRoot ─────────────────────────────────────────────────────
 
 describe('resolveWorktreeRoot', () => {
-  const { resolveWorktreeRoot } = require('../get-shit-done/bin/lib/core.cjs');
+  const { resolveWorktreeRoot } = require('../808/bin/lib/core.cjs');
   let tmpDir;
 
   beforeEach(() => {
@@ -1041,7 +1041,7 @@ describe('resolveWorktreeRoot', () => {
 // ─── resolveWorktreeRoot — linked worktree with .planning/ (#1315) ───────────
 
 describe('resolveWorktreeRoot with linked worktree .planning/', () => {
-  const { resolveWorktreeRoot } = require('../get-shit-done/bin/lib/core.cjs');
+  const { resolveWorktreeRoot } = require('../808/bin/lib/core.cjs');
   const { execSync: execSyncLocal } = require('child_process');
   // On Windows CI, os.tmpdir() may return 8.3 short paths (RUNNER~1) while
   // git returns long paths (runneradmin). realpathSync.native resolves both.
@@ -1053,7 +1053,7 @@ describe('resolveWorktreeRoot with linked worktree .planning/', () => {
   let worktreeDir;
 
   function initBareGitRepo() {
-    const dir = normalizePath(fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-wt-main-')));
+    const dir = normalizePath(fs.mkdtempSync(path.join(os.tmpdir(), '808-wt-main-')));
     execSyncLocal('git init', { cwd: dir, stdio: 'pipe' });
     execSyncLocal('git config user.email "test@test.com"', { cwd: dir, stdio: 'pipe' });
     execSyncLocal('git config user.name "Test"', { cwd: dir, stdio: 'pipe' });
@@ -1082,7 +1082,7 @@ describe('resolveWorktreeRoot with linked worktree .planning/', () => {
     fs.mkdirSync(path.join(mainDir, '.planning'), { recursive: true });
 
     // Create a linked worktree
-    worktreeDir = normalizePath(fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-wt-linked-')));
+    worktreeDir = normalizePath(fs.mkdtempSync(path.join(os.tmpdir(), '808-wt-linked-')));
     fs.rmSync(worktreeDir, { recursive: true, force: true });
     execSyncLocal(`git worktree add "${worktreeDir}" -b test-linked`, { cwd: mainDir, stdio: 'pipe' });
 
@@ -1097,7 +1097,7 @@ describe('resolveWorktreeRoot with linked worktree .planning/', () => {
 
   test('returns main repo root when linked worktree has no .planning/', () => {
     // Create a linked worktree (no .planning/ in main or worktree)
-    worktreeDir = normalizePath(fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-wt-linked-')));
+    worktreeDir = normalizePath(fs.mkdtempSync(path.join(os.tmpdir(), '808-wt-linked-')));
     fs.rmSync(worktreeDir, { recursive: true, force: true });
     execSyncLocal(`git worktree add "${worktreeDir}" -b test-linked-no-plan`, { cwd: mainDir, stdio: 'pipe' });
 
@@ -1112,11 +1112,11 @@ describe('resolveWorktreeRoot with linked worktree .planning/', () => {
 // ─── monorepo worktree CWD preservation (#1283) ─────────────────────────────
 
 describe('monorepo worktree CWD preservation', () => {
-  const { resolveWorktreeRoot } = require('../get-shit-done/bin/lib/core.cjs');
+  const { resolveWorktreeRoot } = require('../808/bin/lib/core.cjs');
   let tmpDir;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-monorepo-wt-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), '808-monorepo-wt-'));
   });
 
   afterEach(() => {
@@ -1149,7 +1149,7 @@ describe('monorepo worktree CWD preservation', () => {
 // ─── withPlanningLock ────────────────────────────────────────────────────────
 
 describe('withPlanningLock', () => {
-  const { withPlanningLock, planningDir } = require('../get-shit-done/bin/lib/core.cjs');
+  const { withPlanningLock, planningDir } = require('../808/bin/lib/core.cjs');
   let tmpDir;
 
   beforeEach(() => {
@@ -1193,7 +1193,7 @@ describe('detectSubRepos', () => {
   let projectRoot;
 
   beforeEach(() => {
-    projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-detect-test-'));
+    projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), '808-detect-test-'));
   });
 
   afterEach(() => {
@@ -1239,7 +1239,7 @@ describe('loadConfig sub_repos auto-sync', () => {
   let projectRoot;
 
   beforeEach(() => {
-    projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-sync-test-'));
+    projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), '808-sync-test-'));
     fs.mkdirSync(path.join(projectRoot, '.planning'), { recursive: true });
   });
 
@@ -1309,7 +1309,7 @@ describe('findProjectRoot', () => {
   let projectRoot;
 
   beforeEach(() => {
-    projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'gsd-root-test-'));
+    projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), '808-root-test-'));
   });
 
   afterEach(() => {
@@ -1521,25 +1521,25 @@ describe('findProjectRoot', () => {
 // ─── reapStaleTempFiles ─────────────────────────────────────────────────────
 
 describe('reapStaleTempFiles', () => {
-  test('removes stale gsd-*.json files older than maxAgeMs', () => {
+  test('removes stale 808-*.json files older than maxAgeMs', () => {
     const tmpDir = os.tmpdir();
-    const stalePath = path.join(tmpDir, `gsd-reap-test-${Date.now()}.json`);
+    const stalePath = path.join(tmpDir, `808-reap-test-${Date.now()}.json`);
     fs.writeFileSync(stalePath, '{}');
     // Set mtime to 10 minutes ago
     const oldTime = new Date(Date.now() - 10 * 60 * 1000);
     fs.utimesSync(stalePath, oldTime, oldTime);
 
-    reapStaleTempFiles('gsd-reap-test-', { maxAgeMs: 5 * 60 * 1000 });
+    reapStaleTempFiles('808-reap-test-', { maxAgeMs: 5 * 60 * 1000 });
 
     assert.ok(!fs.existsSync(stalePath), 'stale file should be removed');
   });
 
-  test('preserves fresh gsd-*.json files', () => {
+  test('preserves fresh 808-*.json files', () => {
     const tmpDir = os.tmpdir();
-    const freshPath = path.join(tmpDir, `gsd-reap-fresh-${Date.now()}.json`);
+    const freshPath = path.join(tmpDir, `808-reap-fresh-${Date.now()}.json`);
     fs.writeFileSync(freshPath, '{}');
 
-    reapStaleTempFiles('gsd-reap-fresh-', { maxAgeMs: 5 * 60 * 1000 });
+    reapStaleTempFiles('808-reap-fresh-', { maxAgeMs: 5 * 60 * 1000 });
 
     assert.ok(fs.existsSync(freshPath), 'fresh file should be preserved');
     // Clean up
@@ -1548,20 +1548,20 @@ describe('reapStaleTempFiles', () => {
 
   test('removes stale temp directories when present', () => {
     const tmpDir = os.tmpdir();
-    const staleDir = fs.mkdtempSync(path.join(tmpDir, 'gsd-reap-dir-'));
+    const staleDir = fs.mkdtempSync(path.join(tmpDir, '808-reap-dir-'));
     fs.writeFileSync(path.join(staleDir, 'data.jsonl'), 'test');
     // Set mtime to 10 minutes ago
     const oldTime = new Date(Date.now() - 10 * 60 * 1000);
     fs.utimesSync(staleDir, oldTime, oldTime);
 
-    reapStaleTempFiles('gsd-reap-dir-', { maxAgeMs: 5 * 60 * 1000 });
+    reapStaleTempFiles('808-reap-dir-', { maxAgeMs: 5 * 60 * 1000 });
 
     assert.ok(!fs.existsSync(staleDir), 'stale directory should be removed');
   });
 
   test('does not throw on empty or missing prefix matches', () => {
     assert.doesNotThrow(() => {
-      reapStaleTempFiles('gsd-nonexistent-prefix-xyz-', { maxAgeMs: 0 });
+      reapStaleTempFiles('808-nonexistent-prefix-xyz-', { maxAgeMs: 0 });
     });
   });
 });

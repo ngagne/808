@@ -1,5 +1,5 @@
 /**
- * GSD Tools Tests - Commands
+ * 808 Tools Tests - Commands
  */
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
@@ -1058,7 +1058,7 @@ describe('resolve-model command', () => {
   });
 
   test('known agent returns model and profile without unknown_agent', () => {
-    const result = runGsdTools('resolve-model gsd-planner', tmpDir);
+    const result = runGsdTools('resolve-model 808-planner', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1077,7 +1077,7 @@ describe('resolve-model command', () => {
 
   test('default profile fallback when no config exists', () => {
     // tmpDir has no config.json, so defaults to balanced profile
-    const result = runGsdTools('resolve-model gsd-executor', tmpDir);
+    const result = runGsdTools('resolve-model 808-executor', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1192,7 +1192,7 @@ describe('commit command', () => {
       JSON.stringify({
         commit_docs: true,
         branching_strategy: 'milestone',
-        milestone_branch_template: 'gsd/{milestone}-{slug}',
+        milestone_branch_template: '808/{milestone}-{slug}',
       })
     );
     // getMilestoneInfo reads ROADMAP.md for milestone version/name
@@ -1213,7 +1213,7 @@ describe('commit command', () => {
     // Verify we're on the strategy branch
     const { execFileSync } = require('child_process');
     const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: tmpDir, encoding: 'utf-8' }).trim();
-    assert.strictEqual(branch, 'gsd/v1.0-initial-release', 'should be on milestone branch');
+    assert.strictEqual(branch, '808/v1.0-initial-release', 'should be on milestone branch');
   });
 
   test('creates strategy branch before first commit when branching_strategy is phase', () => {
@@ -1223,7 +1223,7 @@ describe('commit command', () => {
       JSON.stringify({
         commit_docs: true,
         branching_strategy: 'phase',
-        phase_branch_template: 'gsd/phase-{phase}-{slug}',
+        phase_branch_template: '808/phase-{phase}-{slug}',
       })
     );
     // Create ROADMAP.md with a phase
@@ -1248,7 +1248,7 @@ describe('commit command', () => {
     // Verify we're on the strategy branch
     const { execFileSync } = require('child_process');
     const branch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: tmpDir, encoding: 'utf-8' }).trim();
-    assert.strictEqual(branch, 'gsd/phase-01-setup', 'should be on phase branch');
+    assert.strictEqual(branch, '808/phase-01-setup', 'should be on phase branch');
   });
 });
 
@@ -1257,7 +1257,7 @@ describe('commit command', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('websearch command', () => {
-  const { cmdWebsearch } = require('../get-shit-done/bin/lib/commands.cjs');
+  const { cmdWebsearch } = require('../808/bin/lib/commands.cjs');
   let origFetch;
   let origApiKey;
   let origWriteSync;

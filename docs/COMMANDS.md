@@ -1,4 +1,4 @@
-# GSD Command Reference
+# 808 Command Reference
 
 > Complete command syntax, flags, options, and examples. For feature details, see [Feature Reference](FEATURES.md). For workflow walkthroughs, see [User Guide](USER-GUIDE.md).
 
@@ -6,15 +6,15 @@
 
 ## Command Syntax
 
-- **Claude Code / Gemini / Copilot:** `/gsd:command-name [args]`
-- **OpenCode:** `/gsd-command-name [args]`
-- **Codex:** `$gsd-command-name [args]`
+- **Claude Code / Gemini / Copilot:** `/808:command-name [args]`
+- **OpenCode:** `/808-command-name [args]`
+- **Codex:** `$808-command-name [args]`
 
 ---
 
 ## Core Workflow Commands
 
-### `/gsd:new-project`
+### `/808:new-project`
 
 Initialize a new project with deep context gathering.
 
@@ -26,13 +26,13 @@ Initialize a new project with deep context gathering.
 **Produces:** `PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`, `config.json`, `research/`, `CLAUDE.md`
 
 ```bash
-/gsd:new-project                    # Interactive mode
-/gsd:new-project --auto @prd.md     # Auto-extract from PRD
+/808:new-project                    # Interactive mode
+/808:new-project --auto @prd.md     # Auto-extract from PRD
 ```
 
 ---
 
-### `/gsd:new-workspace`
+### `/808:new-workspace`
 
 Create an isolated workspace with repo copies and independent `.planning/` directory.
 
@@ -40,39 +40,39 @@ Create an isolated workspace with repo copies and independent `.planning/` direc
 |------|-------------|
 | `--name <name>` | Workspace name (required) |
 | `--repos repo1,repo2` | Comma-separated repo paths or names |
-| `--path /target` | Target directory (default: `~/gsd-workspaces/<name>`) |
+| `--path /target` | Target directory (default: `~/808-workspaces/<name>`) |
 | `--strategy worktree\|clone` | Copy strategy (default: `worktree`) |
 | `--branch <name>` | Branch to checkout (default: `workspace/<name>`) |
 | `--auto` | Skip interactive questions |
 
 **Use cases:**
-- Multi-repo: work on a subset of repos with isolated GSD state
+- Multi-repo: work on a subset of repos with isolated 808 state
 - Feature isolation: `--repos .` creates a worktree of the current repo
 
 **Produces:** `WORKSPACE.md`, `.planning/`, repo copies (worktrees or clones)
 
 ```bash
-/gsd:new-workspace --name feature-b --repos hr-ui,ZeymoAPI
-/gsd:new-workspace --name feature-b --repos . --strategy worktree  # Same-repo isolation
-/gsd:new-workspace --name spike --repos api,web --strategy clone   # Full clones
+/808:new-workspace --name feature-b --repos hr-ui,ZeymoAPI
+/808:new-workspace --name feature-b --repos . --strategy worktree  # Same-repo isolation
+/808:new-workspace --name spike --repos api,web --strategy clone   # Full clones
 ```
 
 ---
 
-### `/gsd:list-workspaces`
+### `/808:list-workspaces`
 
-List active GSD workspaces and their status.
+List active 808 workspaces and their status.
 
-**Scans:** `~/gsd-workspaces/` for `WORKSPACE.md` manifests
-**Shows:** Name, repo count, strategy, GSD project status
+**Scans:** `~/808-workspaces/` for `WORKSPACE.md` manifests
+**Shows:** Name, repo count, strategy, 808 project status
 
 ```bash
-/gsd:list-workspaces
+/808:list-workspaces
 ```
 
 ---
 
-### `/gsd:remove-workspace`
+### `/808:remove-workspace`
 
 Remove a workspace and clean up git worktrees.
 
@@ -83,12 +83,12 @@ Remove a workspace and clean up git worktrees.
 **Safety:** Refuses removal if any repo has uncommitted changes. Requires name confirmation.
 
 ```bash
-/gsd:remove-workspace feature-b
+/808:remove-workspace feature-b
 ```
 
 ---
 
-### `/gsd:discuss-phase`
+### `/808:discuss-phase`
 
 Capture implementation decisions before planning.
 
@@ -106,15 +106,15 @@ Capture implementation decisions before planning.
 **Produces:** `{phase}-CONTEXT.md`, `{phase}-DISCUSSION-LOG.md` (audit trail)
 
 ```bash
-/gsd:discuss-phase 1                # Interactive discussion for phase 1
-/gsd:discuss-phase 3 --auto         # Auto-select defaults for phase 3
-/gsd:discuss-phase --batch          # Batch mode for current phase
-/gsd:discuss-phase 2 --analyze      # Discussion with trade-off analysis
+/808:discuss-phase 1                # Interactive discussion for phase 1
+/808:discuss-phase 3 --auto         # Auto-select defaults for phase 3
+/808:discuss-phase --batch          # Batch mode for current phase
+/808:discuss-phase 2 --analyze      # Discussion with trade-off analysis
 ```
 
 ---
 
-### `/gsd:ui-phase`
+### `/808:ui-phase`
 
 Generate UI design contract for frontend phases.
 
@@ -126,12 +126,12 @@ Generate UI design contract for frontend phases.
 **Produces:** `{phase}-UI-SPEC.md`
 
 ```bash
-/gsd:ui-phase 2                     # Design contract for phase 2
+/808:ui-phase 2                     # Design contract for phase 2
 ```
 
 ---
 
-### `/gsd:plan-phase`
+### `/808:plan-phase`
 
 Research, plan, and verify a phase.
 
@@ -153,14 +153,14 @@ Research, plan, and verify a phase.
 **Produces:** `{phase}-RESEARCH.md`, `{phase}-{N}-PLAN.md`, `{phase}-VALIDATION.md`
 
 ```bash
-/gsd:plan-phase 1                   # Research + plan + verify phase 1
-/gsd:plan-phase 3 --skip-research   # Plan without research (familiar domain)
-/gsd:plan-phase --auto              # Non-interactive planning
+/808:plan-phase 1                   # Research + plan + verify phase 1
+/808:plan-phase 3 --skip-research   # Plan without research (familiar domain)
+/808:plan-phase --auto              # Non-interactive planning
 ```
 
 ---
 
-### `/gsd:execute-phase`
+### `/808:execute-phase`
 
 Execute all plans in a phase with wave-based parallelization, or run a specific wave.
 
@@ -173,13 +173,13 @@ Execute all plans in a phase with wave-based parallelization, or run a specific 
 **Produces:** per-plan `{phase}-{N}-SUMMARY.md`, git commits, and `{phase}-VERIFICATION.md` when the phase is fully complete
 
 ```bash
-/gsd:execute-phase 1                # Execute phase 1
-/gsd:execute-phase 1 --wave 2       # Execute only Wave 2
+/808:execute-phase 1                # Execute phase 1
+/808:execute-phase 1 --wave 2       # Execute only Wave 2
 ```
 
 ---
 
-### `/gsd:verify-work`
+### `/808:verify-work`
 
 User acceptance testing with auto-diagnosis.
 
@@ -191,31 +191,31 @@ User acceptance testing with auto-diagnosis.
 **Produces:** `{phase}-UAT.md`, fix plans if issues found
 
 ```bash
-/gsd:verify-work 1                  # UAT for phase 1
+/808:verify-work 1                  # UAT for phase 1
 ```
 
 ---
 
-### `/gsd:next`
+### `/808:next`
 
 Automatically advance to the next logical workflow step. Reads project state and runs the appropriate command.
 
 **Prerequisites:** `.planning/` directory exists
 **Behavior:**
-- No project → suggests `/gsd:new-project`
-- Phase needs discussion → runs `/gsd:discuss-phase`
-- Phase needs planning → runs `/gsd:plan-phase`
-- Phase needs execution → runs `/gsd:execute-phase`
-- Phase needs verification → runs `/gsd:verify-work`
-- All phases complete → suggests `/gsd:complete-milestone`
+- No project → suggests `/808:new-project`
+- Phase needs discussion → runs `/808:discuss-phase`
+- Phase needs planning → runs `/808:plan-phase`
+- Phase needs execution → runs `/808:execute-phase`
+- Phase needs verification → runs `/808:verify-work`
+- All phases complete → suggests `/808:complete-milestone`
 
 ```bash
-/gsd:next                           # Auto-detect and run next step
+/808:next                           # Auto-detect and run next step
 ```
 
 ---
 
-### `/gsd:session-report`
+### `/808:session-report`
 
 Generate a session report with work summary, outcomes, and estimated resource usage.
 
@@ -223,7 +223,7 @@ Generate a session report with work summary, outcomes, and estimated resource us
 **Produces:** `.planning/reports/SESSION_REPORT.md`
 
 ```bash
-/gsd:session-report                 # Generate post-session summary
+/808:session-report                 # Generate post-session summary
 ```
 
 **Report includes:**
@@ -235,7 +235,7 @@ Generate a session report with work summary, outcomes, and estimated resource us
 
 ---
 
-### `/gsd:ship`
+### `/808:ship`
 
 Create PR from completed phase work with auto-generated body.
 
@@ -244,12 +244,12 @@ Create PR from completed phase work with auto-generated body.
 | `N` | No | Phase number or milestone version (e.g., `4` or `v1.0`) |
 | `--draft` | No | Create as draft PR |
 
-**Prerequisites:** Phase verified (`/gsd:verify-work` passed), `gh` CLI installed and authenticated
+**Prerequisites:** Phase verified (`/808:verify-work` passed), `gh` CLI installed and authenticated
 **Produces:** GitHub PR with rich body from planning artifacts, STATE.md updated
 
 ```bash
-/gsd:ship 4                         # Ship phase 4
-/gsd:ship 4 --draft                 # Ship as draft PR
+/808:ship 4                         # Ship phase 4
+/808:ship 4 --draft                 # Ship as draft PR
 ```
 
 **PR body includes:**
@@ -261,7 +261,7 @@ Create PR from completed phase work with auto-generated body.
 
 ---
 
-### `/gsd:ui-review`
+### `/808:ui-review`
 
 Retroactive 6-pillar visual audit of implemented frontend.
 
@@ -269,17 +269,17 @@ Retroactive 6-pillar visual audit of implemented frontend.
 |----------|----------|-------------|
 | `N` | No | Phase number (defaults to last executed phase) |
 
-**Prerequisites:** Project has frontend code (works standalone, no GSD project needed)
+**Prerequisites:** Project has frontend code (works standalone, no 808 project needed)
 **Produces:** `{phase}-UI-REVIEW.md`, screenshots in `.planning/ui-reviews/`
 
 ```bash
-/gsd:ui-review                      # Audit current phase
-/gsd:ui-review 3                    # Audit phase 3
+/808:ui-review                      # Audit current phase
+/808:ui-review 3                    # Audit phase 3
 ```
 
 ---
 
-### `/gsd:audit-uat`
+### `/808:audit-uat`
 
 Cross-phase audit of all outstanding UAT and verification items.
 
@@ -287,12 +287,12 @@ Cross-phase audit of all outstanding UAT and verification items.
 **Produces:** Categorized audit report with human test plan
 
 ```bash
-/gsd:audit-uat
+/808:audit-uat
 ```
 
 ---
 
-### `/gsd:audit-milestone`
+### `/808:audit-milestone`
 
 Verify milestone met its definition of done.
 
@@ -300,12 +300,12 @@ Verify milestone met its definition of done.
 **Produces:** Audit report with gap analysis
 
 ```bash
-/gsd:audit-milestone
+/808:audit-milestone
 ```
 
 ---
 
-### `/gsd:complete-milestone`
+### `/808:complete-milestone`
 
 Archive milestone, tag release.
 
@@ -313,12 +313,12 @@ Archive milestone, tag release.
 **Produces:** `MILESTONES.md` entry, git tag
 
 ```bash
-/gsd:complete-milestone
+/808:complete-milestone
 ```
 
 ---
 
-### `/gsd:milestone-summary`
+### `/808:milestone-summary`
 
 Generate comprehensive project summary from milestone artifacts for team onboarding and review.
 
@@ -338,13 +338,13 @@ Generate comprehensive project summary from milestone artifacts for team onboard
 - Interactive Q&A offered after generation
 
 ```bash
-/gsd:milestone-summary                # Summarize current milestone
-/gsd:milestone-summary v1.0           # Summarize specific milestone
+/808:milestone-summary                # Summarize current milestone
+/808:milestone-summary v1.0           # Summarize specific milestone
 ```
 
 ---
 
-### `/gsd:new-milestone`
+### `/808:new-milestone`
 
 Start next version cycle.
 
@@ -357,24 +357,24 @@ Start next version cycle.
 **Produces:** Updated `PROJECT.md`, new `REQUIREMENTS.md`, new `ROADMAP.md`
 
 ```bash
-/gsd:new-milestone                  # Interactive
-/gsd:new-milestone "v2.0 Mobile"    # Named milestone
-/gsd:new-milestone --reset-phase-numbers "v2.0 Mobile"  # Restart milestone numbering at 1
+/808:new-milestone                  # Interactive
+/808:new-milestone "v2.0 Mobile"    # Named milestone
+/808:new-milestone --reset-phase-numbers "v2.0 Mobile"  # Restart milestone numbering at 1
 ```
 
 ---
 
 ## Phase Management Commands
 
-### `/gsd:add-phase`
+### `/808:add-phase`
 
 Append new phase to roadmap.
 
 ```bash
-/gsd:add-phase                      # Interactive — describe the phase
+/808:add-phase                      # Interactive — describe the phase
 ```
 
-### `/gsd:insert-phase`
+### `/808:insert-phase`
 
 Insert urgent work between phases using decimal numbering.
 
@@ -383,10 +383,10 @@ Insert urgent work between phases using decimal numbering.
 | `N` | No | Insert after this phase number |
 
 ```bash
-/gsd:insert-phase 3                 # Insert between phase 3 and 4 → creates 3.1
+/808:insert-phase 3                 # Insert between phase 3 and 4 → creates 3.1
 ```
 
-### `/gsd:remove-phase`
+### `/808:remove-phase`
 
 Remove future phase and renumber subsequent phases.
 
@@ -395,10 +395,10 @@ Remove future phase and renumber subsequent phases.
 | `N` | No | Phase number to remove |
 
 ```bash
-/gsd:remove-phase 7                 # Remove phase 7, renumber 8→7, 9→8, etc.
+/808:remove-phase 7                 # Remove phase 7, renumber 8→7, 9→8, etc.
 ```
 
-### `/gsd:list-phase-assumptions`
+### `/808:list-phase-assumptions`
 
 Preview Claude's intended approach before planning.
 
@@ -407,30 +407,30 @@ Preview Claude's intended approach before planning.
 | `N` | No | Phase number |
 
 ```bash
-/gsd:list-phase-assumptions 2       # See assumptions for phase 2
+/808:list-phase-assumptions 2       # See assumptions for phase 2
 ```
 
-### `/gsd:plan-milestone-gaps`
+### `/808:plan-milestone-gaps`
 
 Create phases to close gaps from milestone audit.
 
 ```bash
-/gsd:plan-milestone-gaps             # Creates phases for each audit gap
+/808:plan-milestone-gaps             # Creates phases for each audit gap
 ```
 
-### `/gsd:research-phase`
+### `/808:research-phase`
 
-Deep ecosystem research only (standalone — usually use `/gsd:plan-phase` instead).
+Deep ecosystem research only (standalone — usually use `/808:plan-phase` instead).
 
 | Argument | Required | Description |
 |----------|----------|-------------|
 | `N` | No | Phase number |
 
 ```bash
-/gsd:research-phase 4               # Research phase 4 domain
+/808:research-phase 4               # Research phase 4 domain
 ```
 
-### `/gsd:validate-phase`
+### `/808:validate-phase`
 
 Retroactively audit and fill Nyquist validation gaps.
 
@@ -439,38 +439,38 @@ Retroactively audit and fill Nyquist validation gaps.
 | `N` | No | Phase number |
 
 ```bash
-/gsd:validate-phase 2               # Audit test coverage for phase 2
+/808:validate-phase 2               # Audit test coverage for phase 2
 ```
 
 ---
 
 ## Navigation Commands
 
-### `/gsd:progress`
+### `/808:progress`
 
 Show status and next steps.
 
 ```bash
-/gsd:progress                       # "Where am I? What's next?"
+/808:progress                       # "Where am I? What's next?"
 ```
 
-### `/gsd:resume-work`
+### `/808:resume-work`
 
 Restore full context from last session.
 
 ```bash
-/gsd:resume-work                    # After context reset or new session
+/808:resume-work                    # After context reset or new session
 ```
 
-### `/gsd:pause-work`
+### `/808:pause-work`
 
 Save context handoff when stopping mid-phase.
 
 ```bash
-/gsd:pause-work                     # Creates continue-here.md
+/808:pause-work                     # Creates continue-here.md
 ```
 
-### `/gsd:manager`
+### `/808:manager`
 
 Interactive command center for managing multiple phases from one terminal.
 
@@ -482,26 +482,26 @@ Interactive command center for managing multiple phases from one terminal.
 - Designed for power users parallelizing work across phases from one terminal
 
 ```bash
-/gsd:manager                        # Open command center dashboard
+/808:manager                        # Open command center dashboard
 ```
 
 ---
 
-### `/gsd:help`
+### `/808:help`
 
 Show all commands and usage guide.
 
 ```bash
-/gsd:help                           # Quick reference
+/808:help                           # Quick reference
 ```
 
 ---
 
 ## Utility Commands
 
-### `/gsd:quick`
+### `/808:quick`
 
-Execute ad-hoc task with GSD guarantees.
+Execute ad-hoc task with 808 guarantees.
 
 | Flag | Description |
 |------|-------------|
@@ -512,13 +512,13 @@ Execute ad-hoc task with GSD guarantees.
 Flags are composable.
 
 ```bash
-/gsd:quick                          # Basic quick task
-/gsd:quick --discuss --research     # Discussion + research + planning
-/gsd:quick --full                   # With plan checking and verification
-/gsd:quick --discuss --research --full  # All optional stages
+/808:quick                          # Basic quick task
+/808:quick --discuss --research     # Discussion + research + planning
+/808:quick --full                   # With plan checking and verification
+/808:quick --discuss --research --full  # All optional stages
 ```
 
-### `/gsd:autonomous`
+### `/808:autonomous`
 
 Run all remaining phases autonomously.
 
@@ -527,19 +527,19 @@ Run all remaining phases autonomously.
 | `--from N` | Start from a specific phase number |
 
 ```bash
-/gsd:autonomous                     # Run all remaining phases
-/gsd:autonomous --from 3            # Start from phase 3
+/808:autonomous                     # Run all remaining phases
+/808:autonomous --from 3            # Start from phase 3
 ```
 
-### `/gsd:do`
+### `/808:do`
 
-Route freeform text to the right GSD command.
+Route freeform text to the right 808 command.
 
 ```bash
-/gsd:do                             # Then describe what you want
+/808:do                             # Then describe what you want
 ```
 
-### `/gsd:note`
+### `/808:note`
 
 Zero-friction idea capture — append, list, or promote notes to todos.
 
@@ -554,12 +554,12 @@ Zero-friction idea capture — append, list, or promote notes to todos.
 | `--global` | Use global scope for note operations |
 
 ```bash
-/gsd:note "Consider caching strategy for API responses"
-/gsd:note list
-/gsd:note promote 3
+/808:note "Consider caching strategy for API responses"
+/808:note list
+/808:note promote 3
 ```
 
-### `/gsd:debug`
+### `/808:debug`
 
 Systematic debugging with persistent state.
 
@@ -568,10 +568,10 @@ Systematic debugging with persistent state.
 | `description` | No | Description of the bug |
 
 ```bash
-/gsd:debug "Login button not responding on mobile Safari"
+/808:debug "Login button not responding on mobile Safari"
 ```
 
-### `/gsd:add-todo`
+### `/808:add-todo`
 
 Capture idea or task for later.
 
@@ -580,18 +580,18 @@ Capture idea or task for later.
 | `description` | No | Todo description |
 
 ```bash
-/gsd:add-todo "Consider adding dark mode support"
+/808:add-todo "Consider adding dark mode support"
 ```
 
-### `/gsd:check-todos`
+### `/808:check-todos`
 
 List pending todos and select one to work on.
 
 ```bash
-/gsd:check-todos
+/808:check-todos
 ```
 
-### `/gsd:add-tests`
+### `/808:add-tests`
 
 Generate tests for a completed phase.
 
@@ -600,18 +600,18 @@ Generate tests for a completed phase.
 | `N` | No | Phase number |
 
 ```bash
-/gsd:add-tests 2                    # Generate tests for phase 2
+/808:add-tests 2                    # Generate tests for phase 2
 ```
 
-### `/gsd:stats`
+### `/808:stats`
 
 Display project statistics.
 
 ```bash
-/gsd:stats                          # Project metrics dashboard
+/808:stats                          # Project metrics dashboard
 ```
 
-### `/gsd:profile-user`
+### `/808:profile-user`
 
 Generate a developer behavioral profile from Claude Code session analysis across 8 dimensions (communication style, decision patterns, debugging approach, UX preferences, vendor choices, frustration triggers, learning style, explanation depth). Produces artifacts that personalize Claude's responses.
 
@@ -622,16 +622,16 @@ Generate a developer behavioral profile from Claude Code session analysis across
 
 **Generated artifacts:**
 - `USER-PROFILE.md` — Full behavioral profile
-- `/gsd:dev-preferences` command — Load preferences in any session
+- `/808:dev-preferences` command — Load preferences in any session
 - `CLAUDE.md` profile section — Auto-discovered by Claude Code
 
 ```bash
-/gsd:profile-user                   # Analyze sessions and build profile
-/gsd:profile-user --questionnaire   # Interactive questionnaire fallback
-/gsd:profile-user --refresh         # Re-generate from fresh analysis
+/808:profile-user                   # Analyze sessions and build profile
+/808:profile-user --questionnaire   # Interactive questionnaire fallback
+/808:profile-user --refresh         # Re-generate from fresh analysis
 ```
 
-### `/gsd:health`
+### `/808:health`
 
 Validate `.planning/` directory integrity.
 
@@ -640,25 +640,25 @@ Validate `.planning/` directory integrity.
 | `--repair` | Auto-fix recoverable issues |
 
 ```bash
-/gsd:health                         # Check integrity
-/gsd:health --repair                # Check and fix
+/808:health                         # Check integrity
+/808:health --repair                # Check and fix
 ```
 
-### `/gsd:cleanup`
+### `/808:cleanup`
 
 Archive accumulated phase directories from completed milestones.
 
 ```bash
-/gsd:cleanup
+/808:cleanup
 ```
 
 ---
 
 ## Diagnostics Commands
 
-### `/gsd:forensics`
+### `/808:forensics`
 
-Post-mortem investigation of failed or stuck GSD workflows.
+Post-mortem investigation of failed or stuck 808 workflows.
 
 | Argument | Required | Description |
 |----------|----------|-------------|
@@ -676,15 +676,15 @@ Post-mortem investigation of failed or stuck GSD workflows.
 - GitHub issue creation offered if actionable findings exist
 
 ```bash
-/gsd:forensics                              # Interactive — prompted for problem
-/gsd:forensics "Phase 3 execution stalled"  # With problem description
+/808:forensics                              # Interactive — prompted for problem
+/808:forensics "Phase 3 execution stalled"  # With problem description
 ```
 
 ---
 
 ## Workstream Management
 
-### `/gsd:workstreams`
+### `/808:workstreams`
 
 Manage parallel workstreams for concurrent work on different milestone areas.
 
@@ -700,32 +700,32 @@ Manage parallel workstreams for concurrent work on different milestone areas.
 | `complete <name>` | Archive a completed workstream |
 | `resume <name>` | Resume work in a workstream |
 
-**Prerequisites:** Active GSD project
+**Prerequisites:** Active 808 project
 **Produces:** Workstream directories under `.planning/`, state tracking per workstream
 
 ```bash
-/gsd:workstreams                    # List all workstreams
-/gsd:workstreams create backend-api # Create new workstream
-/gsd:workstreams switch backend-api # Set active workstream
-/gsd:workstreams status backend-api # Detailed status
-/gsd:workstreams progress           # Cross-workstream progress overview
-/gsd:workstreams complete backend-api  # Archive completed workstream
-/gsd:workstreams resume backend-api    # Resume work in workstream
+/808:workstreams                    # List all workstreams
+/808:workstreams create backend-api # Create new workstream
+/808:workstreams switch backend-api # Set active workstream
+/808:workstreams status backend-api # Detailed status
+/808:workstreams progress           # Cross-workstream progress overview
+/808:workstreams complete backend-api  # Archive completed workstream
+/808:workstreams resume backend-api    # Resume work in workstream
 ```
 
 ---
 
 ## Configuration Commands
 
-### `/gsd:settings`
+### `/808:settings`
 
 Interactive configuration of workflow toggles and model profile.
 
 ```bash
-/gsd:settings                       # Interactive config
+/808:settings                       # Interactive config
 ```
 
-### `/gsd:set-profile`
+### `/808:set-profile`
 
 Quick profile switch.
 
@@ -734,15 +734,15 @@ Quick profile switch.
 | `profile` | **Yes** | `quality`, `balanced`, `budget`, or `inherit` |
 
 ```bash
-/gsd:set-profile budget             # Switch to budget profile
-/gsd:set-profile quality            # Switch to quality profile
+/808:set-profile budget             # Switch to budget profile
+/808:set-profile quality            # Switch to quality profile
 ```
 
 ---
 
 ## Brownfield Commands
 
-### `/gsd:map-codebase`
+### `/808:map-codebase`
 
 Analyze existing codebase with parallel mapper agents.
 
@@ -751,35 +751,35 @@ Analyze existing codebase with parallel mapper agents.
 | `area` | No | Scope mapping to a specific area |
 
 ```bash
-/gsd:map-codebase                   # Full codebase analysis
-/gsd:map-codebase auth              # Focus on auth area
+/808:map-codebase                   # Full codebase analysis
+/808:map-codebase auth              # Focus on auth area
 ```
 
 ---
 
 ## Update Commands
 
-### `/gsd:update`
+### `/808:update`
 
-Update GSD with changelog preview.
+Update 808 with changelog preview.
 
 ```bash
-/gsd:update                         # Check for updates and install
+/808:update                         # Check for updates and install
 ```
 
-### `/gsd:reapply-patches`
+### `/808:reapply-patches`
 
-Restore local modifications after a GSD update.
+Restore local modifications after a 808 update.
 
 ```bash
-/gsd:reapply-patches                # Merge back local changes
+/808:reapply-patches                # Merge back local changes
 ```
 
 ---
 
 ## Fast & Inline Commands
 
-### `/gsd:fast`
+### `/808:fast`
 
 Execute a trivial task inline — no subagents, no planning overhead. For typo fixes, config changes, small refactors, forgotten commits.
 
@@ -787,18 +787,18 @@ Execute a trivial task inline — no subagents, no planning overhead. For typo f
 |----------|----------|-------------|
 | `task description` | No | What to do (prompted if omitted) |
 
-**Not a replacement for `/gsd:quick`** — use `/gsd:quick` for anything needing research, multi-step planning, or verification.
+**Not a replacement for `/808:quick`** — use `/808:quick` for anything needing research, multi-step planning, or verification.
 
 ```bash
-/gsd:fast "fix typo in README"
-/gsd:fast "add .env to gitignore"
+/808:fast "fix typo in README"
+/808:fast "add .env to gitignore"
 ```
 
 ---
 
 ## Code Quality Commands
 
-### `/gsd:review`
+### `/808:review`
 
 Cross-AI peer review of phase plans from external AI CLIs.
 
@@ -813,16 +813,16 @@ Cross-AI peer review of phase plans from external AI CLIs.
 | `--codex` | Include Codex CLI review |
 | `--all` | Include all available CLIs |
 
-**Produces:** `{phase}-REVIEWS.md` — consumable by `/gsd:plan-phase --reviews`
+**Produces:** `{phase}-REVIEWS.md` — consumable by `/808:plan-phase --reviews`
 
 ```bash
-/gsd:review --phase 3 --all
-/gsd:review --phase 2 --gemini
+/808:review --phase 3 --all
+/808:review --phase 2 --gemini
 ```
 
 ---
 
-### `/gsd:pr-branch`
+### `/808:pr-branch`
 
 Create a clean PR branch by filtering out `.planning/` commits.
 
@@ -830,16 +830,16 @@ Create a clean PR branch by filtering out `.planning/` commits.
 |----------|----------|-------------|
 | `target branch` | No | Base branch (default: `main`) |
 
-**Purpose:** Reviewers see only code changes, not GSD planning artifacts.
+**Purpose:** Reviewers see only code changes, not 808 planning artifacts.
 
 ```bash
-/gsd:pr-branch                     # Filter against main
-/gsd:pr-branch develop             # Filter against develop
+/808:pr-branch                     # Filter against main
+/808:pr-branch develop             # Filter against develop
 ```
 
 ---
 
-### `/gsd:audit-uat`
+### `/808:audit-uat`
 
 Cross-phase audit of all outstanding UAT and verification items.
 
@@ -847,14 +847,14 @@ Cross-phase audit of all outstanding UAT and verification items.
 **Produces:** Categorized audit report with human test plan
 
 ```bash
-/gsd:audit-uat
+/808:audit-uat
 ```
 
 ---
 
 ## Backlog & Thread Commands
 
-### `/gsd:add-backlog`
+### `/808:add-backlog`
 
 Add an idea to the backlog parking lot using 999.x numbering.
 
@@ -862,28 +862,28 @@ Add an idea to the backlog parking lot using 999.x numbering.
 |----------|----------|-------------|
 | `description` | **Yes** | Backlog item description |
 
-**999.x numbering** keeps backlog items outside the active phase sequence. Phase directories are created immediately so `/gsd:discuss-phase` and `/gsd:plan-phase` work on them.
+**999.x numbering** keeps backlog items outside the active phase sequence. Phase directories are created immediately so `/808:discuss-phase` and `/808:plan-phase` work on them.
 
 ```bash
-/gsd:add-backlog "GraphQL API layer"
-/gsd:add-backlog "Mobile responsive redesign"
+/808:add-backlog "GraphQL API layer"
+/808:add-backlog "Mobile responsive redesign"
 ```
 
 ---
 
-### `/gsd:review-backlog`
+### `/808:review-backlog`
 
 Review and promote backlog items to active milestone.
 
 **Actions per item:** Promote (move to active sequence), Keep (leave in backlog), Remove (delete).
 
 ```bash
-/gsd:review-backlog
+/808:review-backlog
 ```
 
 ---
 
-### `/gsd:plant-seed`
+### `/808:plant-seed`
 
 Capture a forward-looking idea with trigger conditions — surfaces automatically at the right milestone.
 
@@ -894,15 +894,15 @@ Capture a forward-looking idea with trigger conditions — surfaces automaticall
 Seeds solve context rot: instead of a one-liner in Deferred that nobody reads, a seed preserves the full WHY, WHEN to surface, and breadcrumbs to details.
 
 **Produces:** `.planning/seeds/SEED-NNN-slug.md`
-**Consumed by:** `/gsd:new-milestone` (scans seeds and presents matches)
+**Consumed by:** `/808:new-milestone` (scans seeds and presents matches)
 
 ```bash
-/gsd:plant-seed "Add real-time collaboration when WebSocket infra is in place"
+/808:plant-seed "Add real-time collaboration when WebSocket infra is in place"
 ```
 
 ---
 
-### `/gsd:thread`
+### `/808:thread`
 
 Manage persistent context threads for cross-session work.
 
@@ -912,22 +912,22 @@ Manage persistent context threads for cross-session work.
 | `name` | — | Resume existing thread by name |
 | `description` | — | Create new thread |
 
-Threads are lightweight cross-session knowledge stores for work that spans multiple sessions but doesn't belong to any specific phase. Lighter weight than `/gsd:pause-work`.
+Threads are lightweight cross-session knowledge stores for work that spans multiple sessions but doesn't belong to any specific phase. Lighter weight than `/808:pause-work`.
 
 ```bash
-/gsd:thread                         # List all threads
-/gsd:thread fix-deploy-key-auth     # Resume thread
-/gsd:thread "Investigate TCP timeout in pasta service"  # Create new
+/808:thread                         # List all threads
+/808:thread fix-deploy-key-auth     # Resume thread
+/808:thread "Investigate TCP timeout in pasta service"  # Create new
 ```
 
 ---
 
 ## Community Commands
 
-### `/gsd:join-discord`
+### `/808:join-discord`
 
 Open Discord community invite.
 
 ```bash
-/gsd:join-discord
+/808:join-discord
 ```

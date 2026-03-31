@@ -1,5 +1,5 @@
 /**
- * GSD Tools Tests - Phase
+ * 808 Tools Tests - Phase
  */
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
@@ -536,7 +536,7 @@ Output: Chat component, API endpoints.
 </objective>
 
 <execution_context>
-@~/.claude/get-shit-done/workflows/execute-plan.md
+@~/.claude/808/workflows/execute-plan.md
 </execution_context>
 
 <context>
@@ -1539,7 +1539,7 @@ describe('phase complete command', () => {
 // comparePhaseNum and normalizePhaseName (imported directly)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const { comparePhaseNum, normalizePhaseName } = require('../get-shit-done/bin/lib/core.cjs');
+const { comparePhaseNum, normalizePhaseName } = require('../808/bin/lib/core.cjs');
 
 describe('comparePhaseNum', () => {
   test('sorts integer phases numerically', () => {

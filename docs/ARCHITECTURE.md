@@ -1,4 +1,4 @@
-# GSD Architecture
+# 808 Architecture
 
 > System architecture for contributors and advanced users. For user-facing documentation, see [Feature Reference](FEATURES.md) or [User Guide](USER-GUIDE.md).
 
@@ -21,7 +21,7 @@
 
 ## System Overview
 
-GSD is a **meta-prompting framework** that sits between the user and AI coding agents (Claude Code, Gemini CLI, OpenCode, Codex, Copilot, Antigravity). It provides:
+808 is a **meta-prompting framework** that sits between the user and AI coding agents (Claude Code, Gemini CLI, OpenCode, Codex, Copilot, Antigravity). It provides:
 
 1. **Context engineering** — Structured artifacts that give the AI everything it needs per task
 2. **Multi-agent orchestration** — Thin orchestrators that spawn specialized agents with fresh context windows
@@ -31,18 +31,18 @@ GSD is a **meta-prompting framework** that sits between the user and AI coding a
 ```
 ┌──────────────────────────────────────────────────────┐
 │                      USER                            │
-│            /gsd:command [args]                        │
+│            /808:command [args]                        │
 └─────────────────────┬────────────────────────────────┘
                       │
 ┌─────────────────────▼────────────────────────────────┐
 │              COMMAND LAYER                            │
-│   commands/gsd/*.md — Prompt-based command files      │
+│   commands/808/*.md — Prompt-based command files      │
 │   (Claude Code custom commands / Codex skills)        │
 └─────────────────────┬────────────────────────────────┘
                       │
 ┌─────────────────────▼────────────────────────────────┐
 │              WORKFLOW LAYER                           │
-│   get-shit-done/workflows/*.md — Orchestration logic  │
+│   808/workflows/*.md — Orchestration logic  │
 │   (Reads references, spawns agents, manages state)    │
 └──────┬──────────────┬─────────────────┬──────────────┘
        │              │                 │
@@ -54,7 +54,7 @@ GSD is a **meta-prompting framework** that sits between the user and AI coding a
        │              │                 │
 ┌──────▼──────────────▼─────────────────▼──────────────┐
 │              CLI TOOLS LAYER                          │
-│   get-shit-done/bin/gsd-tools.cjs                     │
+│   808/bin/808-tools.cjs                     │
 │   (State, config, phase, roadmap, verify, templates)  │
 └──────────────────────┬───────────────────────────────┘
                        │
@@ -75,8 +75,8 @@ Every agent spawned by an orchestrator gets a clean context window (up to 200K t
 
 ### 2. Thin Orchestrators
 
-Workflow files (`get-shit-done/workflows/*.md`) never do heavy lifting. They:
-- Load context via `gsd-tools.cjs init <workflow>`
+Workflow files (`808/workflows/*.md`) never do heavy lifting. They:
+- Load context via `808-tools.cjs init <workflow>`
 - Spawn specialized agents with focused prompts
 - Collect results and route to the next step
 - Update state between steps
@@ -104,21 +104,21 @@ Multiple layers prevent common failure modes:
 
 ## Component Architecture
 
-### Commands (`commands/gsd/*.md`)
+### Commands (`commands/808/*.md`)
 
 User-facing entry points. Each file contains YAML frontmatter (name, description, allowed-tools) and a prompt body that bootstraps the workflow. Commands are installed as:
-- **Claude Code:** Custom slash commands (`/gsd:command-name`)
-- **OpenCode:** Slash commands (`/gsd-command-name`)
-- **Codex:** Skills (`$gsd-command-name`)
-- **Copilot:** Slash commands (`/gsd:command-name`)
+- **Claude Code:** Custom slash commands (`/808:command-name`)
+- **OpenCode:** Slash commands (`/808-command-name`)
+- **Codex:** Skills (`$808-command-name`)
+- **Copilot:** Slash commands (`/808:command-name`)
 - **Antigravity:** Skills
 
 **Total commands:** 44
 
-### Workflows (`get-shit-done/workflows/*.md`)
+### Workflows (`808/workflows/*.md`)
 
 Orchestration logic that commands reference. Contains the step-by-step process including:
-- Context loading via `gsd-tools.cjs init`
+- Context loading via `808-tools.cjs init`
 - Agent spawn instructions with model resolution
 - Gate/checkpoint definitions
 - State update patterns
@@ -136,7 +136,7 @@ Specialized agent definitions with frontmatter specifying:
 
 **Total agents:** 16
 
-### References (`get-shit-done/references/*.md`)
+### References (`808/references/*.md`)
 
 Shared knowledge documents that workflows and agents `@-reference`:
 - `checkpoints.md` — Checkpoint type definitions and interaction patterns
@@ -148,9 +148,9 @@ Shared knowledge documents that workflows and agents `@-reference`:
 - `tdd.md` — Test-driven development integration patterns
 - `ui-brand.md` — Visual output formatting patterns
 
-### Templates (`get-shit-done/templates/`)
+### Templates (`808/templates/`)
 
-Markdown templates for all planning artifacts. Used by `gsd-tools.cjs template fill` and `scaffold` commands to create pre-structured files:
+Markdown templates for all planning artifacts. Used by `808-tools.cjs template fill` and `scaffold` commands to create pre-structured files:
 - `project.md`, `requirements.md`, `roadmap.md`, `state.md` — Core project files
 - `phase-prompt.md` — Phase execution prompt template
 - `summary.md` (+ `summary-minimal.md`, `summary-standard.md`, `summary-complex.md`) — Granularity-aware summary templates
@@ -166,15 +166,15 @@ Runtime hooks that integrate with the host AI agent:
 
 | Hook | Event | Purpose |
 |------|-------|---------|
-| `gsd-statusline.js` | `statusLine` | Displays model, task, directory, and context usage bar |
-| `gsd-context-monitor.js` | `PostToolUse` / `AfterTool` | Injects agent-facing context warnings at 35%/25% remaining |
-| `gsd-check-update.js` | `SessionStart` | Background check for new GSD versions |
-| `gsd-prompt-guard.js` | `PreToolUse` | Scans `.planning/` writes for prompt injection patterns (advisory) |
-| `gsd-workflow-guard.js` | `PreToolUse` | Detects file edits outside GSD workflow context (advisory, opt-in via `hooks.workflow_guard`) |
+| `808-statusline.js` | `statusLine` | Displays model, task, directory, and context usage bar |
+| `808-context-monitor.js` | `PostToolUse` / `AfterTool` | Injects agent-facing context warnings at 35%/25% remaining |
+| `808-check-update.js` | `SessionStart` | Background check for new 808 versions |
+| `808-prompt-guard.js` | `PreToolUse` | Scans `.planning/` writes for prompt injection patterns (advisory) |
+| `808-workflow-guard.js` | `PreToolUse` | Detects file edits outside 808 workflow context (advisory, opt-in via `hooks.workflow_guard`) |
 
-### CLI Tools (`get-shit-done/bin/`)
+### CLI Tools (`808/bin/`)
 
-Node.js CLI utility (`gsd-tools.cjs`) with 17 domain modules:
+Node.js CLI utility (`808-tools.cjs`) with 17 domain modules:
 
 | Module | Responsibility |
 |--------|---------------|
@@ -202,10 +202,10 @@ Node.js CLI utility (`gsd-tools.cjs`) with 17 domain modules:
 ```
 Orchestrator (workflow .md)
     │
-    ├── Load context: gsd-tools.cjs init <workflow> <phase>
+    ├── Load context: 808-tools.cjs init <workflow> <phase>
     │   Returns JSON with: project info, config, state, phase details
     │
-    ├── Resolve model: gsd-tools.cjs resolve-model <agent-name>
+    ├── Resolve model: 808-tools.cjs resolve-model <agent-name>
     │   Returns: opus | sonnet | haiku | inherit
     │
     ├── Spawn Agent (Task/SubAgent call)
@@ -216,22 +216,22 @@ Orchestrator (workflow .md)
     │
     ├── Collect result
     │
-    └── Update state: gsd-tools.cjs state update/patch/advance-plan
+    └── Update state: 808-tools.cjs state update/patch/advance-plan
 ```
 
 ### Agent Spawn Categories
 
 | Category | Agents | Parallelism |
 |----------|--------|-------------|
-| **Researchers** | gsd-project-researcher, gsd-phase-researcher, gsd-ui-researcher, gsd-advisor-researcher | 4 parallel (stack, features, architecture, pitfalls); advisor spawns during discuss-phase |
-| **Synthesizers** | gsd-research-synthesizer | Sequential (after researchers complete) |
-| **Planners** | gsd-planner, gsd-roadmapper | Sequential |
-| **Checkers** | gsd-plan-checker, gsd-integration-checker, gsd-ui-checker, gsd-nyquist-auditor | Sequential (verification loop, max 3 iterations) |
-| **Executors** | gsd-executor | Parallel within waves, sequential across waves |
-| **Verifiers** | gsd-verifier | Sequential (after all executors complete) |
-| **Mappers** | gsd-codebase-mapper | 4 parallel (tech, arch, quality, concerns) |
-| **Debuggers** | gsd-debugger | Sequential (interactive) |
-| **Auditors** | gsd-ui-auditor | Sequential |
+| **Researchers** | 808-project-researcher, 808-phase-researcher, 808-ui-researcher, 808-advisor-researcher | 4 parallel (stack, features, architecture, pitfalls); advisor spawns during discuss-phase |
+| **Synthesizers** | 808-research-synthesizer | Sequential (after researchers complete) |
+| **Planners** | 808-planner, 808-roadmapper | Sequential |
+| **Checkers** | 808-plan-checker, 808-integration-checker, 808-ui-checker, 808-nyquist-auditor | Sequential (verification loop, max 3 iterations) |
+| **Executors** | 808-executor | Parallel within waves, sequential across waves |
+| **Verifiers** | 808-verifier | Sequential (after all executors complete) |
+| **Mappers** | 808-codebase-mapper | 4 parallel (tech, arch, quality, concerns) |
+| **Debuggers** | 808-debugger | Sequential (interactive) |
+| **Auditors** | 808-ui-auditor | Sequential |
 
 ### Wave Execution Model
 
@@ -344,18 +344,18 @@ UI-SPEC.md (per phase) ───────────────────
 
 ```
 ~/.claude/                          # Claude Code (global install)
-├── commands/gsd/*.md               # 37 slash commands
-├── get-shit-done/
-│   ├── bin/gsd-tools.cjs           # CLI utility
+├── commands/808/*.md               # 37 slash commands
+├── 808/
+│   ├── bin/808-tools.cjs           # CLI utility
 │   ├── bin/lib/*.cjs               # 15 domain modules
 │   ├── workflows/*.md              # 42 workflow definitions
 │   ├── references/*.md             # 13 shared reference docs
 │   └── templates/                  # Planning artifact templates
 ├── agents/*.md                     # 15 agent definitions
 ├── hooks/
-│   ├── gsd-statusline.js           # Statusline hook
-│   ├── gsd-context-monitor.js      # Context warning hook
-│   └── gsd-check-update.js         # Update check hook
+│   ├── 808-statusline.js           # Statusline hook
+│   ├── 808-context-monitor.js      # Context warning hook
+│   └── 808-check-update.js         # Update check hook
 ├── settings.json                   # Hook registrations
 └── VERSION                         # Installed version number
 ```
@@ -377,13 +377,13 @@ Equivalent paths for other runtimes:
 ├── STATE.md                # Living memory: position, decisions, blockers, metrics
 ├── config.json             # Workflow configuration
 ├── MILESTONES.md           # Completed milestone archive
-├── research/               # Domain research from /gsd:new-project
+├── research/               # Domain research from /808:new-project
 │   ├── SUMMARY.md
 │   ├── STACK.md
 │   ├── FEATURES.md
 │   ├── ARCHITECTURE.md
 │   └── PITFALLS.md
-├── codebase/               # Brownfield mapping (from /gsd:map-codebase)
+├── codebase/               # Brownfield mapping (from /808:map-codebase)
 │   ├── STACK.md
 │   ├── ARCHITECTURE.md
 │   ├── CONVENTIONS.md
@@ -409,13 +409,13 @@ Equivalent paths for other runtimes:
 ├── todos/
 │   ├── pending/            # Captured ideas
 │   └── done/               # Completed todos
-├── threads/               # Persistent context threads (from /gsd:thread)
-├── seeds/                 # Forward-looking ideas (from /gsd:plant-seed)
+├── threads/               # Persistent context threads (from /808:thread)
+├── seeds/                 # Forward-looking ideas (from /808:plant-seed)
 ├── debug/                  # Active debug sessions
 │   ├── *.md                # Active sessions
 │   ├── resolved/           # Archived sessions
 │   └── knowledge-base.md   # Persistent debug learnings
-├── ui-reviews/             # Screenshots from /gsd:ui-review (gitignored)
+├── ui-reviews/             # Screenshots from /808:ui-review (gitignored)
 └── continue-here.md        # Context handoff (from pause-work)
 ```
 
@@ -437,9 +437,9 @@ The installer (`bin/install.js`, ~3,000 lines) handles:
    - Antigravity: Skills-first with Google model equivalents
 5. **Path normalization** — Replaces `~/.claude/` paths with runtime-specific paths
 6. **Settings integration** — Registers hooks in runtime's `settings.json`
-7. **Patch backup** — Since v1.17, backs up locally modified files to `gsd-local-patches/` for `/gsd:reapply-patches`
-8. **Manifest tracking** — Writes `gsd-file-manifest.json` for clean uninstall
-9. **Uninstall mode** — `--uninstall` removes all GSD files, hooks, and settings
+7. **Patch backup** — Since v1.17, backs up locally modified files to `808-local-patches/` for `/808:reapply-patches`
+8. **Manifest tracking** — Writes `808-file-manifest.json` for clean uninstall
+9. **Uninstall mode** — `--uninstall` removes all 808 files, hooks, and settings
 
 ### Platform Handling
 
@@ -456,17 +456,17 @@ The installer (`bin/install.js`, ~3,000 lines) handles:
 ```
 Runtime Engine (Claude Code / Gemini CLI)
     │
-    ├── statusLine event ──► gsd-statusline.js
+    ├── statusLine event ──► 808-statusline.js
     │   Reads: stdin (session JSON)
     │   Writes: stdout (formatted status), /tmp/claude-ctx-{session}.json (bridge)
     │
-    ├── PostToolUse/AfterTool event ──► gsd-context-monitor.js
+    ├── PostToolUse/AfterTool event ──► 808-context-monitor.js
     │   Reads: stdin (tool event JSON), /tmp/claude-ctx-{session}.json (bridge)
     │   Writes: stdout (hookSpecificOutput with additionalContext warning)
     │
-    └── SessionStart event ──► gsd-check-update.js
+    └── SessionStart event ──► 808-check-update.js
         Reads: VERSION file
-        Writes: ~/.claude/cache/gsd-update-check.json (spawns background process)
+        Writes: ~/.claude/cache/808-update-check.json (spawns background process)
 ```
 
 ### Context Monitor Thresholds
@@ -489,31 +489,31 @@ Debounce: 5 tool uses between repeated warnings. Severity escalation (WARNING→
 
 ### Security Hooks (v1.27)
 
-**Prompt Guard** (`gsd-prompt-guard.js`):
+**Prompt Guard** (`808-prompt-guard.js`):
 - Triggers on Write/Edit to `.planning/` files
 - Scans content for prompt injection patterns (role override, instruction bypass, system tag injection)
 - Advisory-only — logs detection, does not block
 - Patterns are inlined (subset of `security.cjs`) for hook independence
 
-**Workflow Guard** (`gsd-workflow-guard.js`):
+**Workflow Guard** (`808-workflow-guard.js`):
 - Triggers on Write/Edit to non-`.planning/` files
-- Detects edits outside GSD workflow context (no active `/gsd:` command or Task subagent)
-- Advises using `/gsd:quick` or `/gsd:fast` for state-tracked changes
+- Detects edits outside 808 workflow context (no active `/808:` command or Task subagent)
+- Advises using `/808:quick` or `/808:fast` for state-tracked changes
 - Opt-in via `hooks.workflow_guard: true` (default: false)
 
 ---
 
 ## Runtime Abstraction
 
-GSD supports 6 AI coding runtimes through a unified command/workflow architecture:
+808 supports 6 AI coding runtimes through a unified command/workflow architecture:
 
 | Runtime | Command Format | Agent System | Config Location |
 |---------|---------------|--------------|-----------------|
-| Claude Code | `/gsd:command` | Task spawning | `~/.claude/` |
-| OpenCode | `/gsd-command` | Subagent mode | `~/.config/opencode/` |
-| Gemini CLI | `/gsd:command` | Task spawning | `~/.gemini/` |
-| Codex | `$gsd-command` | Skills | `~/.codex/` |
-| Copilot | `/gsd:command` | Agent delegation | `~/.github/` |
+| Claude Code | `/808:command` | Task spawning | `~/.claude/` |
+| OpenCode | `/808-command` | Subagent mode | `~/.config/opencode/` |
+| Gemini CLI | `/808:command` | Task spawning | `~/.gemini/` |
+| Codex | `$808-command` | Skills | `~/.codex/` |
+| Copilot | `/808:command` | Agent delegation | `~/.github/` |
 | Antigravity | Skills | Skills | `~/.gemini/antigravity/` |
 
 ### Abstraction Points
@@ -522,6 +522,6 @@ GSD supports 6 AI coding runtimes through a unified command/workflow architectur
 2. **Hook event names** — Claude uses `PostToolUse`, Gemini uses `AfterTool`
 3. **Agent frontmatter** — Each runtime has its own agent definition format
 4. **Path conventions** — Each runtime stores config in different directories
-5. **Model references** — `inherit` profile lets GSD defer to runtime's model selection
+5. **Model references** — `inherit` profile lets 808 defer to runtime's model selection
 
 The installer handles all translation at install time. Workflows and agents are written in Claude Code's native format and transformed during deployment.

@@ -1,5 +1,5 @@
 /**
- * GSD Tools Tests - --pick flag
+ * 808 Tools Tests - --pick flag
  *
  * Regression tests for the --pick CLI flag that extracts a single field
  * from JSON output, replacing the need for jq as an external dependency.

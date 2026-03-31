@@ -1,5 +1,5 @@
 /**
- * GSD Tools Tests - Init
+ * 808 Tools Tests - Init
  */
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
@@ -862,7 +862,7 @@ describe('cmdInitQuick', () => {
       path.join(tmpDir, '.planning', 'config.json'),
       JSON.stringify({
         git: {
-          quick_branch_template: 'gsd/quick-{num}-{slug}',
+          quick_branch_template: '808/quick-{num}-{slug}',
         },
       }, null, 2)
     );
@@ -872,7 +872,7 @@ describe('cmdInitQuick', () => {
 
     const output = JSON.parse(result.output);
     assert.ok(output.branch_name, 'branch_name should be set');
-    assert.ok(output.branch_name.startsWith('gsd/quick-'));
+    assert.ok(output.branch_name.startsWith('808/quick-'));
     assert.ok(output.branch_name.endsWith('-fix-login-bug'));
     assert.ok(output.branch_name.includes(output.quick_id), 'branch_name should include quick_id');
   });
@@ -882,7 +882,7 @@ describe('cmdInitQuick', () => {
       path.join(tmpDir, '.planning', 'config.json'),
       JSON.stringify({
         git: {
-          quick_branch_template: 'gsd/quick-{quick}-{slug}',
+          quick_branch_template: '808/quick-{quick}-{slug}',
         },
       }, null, 2)
     );
@@ -953,7 +953,7 @@ describe('cmdInitMapCodebase', () => {
 
   test('map-codebase workflow does not list OpenCode under runtimes without Task tool (#1316)', () => {
     const workflow = fs.readFileSync(
-      path.join(__dirname, '..', 'get-shit-done', 'workflows', 'map-codebase.md'), 'utf8'
+      path.join(__dirname, '..', '808', 'workflows', 'map-codebase.md'), 'utf8'
     );
     // OpenCode must NOT appear in the "WITHOUT Task tool" / "NOT available" condition
     const withoutLine = workflow.split('\n').find(l =>
@@ -1191,7 +1191,7 @@ describe('cmdInitNewMilestone', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// findProjectRoot integration — gsd-tools resolves project root from sub-repo
+// findProjectRoot integration — 808-tools resolves project root from sub-repo
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('findProjectRoot integration via --cwd', () => {

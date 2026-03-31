@@ -1,7 +1,7 @@
 /**
  * Config reader — loads `.planning/config.json` and merges with defaults.
  *
- * Mirrors the default structure from `get-shit-done/bin/lib/config.cjs`
+ * Mirrors the default structure from `808/bin/lib/config.cjs`
  * `buildNewProjectConfig()`.
  */
 
@@ -37,7 +37,7 @@ export interface HooksConfig {
   context_warnings: boolean;
 }
 
-export interface GSDConfig {
+export interface 808Config {
   model_profile: string;
   commit_docs: boolean;
   parallelization: boolean;
@@ -54,7 +54,7 @@ export interface GSDConfig {
 
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
-export const CONFIG_DEFAULTS: GSDConfig = {
+export const CONFIG_DEFAULTS: 808Config = {
   model_profile: 'balanced',
   commit_docs: true,
   parallelization: true,
@@ -64,8 +64,8 @@ export const CONFIG_DEFAULTS: GSDConfig = {
   exa_search: false,
   git: {
     branching_strategy: 'none',
-    phase_branch_template: 'gsd/phase-{phase}-{slug}',
-    milestone_branch_template: 'gsd/{milestone}-{slug}',
+    phase_branch_template: '808/phase-{phase}-{slug}',
+    milestone_branch_template: '808/{milestone}-{slug}',
     quick_branch_template: null,
   },
   workflow: {
@@ -96,7 +96,7 @@ export const CONFIG_DEFAULTS: GSDConfig = {
  * Returns full defaults when file is missing or empty.
  * Throws on malformed JSON with a helpful error message.
  */
-export async function loadConfig(projectDir: string): Promise<GSDConfig> {
+export async function loadConfig(projectDir: string): Promise<808Config> {
   const configPath = join(projectDir, '.planning', 'config.json');
 
   let raw: string;

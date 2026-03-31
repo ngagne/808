@@ -1,5 +1,5 @@
 /**
- * GSD Tools Tests - Validate Health Command
+ * 808 Tools Tests - Validate Health Command
  *
  * Comprehensive tests for validate-health covering all 8 health checks
  * and the repair path.
@@ -561,8 +561,8 @@ describe('validate health --repair command', () => {
     assert.strictEqual(diskConfig.workflow.verifier, true, 'workflow.verifier should default to true');
     assert.strictEqual(diskConfig.workflow.nyquist_validation, true, 'workflow.nyquist_validation should default to true');
     // Verify branch templates are present
-    assert.strictEqual(diskConfig.phase_branch_template, 'gsd/phase-{phase}-{slug}');
-    assert.strictEqual(diskConfig.milestone_branch_template, 'gsd/{milestone}-{slug}');
+    assert.strictEqual(diskConfig.phase_branch_template, '808/phase-{phase}-{slug}');
+    assert.strictEqual(diskConfig.milestone_branch_template, '808/{milestone}-{slug}');
   });
 
   test('resets config.json when JSON is invalid', () => {

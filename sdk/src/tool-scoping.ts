@@ -29,10 +29,10 @@ const PHASE_DEFAULT_TOOLS: Record<PhaseType, string[]> = {
  * Discuss has no dedicated agent — it runs in the main conversation.
  */
 export const PHASE_AGENT_MAP: Record<PhaseType, string | null> = {
-  [PhaseType.Execute]: 'gsd-executor.md',
-  [PhaseType.Research]: 'gsd-phase-researcher.md',
-  [PhaseType.Plan]: 'gsd-planner.md',
-  [PhaseType.Verify]: 'gsd-verifier.md',
+  [PhaseType.Execute]: '808-executor.md',
+  [PhaseType.Research]: '808-phase-researcher.md',
+  [PhaseType.Plan]: '808-planner.md',
+  [PhaseType.Verify]: '808-verifier.md',
   [PhaseType.Discuss]: null,
 };
 

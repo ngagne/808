@@ -1,4 +1,4 @@
-# Multi-Project Workspaces (`/gsd:new-workspace`)
+# Multi-Project Workspaces (`/808:new-workspace`)
 
 **Issue:** #1241
 **Date:** 2026-03-20
@@ -6,7 +6,7 @@
 
 ## Problem
 
-GSD is tied to one `.planning/` directory per working directory. Users with multiple independent projects (monorepo-style setups with 20+ child repos) or users needing feature branch isolation in the same repo cannot run parallel GSD sessions without manual cloning and state management.
+808 is tied to one `.planning/` directory per working directory. Users with multiple independent projects (monorepo-style setups with 20+ child repos) or users needing feature branch isolation in the same repo cannot run parallel 808 sessions without manual cloning and state management.
 
 ## Solution
 
@@ -18,13 +18,13 @@ This covers two use cases:
 
 ## Commands
 
-### `/gsd:new-workspace`
+### `/808:new-workspace`
 
 Creates a workspace directory with repo copies and its own `.planning/`.
 
 ```
-/gsd:new-workspace --name feature-b --repos hr-ui,ZeymoAPI --path ~/workspaces/feature-b
-/gsd:new-workspace --name feature-b --repos . --strategy worktree   # same-repo isolation
+/808:new-workspace --name feature-b --repos hr-ui,ZeymoAPI --path ~/workspaces/feature-b
+/808:new-workspace --name feature-b --repos . --strategy worktree   # same-repo isolation
 ```
 
 **Arguments:**
@@ -33,26 +33,26 @@ Creates a workspace directory with repo copies and its own `.planning/`.
 |------|----------|---------|-------------|
 | `--name` | Yes | — | Workspace name |
 | `--repos` | No | Interactive selection | Comma-separated repo paths or names |
-| `--path` | No | `~/gsd-workspaces/<name>` | Target directory |
+| `--path` | No | `~/808-workspaces/<name>` | Target directory |
 | `--strategy` | No | `worktree` | `worktree` (lightweight, shared .git) or `clone` (fully independent) |
 | `--branch` | No | `workspace/<name>` | Branch to checkout |
 | `--auto` | No | false | Skip interactive questions, use defaults |
 
-### `/gsd:list-workspaces`
+### `/808:list-workspaces`
 
-Scans `~/gsd-workspaces/*/WORKSPACE.md` for workspace manifests. Displays table with name, path, repo count, GSD status (has PROJECT.md, current phase).
+Scans `~/808-workspaces/*/WORKSPACE.md` for workspace manifests. Displays table with name, path, repo count, 808 status (has PROJECT.md, current phase).
 
-### `/gsd:remove-workspace`
+### `/808:remove-workspace`
 
 Removes a workspace directory after confirmation. For worktree strategy, runs `git worktree remove` for each member repo first. Refuses if any repo has uncommitted changes.
 
 ## Directory Structure
 
 ```
-~/gsd-workspaces/feature-b/          # workspace root
+~/808-workspaces/feature-b/          # workspace root
 ├── WORKSPACE.md                      # manifest
-├── .planning/                        # independent GSD planning directory
-│   ├── PROJECT.md                    # (if user ran /gsd:new-project)
+├── .planning/                        # independent 808 planning directory
+│   ├── PROJECT.md                    # (if user ran /808:new-project)
 │   ├── STATE.md
 │   └── config.json
 ├── hr-ui/                            # git worktree of source repo
@@ -64,7 +64,7 @@ Removes a workspace directory after confirmation. For worktree strategy, runs `g
 Key properties:
 - `.planning/` is at the workspace root, not inside any individual repo
 - Each repo is a peer directory under the workspace root
-- `WORKSPACE.md` is the only GSD-specific file at the root (besides `.planning/`)
+- `WORKSPACE.md` is the only 808-specific file at the root (besides `.planning/`)
 - For `--strategy clone`, same structure but repos are full clones
 
 ## WORKSPACE.md Format
@@ -89,7 +89,7 @@ Strategy: worktree
 
 ## Workflow
 
-### `/gsd:new-workspace` Workflow Steps
+### `/808:new-workspace` Workflow Steps
 
 1. **Setup** — Call `init new-workspace`, parse JSON context
 2. **Gather inputs** — If `--name`/`--repos`/`--path` not provided, ask interactively. For repos, show child `.git` directories in cwd as options
@@ -100,7 +100,7 @@ Strategy: worktree
    - Clone: `git clone <source> <workspace>/<repo-name>`
 6. **Write WORKSPACE.md** — Manifest with source paths, strategy, branch
 7. **Initialize .planning/** — `mkdir -p <workspace>/.planning`
-8. **Offer /gsd:new-project** — Ask if user wants to run project initialization in the new workspace
+8. **Offer /808:new-project** — Ask if user wants to run project initialization in the new workspace
 9. **Commit** — If commit_docs enabled, atomic commit of WORKSPACE.md
 10. **Done** — Print workspace path and next steps
 
@@ -111,7 +111,7 @@ Detects:
 - Whether target path already exists
 - Whether source repos have uncommitted changes
 - Whether `git worktree` is available
-- Default workspace base dir (`~/gsd-workspaces/`)
+- Default workspace base dir (`~/808-workspaces/`)
 
 Returns JSON with flags for workflow gating.
 
@@ -137,7 +137,7 @@ Returns JSON with flags for workflow gating.
 
 ### List-Workspaces Edge Cases
 
-- **`~/gsd-workspaces/` doesn't exist** — "No workspaces found"
+- **`~/808-workspaces/` doesn't exist** — "No workspaces found"
 - **WORKSPACE.md exists but repos inside are gone** — Show workspace, mark repos as missing
 
 ## Testing
@@ -163,23 +163,23 @@ All tests use temp directories and clean up after themselves. Follow existing `n
 
 | Component | Path |
 |-----------|------|
-| Command: new-workspace | `commands/gsd/new-workspace.md` |
-| Command: list-workspaces | `commands/gsd/list-workspaces.md` |
-| Command: remove-workspace | `commands/gsd/remove-workspace.md` |
-| Workflow: new-workspace | `get-shit-done/workflows/new-workspace.md` |
-| Workflow: list-workspaces | `get-shit-done/workflows/list-workspaces.md` |
-| Workflow: remove-workspace | `get-shit-done/workflows/remove-workspace.md` |
-| Init function | `get-shit-done/bin/lib/init.cjs` (add `cmdInitNewWorkspace`, `cmdInitListWorkspaces`, `cmdInitRemoveWorkspace`) |
-| Routing | `get-shit-done/bin/gsd-tools.cjs` (add cases to init switch) |
+| Command: new-workspace | `commands/808/new-workspace.md` |
+| Command: list-workspaces | `commands/808/list-workspaces.md` |
+| Command: remove-workspace | `commands/808/remove-workspace.md` |
+| Workflow: new-workspace | `808/workflows/new-workspace.md` |
+| Workflow: list-workspaces | `808/workflows/list-workspaces.md` |
+| Workflow: remove-workspace | `808/workflows/remove-workspace.md` |
+| Init function | `808/bin/lib/init.cjs` (add `cmdInitNewWorkspace`, `cmdInitListWorkspaces`, `cmdInitRemoveWorkspace`) |
+| Routing | `808/bin/808-tools.cjs` (add cases to init switch) |
 | Tests | `tests/workspace.test.cjs` |
 
 ## Design Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| Physical directories over logical registry | Filesystem is source of truth — matches GSD's existing cwd-based detection pattern |
+| Physical directories over logical registry | Filesystem is source of truth — matches 808's existing cwd-based detection pattern |
 | Worktree as default strategy | Lightweight (shared .git objects), fast to create, easy to clean up |
-| `.planning/` at workspace root | Gives full isolation from individual repo planning. Each workspace is an independent GSD project |
+| `.planning/` at workspace root | Gives full isolation from individual repo planning. Each workspace is an independent 808 project |
 | No central registry | Avoids state drift. `list-workspaces` scans the filesystem directly |
 | Case B as special case of A | `--repos .` reuses the same machinery, no special feature-branch code needed |
-| Default path `~/gsd-workspaces/<name>` | Predictable location for `list-workspaces` to scan, keeps workspaces out of source repos |
+| Default path `~/808-workspaces/<name>` | Predictable location for `list-workspaces` to scan, keeps workspaces out of source repos |

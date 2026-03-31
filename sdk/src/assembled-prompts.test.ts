@@ -18,9 +18,9 @@ import { fileURLToPath } from 'node:url';
 import { PromptFactory } from './phase-prompt.js';
 import { InitRunner } from './init-runner.js';
 import { PhaseType } from './types.js';
-import type { ParsedPlan, ContextFiles, GSDEvent } from './types.js';
-import type { GSDTools } from './gsd-tools.js';
-import type { GSDEventStream } from './event-stream.js';
+import type { ParsedPlan, ContextFiles, 808Event } from './types.js';
+import type { 808Tools } from './808-tools.js';
+import type { 808EventStream } from './event-stream.js';
 
 // ─── Paths ───────────────────────────────────────────────────────────────────
 
@@ -32,7 +32,7 @@ const sdkPromptsDir = join(__dirname, '..', 'prompts');
 const BLOCKED_PATTERNS: Array<[string, RegExp]> = [
   ['AskUserQuestion', /AskUserQuestion\s*\(/],
   ['SlashCommand', /SlashCommand\s*\(/],
-  ['/gsd: command', /\/gsd:\S+/],
+  ['/808: command', /\/808:\S+/],
   ['@file: reference', /@file:\S+/],
   ['STOP + wait directive', /\bSTOP\b\s+(?:and\s+)?(?:wait|ask)/i],
   ['bare STOP directive', /^\s*STOP\s*[.!]?\s*$/m],
@@ -155,7 +155,7 @@ describe('InitRunner assembled output', () => {
   let runner: InitRunner;
 
   // Minimal stub tools and event stream — we only call build*Prompt(), not run()
-  const stubTools: GSDTools = {
+  const stubTools: 808Tools = {
     initNewProject: async () => ({
       researcher_model: 'test',
       synthesizer_model: 'test',
@@ -167,11 +167,11 @@ describe('InitRunner assembled output', () => {
     }),
     configSet: async () => {},
     commit: async () => {},
-  } as unknown as GSDTools;
+  } as unknown as 808Tools;
 
-  const stubEventStream: GSDEventStream = {
-    emitEvent: (_event: GSDEvent) => {},
-  } as unknown as GSDEventStream;
+  const stubEventStream: 808EventStream = {
+    emitEvent: (_event: 808Event) => {},
+  } as unknown as 808EventStream;
 
   beforeAll(async () => {
     // Create temp directory with .planning/ structure for InitRunner file reads
@@ -334,7 +334,7 @@ describe('InitRunner assembled output', () => {
     });
 
     it('contains agent definition content', () => {
-      // Roadmap prompt loads gsd-roadmapper.md
+      // Roadmap prompt loads 808-roadmapper.md
       expect(output).toContain('agent_definition');
     });
 

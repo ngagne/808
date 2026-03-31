@@ -1,5 +1,5 @@
 /**
- * GSD Tools Tests - Init Manager
+ * 808 Tools Tests - Init Manager
  */
 
 const { test, describe, beforeEach, afterEach } = require('node:test');

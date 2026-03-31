@@ -13,7 +13,7 @@ import { constants } from 'node:fs';
 
 import type { ContextFiles } from './types.js';
 import { PhaseType } from './types.js';
-import type { GSDLogger } from './logger.js';
+import type { 808Logger } from './logger.js';
 
 // ─── File manifest per phase ─────────────────────────────────────────────────
 
@@ -63,9 +63,9 @@ const PHASE_FILE_MANIFEST: Record<PhaseType, FileSpec[]> = {
 
 export class ContextEngine {
   private readonly planningDir: string;
-  private readonly logger?: GSDLogger;
+  private readonly logger?: 808Logger;
 
-  constructor(projectDir: string, logger?: GSDLogger) {
+  constructor(projectDir: string, logger?: 808Logger) {
     this.planningDir = join(projectDir, '.planning');
     this.logger = logger;
   }

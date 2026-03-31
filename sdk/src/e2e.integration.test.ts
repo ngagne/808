@@ -13,8 +13,8 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
-import { GSD, parsePlanFile, GSDEventType } from './index.js';
-import type { GSDEvent } from './index.js';
+import { 808, parsePlanFile, 808EventType } from './index.js';
+import type { 808Event } from './index.js';
 
 // ─── CLI availability check ─────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ describe.skipIf(!cliAvailable)('E2E: Single plan execution', () => {
   let tmpDir: string;
 
   beforeAll(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'gsd-sdk-e2e-'));
+    tmpDir = await mkdtemp(join(tmpdir(), '808-sdk-e2e-'));
     // Copy fixture files to temp directory
     await cp(fixturesDir, tmpDir, { recursive: true });
   });
@@ -47,8 +47,8 @@ describe.skipIf(!cliAvailable)('E2E: Single plan execution', () => {
   });
 
   it('executes a single plan and returns a valid PlanResult', async () => {
-    const gsd = new GSD({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
-    const result = await gsd.executePlan('sample-plan.md');
+    const app = new 808({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
+    const result = await app.executePlan('sample-plan.md');
 
     expect(result.success).toBe(true);
     expect(typeof result.sessionId).toBe('string');
@@ -60,17 +60,17 @@ describe.skipIf(!cliAvailable)('E2E: Single plan execution', () => {
     // Verify the plan's task was executed — output.txt should exist
     const outputPath = join(tmpDir, 'output.txt');
     const outputContent = await readFile(outputPath, 'utf-8');
-    expect(outputContent).toContain('hello from gsd-sdk');
+    expect(outputContent).toContain('hello from 808-sdk');
   }, 120_000); // 2 minute timeout for real CLI execution
 
   it('proves session isolation (R014) — different session IDs for sequential runs', async () => {
     // Create a second temp dir for isolation proof
-    const tmpDir2 = await mkdtemp(join(tmpdir(), 'gsd-sdk-e2e-'));
+    const tmpDir2 = await mkdtemp(join(tmpdir(), '808-sdk-e2e-'));
     await cp(fixturesDir, tmpDir2, { recursive: true });
 
     try {
-      const gsd1 = new GSD({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
-      const gsd2 = new GSD({ projectDir: tmpDir2, maxBudgetUsd: 1.0, maxTurns: 20 });
+      const gsd1 = new 808({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
+      const gsd2 = new 808({ projectDir: tmpDir2, maxBudgetUsd: 1.0, maxTurns: 20 });
 
       const result1 = await gsd1.executePlan('sample-plan.md');
       const result2 = await gsd2.executePlan('sample-plan.md');
@@ -113,7 +113,7 @@ describe.skipIf(!cliAvailable)('E2E: Event stream during plan execution (R007)',
   let tmpDir: string;
 
   beforeAll(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'gsd-sdk-e2e-stream-'));
+    tmpDir = await mkdtemp(join(tmpdir(), '808-sdk-e2e-stream-'));
     await cp(fixturesDir, tmpDir, { recursive: true });
   });
 
@@ -124,53 +124,53 @@ describe.skipIf(!cliAvailable)('E2E: Event stream during plan execution (R007)',
   });
 
   it('event stream emits events during plan execution (R007)', async () => {
-    const events: GSDEvent[] = [];
-    const gsd = new GSD({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
+    const events: 808Event[] = [];
+    const app = new 808({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
 
     // Subscribe to all events
-    gsd.onEvent((event) => {
+    app.onEvent((event) => {
       events.push(event);
     });
 
-    const result = await gsd.executePlan('sample-plan.md');
+    const result = await app.executePlan('sample-plan.md');
     expect(result.success).toBe(true);
 
     // (a) At least one session_init event received
-    const initEvents = events.filter(e => e.type === GSDEventType.SessionInit);
+    const initEvents = events.filter(e => e.type === 808EventType.SessionInit);
     expect(initEvents.length).toBeGreaterThanOrEqual(1);
 
     // (b) At least one tool_call event received
-    const toolCallEvents = events.filter(e => e.type === GSDEventType.ToolCall);
+    const toolCallEvents = events.filter(e => e.type === 808EventType.ToolCall);
     expect(toolCallEvents.length).toBeGreaterThanOrEqual(1);
 
     // (c) Exactly one session_complete event with cost >= 0
-    const completeEvents = events.filter(e => e.type === GSDEventType.SessionComplete);
+    const completeEvents = events.filter(e => e.type === 808EventType.SessionComplete);
     expect(completeEvents).toHaveLength(1);
     const completeEvent = completeEvents[0]!;
-    if (completeEvent.type === GSDEventType.SessionComplete) {
+    if (completeEvent.type === 808EventType.SessionComplete) {
       expect(completeEvent.totalCostUsd).toBeGreaterThanOrEqual(0);
     }
 
     // (d) Events arrived in order: session_init before tool_call before session_complete
-    const initIdx = events.findIndex(e => e.type === GSDEventType.SessionInit);
-    const toolCallIdx = events.findIndex(e => e.type === GSDEventType.ToolCall);
-    const completeIdx = events.findIndex(e => e.type === GSDEventType.SessionComplete);
+    const initIdx = events.findIndex(e => e.type === 808EventType.SessionInit);
+    const toolCallIdx = events.findIndex(e => e.type === 808EventType.ToolCall);
+    const completeIdx = events.findIndex(e => e.type === 808EventType.SessionComplete);
     expect(initIdx).toBeLessThan(toolCallIdx);
     expect(toolCallIdx).toBeLessThan(completeIdx);
 
     // Bonus: at least one cost_update event was emitted
-    const costEvents = events.filter(e => e.type === GSDEventType.CostUpdate);
+    const costEvents = events.filter(e => e.type === 808EventType.CostUpdate);
     expect(costEvents.length).toBeGreaterThanOrEqual(1);
   }, 120_000);
 });
 
 describe('E2E: Error handling', () => {
   it('returns failure for nonexistent plan path', async () => {
-    const tmpDir = await mkdtemp(join(tmpdir(), 'gsd-sdk-e2e-err-'));
+    const tmpDir = await mkdtemp(join(tmpdir(), '808-sdk-e2e-err-'));
 
     try {
-      const gsd = new GSD({ projectDir: tmpDir });
-      await expect(gsd.executePlan('nonexistent-plan.md')).rejects.toThrow();
+      const app = new 808({ projectDir: tmpDir });
+      await expect(app.executePlan('nonexistent-plan.md')).rejects.toThrow();
     } finally {
       await rm(tmpDir, { recursive: true, force: true });
     }

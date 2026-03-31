@@ -27,7 +27,7 @@ const agentsDir = join(promptsDir, 'agents');
 const BLOCKED_PATTERNS: Array<[string, RegExp]> = [
   ['AskUserQuestion', /AskUserQuestion\s*\(/],
   ['SlashCommand', /SlashCommand\s*\(/],
-  ['/gsd: command', /\/gsd:\S+/],
+  ['/808: command', /\/808:\S+/],
   ['@file: reference', /@file:\S+/],
   ['STOP + wait directive', /\bSTOP\b\s+(?:and\s+)?(?:wait|ask)/i],
   ['bare STOP directive', /^\s*STOP\s*[.!]?\s*$/m],
@@ -46,14 +46,14 @@ const EXPECTED_WORKFLOWS = [
 ];
 
 const EXPECTED_AGENTS = [
-  'gsd-executor.md',
-  'gsd-phase-researcher.md',
-  'gsd-planner.md',
-  'gsd-verifier.md',
-  'gsd-plan-checker.md',
-  'gsd-project-researcher.md',
-  'gsd-research-synthesizer.md',
-  'gsd-roadmapper.md',
+  '808-executor.md',
+  '808-phase-researcher.md',
+  '808-planner.md',
+  '808-verifier.md',
+  '808-plan-checker.md',
+  '808-project-researcher.md',
+  '808-research-synthesizer.md',
+  '808-roadmapper.md',
 ];
 
 const templatesDir = join(promptsDir, 'templates');

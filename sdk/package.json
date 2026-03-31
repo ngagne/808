@@ -1,7 +1,7 @@
 {
-  "name": "@gsd-build/sdk",
+  "name": "@808/sdk",
   "version": "0.1.0",
-  "description": "GSD SDK — programmatic interface for running GSD plans via the Agent SDK",
+  "description": "808 SDK — programmatic interface for running 808 plans via the Agent SDK",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
     }
   },
   "bin": {
-    "gsd-sdk": "./dist/cli.js"
+    "808-sdk": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -20,12 +20,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gsd-build/get-shit-done.git",
+    "url": "git+https://github.com/808-build/808.git",
     "directory": "sdk"
   },
-  "homepage": "https://github.com/gsd-build/get-shit-done/tree/main/sdk",
+  "homepage": "https://github.com/808-build/808/tree/main/sdk",
   "bugs": {
-    "url": "https://github.com/gsd-build/get-shit-done/issues"
+    "url": "https://github.com/808-build/808/issues"
   },
   "author": "TÂCHES",
   "license": "MIT",

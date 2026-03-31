@@ -1,4 +1,4 @@
-# GSD Configuration Reference
+# 808 Configuration Reference
 
 > Full configuration schema, workflow toggles, model profiles, and git branching options. For feature context, see [Feature Reference](FEATURES.md).
 
@@ -6,7 +6,7 @@
 
 ## Configuration File
 
-GSD stores project settings in `.planning/config.json`. Created during `/gsd:new-project`, updated via `/gsd:settings`.
+808 stores project settings in `.planning/config.json`. Created during `/808:new-project`, updated via `/808:settings`.
 
 ### Full Schema
 
@@ -49,8 +49,8 @@ GSD stores project settings in `.planning/config.json`. Created during `/gsd:new
   },
   "git": {
     "branching_strategy": "none",
-    "phase_branch_template": "gsd/phase-{phase}-{slug}",
-    "milestone_branch_template": "gsd/{milestone}-{slug}",
+    "phase_branch_template": "808/phase-{phase}-{slug}",
+    "milestone_branch_template": "808/{milestone}-{slug}",
     "quick_branch_template": null
   },
   "gates": {
@@ -97,12 +97,12 @@ All workflow toggles follow the **absent = enabled** pattern. If a key is missin
 | `workflow.auto_advance` | boolean | `false` | Auto-chain discuss → plan → execute without stopping |
 | `workflow.nyquist_validation` | boolean | `true` | Test coverage mapping during plan-phase research |
 | `workflow.ui_phase` | boolean | `true` | Generate UI design contracts for frontend phases |
-| `workflow.ui_safety_gate` | boolean | `true` | Prompt to run /gsd:ui-phase for frontend phases during plan-phase |
+| `workflow.ui_safety_gate` | boolean | `true` | Prompt to run /808:ui-phase for frontend phases during plan-phase |
 | `workflow.node_repair` | boolean | `true` | Autonomous task repair on verification failure |
 | `workflow.node_repair_budget` | number | `2` | Max repair attempts per failed task |
 | `workflow.research_before_questions` | boolean | `false` | Run research before discussion questions instead of after |
-| `workflow.discuss_mode` | string | `'discuss'` | Controls how `/gsd:discuss-phase` gathers context. `'discuss'` (default) asks questions one-by-one. `'assumptions'` reads the codebase first, generates structured assumptions with confidence levels, and only asks you to correct what's wrong. Added in v1.28 |
-| `workflow.skip_discuss` | boolean | `false` | When `true`, `/gsd:autonomous` bypasses the discuss-phase entirely, writing minimal CONTEXT.md from the ROADMAP phase goal. Useful for projects where developer preferences are fully captured in PROJECT.md/REQUIREMENTS.md. Added in v1.28 |
+| `workflow.discuss_mode` | string | `'discuss'` | Controls how `/808:discuss-phase` gathers context. `'discuss'` (default) asks questions one-by-one. `'assumptions'` reads the codebase first, generates structured assumptions with confidence levels, and only asks you to correct what's wrong. Added in v1.28 |
+| `workflow.skip_discuss` | boolean | `false` | When `true`, `/808:autonomous` bypasses the discuss-phase entirely, writing minimal CONTEXT.md from the ROADMAP phase goal. Useful for projects where developer preferences are fully captured in PROJECT.md/REQUIREMENTS.md. Added in v1.28 |
 | `workflow.text_mode` | boolean | `false` | Replaces AskUserQuestion TUI menus with plain-text numbered lists. Required for Claude Code remote sessions (`/rc` mode) where TUI menus don't render. Can also be set per-session with `--text` flag on discuss-phase. Added in v1.28 |
 
 ### Recommended Presets
@@ -133,9 +133,9 @@ If `.planning/` is in `.gitignore`, `commit_docs` is automatically `false` regar
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
 | `hooks.context_warnings` | boolean | `true` | Show context window usage warnings via context monitor hook |
-| `hooks.workflow_guard` | boolean | `false` | Warn when file edits happen outside GSD workflow context (advises using `/gsd:quick` or `/gsd:fast`) |
+| `hooks.workflow_guard` | boolean | `false` | Warn when file edits happen outside 808 workflow context (advises using `/808:quick` or `/808:fast`) |
 
-The prompt injection guard hook (`gsd-prompt-guard.js`) is always active and cannot be disabled — it's a security feature, not a workflow toggle.
+The prompt injection guard hook (`808-prompt-guard.js`) is always active and cannot be disabled — it's a security feature, not a workflow toggle.
 
 ### Private Planning Setup
 
@@ -149,7 +149,7 @@ To keep planning artifacts out of git:
 
 ## Agent Skills Injection
 
-Inject custom skill files into GSD subagent prompts. Skills are read by agents at spawn time, giving them project-specific instructions beyond what CLAUDE.md provides.
+Inject custom skill files into 808 subagent prompts. Skills are read by agents at spawn time, giving them project-specific instructions beyond what CLAUDE.md provides.
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
@@ -162,9 +162,9 @@ Add an `agent_skills` section to `.planning/config.json` mapping agent types to 
 ```json
 {
   "agent_skills": {
-    "gsd-executor": ["skills/testing-standards", "skills/api-conventions"],
-    "gsd-planner": ["skills/architecture-rules"],
-    "gsd-verifier": ["skills/acceptance-criteria"]
+    "808-executor": ["skills/testing-standards", "skills/api-conventions"],
+    "808-planner": ["skills/architecture-rules"],
+    "808-verifier": ["skills/acceptance-criteria"]
   }
 }
 ```
@@ -173,25 +173,25 @@ Each path must be a directory containing a `SKILL.md` file. Paths are validated 
 
 ### Supported Agent Types
 
-Any GSD agent type can receive skills. Common types:
+Any 808 agent type can receive skills. Common types:
 
-- `gsd-executor` -- executes implementation plans
-- `gsd-planner` -- creates phase plans
-- `gsd-checker` -- verifies plan quality
-- `gsd-verifier` -- post-execution verification
-- `gsd-researcher` -- phase research
-- `gsd-project-researcher` -- new-project research
-- `gsd-debugger` -- diagnostic agents
-- `gsd-codebase-mapper` -- codebase analysis
-- `gsd-advisor` -- discuss-phase advisors
-- `gsd-ui-researcher` -- UI design contract creation
-- `gsd-ui-checker` -- UI spec verification
-- `gsd-roadmapper` -- roadmap creation
-- `gsd-synthesizer` -- research synthesis
+- `808-executor` -- executes implementation plans
+- `808-planner` -- creates phase plans
+- `808-checker` -- verifies plan quality
+- `808-verifier` -- post-execution verification
+- `808-researcher` -- phase research
+- `808-project-researcher` -- new-project research
+- `808-debugger` -- diagnostic agents
+- `808-codebase-mapper` -- codebase analysis
+- `808-advisor` -- discuss-phase advisors
+- `808-ui-researcher` -- UI design contract creation
+- `808-ui-checker` -- UI spec verification
+- `808-roadmapper` -- roadmap creation
+- `808-synthesizer` -- research synthesis
 
 ### How It Works
 
-At spawn time, workflows call `node gsd-tools.cjs agent-skills <type>` to load configured skills. If skills exist for the agent type, they are injected as an `<agent_skills>` block in the Task() prompt:
+At spawn time, workflows call `node 808-tools.cjs agent-skills <type>` to load configured skills. If skills exist for the agent type, they are injected as an `<agent_skills>` block in the Task() prompt:
 
 ```xml
 <agent_skills>
@@ -208,7 +208,7 @@ If no skills are configured, the block is omitted (zero overhead).
 Set skills via the CLI:
 
 ```bash
-node gsd-tools.cjs config-set agent_skills.gsd-executor '["skills/my-skill"]'
+node 808-tools.cjs config-set agent_skills.808-executor '["skills/my-skill"]'
 ```
 
 ---
@@ -233,9 +233,9 @@ node gsd-tools.cjs config-set agent_skills.gsd-executor '["skills/my-skill"]'
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
 | `git.branching_strategy` | enum | `none` | `none`, `phase`, or `milestone` |
-| `git.phase_branch_template` | string | `gsd/phase-{phase}-{slug}` | Branch name template for phase strategy |
-| `git.milestone_branch_template` | string | `gsd/{milestone}-{slug}` | Branch name template for milestone strategy |
-| `git.quick_branch_template` | string or null | `null` | Optional branch name template for `/gsd:quick` tasks |
+| `git.phase_branch_template` | string | `808/phase-{phase}-{slug}` | Branch name template for phase strategy |
+| `git.milestone_branch_template` | string | `808/{milestone}-{slug}` | Branch name template for milestone strategy |
+| `git.quick_branch_template` | string or null | `null` | Optional branch name template for `/808:quick` tasks |
 
 ### Strategy Comparison
 
@@ -258,7 +258,7 @@ Example quick-task branching:
 
 ```json
 "git": {
-  "quick_branch_template": "gsd/quick-{num}-{slug}"
+  "quick_branch_template": "808/quick-{num}-{slug}"
 }
 ```
 
@@ -313,18 +313,18 @@ Control confirmation prompts during workflows.
 
 | Agent | `quality` | `balanced` | `budget` | `inherit` |
 |-------|-----------|------------|----------|-----------|
-| gsd-planner | Opus | Opus | Sonnet | Inherit |
-| gsd-roadmapper | Opus | Sonnet | Sonnet | Inherit |
-| gsd-executor | Opus | Sonnet | Sonnet | Inherit |
-| gsd-phase-researcher | Opus | Sonnet | Haiku | Inherit |
-| gsd-project-researcher | Opus | Sonnet | Haiku | Inherit |
-| gsd-research-synthesizer | Sonnet | Sonnet | Haiku | Inherit |
-| gsd-debugger | Opus | Sonnet | Sonnet | Inherit |
-| gsd-codebase-mapper | Sonnet | Haiku | Haiku | Inherit |
-| gsd-verifier | Sonnet | Sonnet | Haiku | Inherit |
-| gsd-plan-checker | Sonnet | Sonnet | Haiku | Inherit |
-| gsd-integration-checker | Sonnet | Sonnet | Haiku | Inherit |
-| gsd-nyquist-auditor | Sonnet | Sonnet | Haiku | Inherit |
+| 808-planner | Opus | Opus | Sonnet | Inherit |
+| 808-roadmapper | Opus | Sonnet | Sonnet | Inherit |
+| 808-executor | Opus | Sonnet | Sonnet | Inherit |
+| 808-phase-researcher | Opus | Sonnet | Haiku | Inherit |
+| 808-project-researcher | Opus | Sonnet | Haiku | Inherit |
+| 808-research-synthesizer | Sonnet | Sonnet | Haiku | Inherit |
+| 808-debugger | Opus | Sonnet | Sonnet | Inherit |
+| 808-codebase-mapper | Sonnet | Haiku | Haiku | Inherit |
+| 808-verifier | Sonnet | Sonnet | Haiku | Inherit |
+| 808-plan-checker | Sonnet | Sonnet | Haiku | Inherit |
+| 808-integration-checker | Sonnet | Sonnet | Haiku | Inherit |
+| 808-nyquist-auditor | Sonnet | Sonnet | Haiku | Inherit |
 
 ### Per-Agent Overrides
 
@@ -334,8 +334,8 @@ Override specific agents without changing the entire profile:
 {
   "model_profile": "balanced",
   "model_overrides": {
-    "gsd-executor": "opus",
-    "gsd-planner": "haiku"
+    "808-executor": "opus",
+    "808-planner": "haiku"
   }
 }
 ```
@@ -344,7 +344,7 @@ Valid override values: `opus`, `sonnet`, `haiku`, `inherit`, or any fully-qualif
 
 ### Non-Claude Runtimes (Codex, OpenCode, Gemini CLI)
 
-When GSD is installed for a non-Claude runtime, the installer automatically sets `resolve_model_ids: "omit"` in `~/.gsd/defaults.json`. This causes GSD to return an empty model parameter for all agents, so each agent uses whatever model the runtime is configured with. No additional setup is needed for the default case.
+When 808 is installed for a non-Claude runtime, the installer automatically sets `resolve_model_ids: "omit"` in `~/.808/defaults.json`. This causes 808 to return an empty model parameter for all agents, so each agent uses whatever model the runtime is configured with. No additional setup is needed for the default case.
 
 If you want different agents to use different models, use `model_overrides` with fully-qualified model IDs that your runtime recognizes:
 
@@ -352,10 +352,10 @@ If you want different agents to use different models, use `model_overrides` with
 {
   "resolve_model_ids": "omit",
   "model_overrides": {
-    "gsd-planner": "o3",
-    "gsd-executor": "o4-mini",
-    "gsd-debugger": "o3",
-    "gsd-codebase-mapper": "o4-mini"
+    "808-planner": "o3",
+    "808-executor": "o4-mini",
+    "808-debugger": "o3",
+    "808-codebase-mapper": "o4-mini"
   }
 }
 ```
@@ -404,6 +404,6 @@ The intent is the same as the Claude profile tiers -- use a stronger model for p
 
 Save settings as global defaults for future projects:
 
-**Location:** `~/.gsd/defaults.json`
+**Location:** `~/.808/defaults.json`
 
-When `/gsd:new-project` creates a new `config.json`, it reads global defaults and merges them as the starting configuration. Per-project settings always override globals.
+When `/808:new-project` creates a new `config.json`, it reads global defaults and merges them as the starting configuration. Per-project settings always override globals.

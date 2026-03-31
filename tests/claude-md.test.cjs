@@ -35,11 +35,11 @@ describe('generate-claude-md', () => {
 
     const claudePath = path.join(tmpDir, 'CLAUDE.md');
     const content = fs.readFileSync(claudePath, 'utf-8');
-    assert.ok(content.includes('## GSD Workflow Enforcement'));
-    assert.ok(content.includes('/gsd:quick'));
-    assert.ok(content.includes('/gsd:debug'));
-    assert.ok(content.includes('/gsd:execute-phase'));
-    assert.ok(content.includes('Do not make direct repo edits outside a GSD workflow'));
+    assert.ok(content.includes('## 808 Workflow Enforcement'));
+    assert.ok(content.includes('/808:quick'));
+    assert.ok(content.includes('/808:debug'));
+    assert.ok(content.includes('/808:execute-phase'));
+    assert.ok(content.includes('Do not make direct repo edits outside a 808 workflow'));
   });
 
   test('adds workflow enforcement section when updating an existing CLAUDE.md', () => {
@@ -57,12 +57,12 @@ describe('generate-claude-md', () => {
 
     const content = fs.readFileSync(path.join(tmpDir, 'CLAUDE.md'), 'utf-8');
     assert.ok(content.includes('## Local Notes'));
-    assert.ok(content.includes('## GSD Workflow Enforcement'));
+    assert.ok(content.includes('## 808 Workflow Enforcement'));
   });
 });
 
 describe('new-project workflow includes CLAUDE.md generation', () => {
-  const workflowPath = path.join(__dirname, '..', 'get-shit-done', 'workflows', 'new-project.md');
+  const workflowPath = path.join(__dirname, '..', '808', 'workflows', 'new-project.md');
   const commandsPath = path.join(__dirname, '..', 'docs', 'COMMANDS.md');
 
   test('new-project workflow generates CLAUDE.md before final commit', () => {

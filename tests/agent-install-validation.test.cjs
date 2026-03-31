@@ -1,9 +1,9 @@
 /**
- * GSD Agent Installation Validation Tests (#1371)
+ * 808 Agent Installation Validation Tests (#1371)
  *
- * Validates that GSD detects missing or incomplete agent installations and
+ * Validates that 808 detects missing or incomplete agent installations and
  * surfaces warnings through init commands and health checks. When agents are
- * not installed, Task(subagent_type="gsd-*") silently falls back to
+ * not installed, Task(subagent_type="808-*") silently falls back to
  * general-purpose, losing specialized instructions.
  */
 
@@ -14,15 +14,15 @@ const path = require('path');
 const { runGsdTools, createTempProject, cleanup } = require('./helpers.cjs');
 
 const AGENTS_DIR_NAME = 'agents';
-const MODEL_PROFILES = require('../get-shit-done/bin/lib/model-profiles.cjs').MODEL_PROFILES;
+const MODEL_PROFILES = require('../808/bin/lib/model-profiles.cjs').MODEL_PROFILES;
 const EXPECTED_AGENTS = Object.keys(MODEL_PROFILES);
 
 /**
- * Create a fake GSD install directory structure that mirrors what the installer
- * produces. gsd-tools.cjs lives at <configDir>/get-shit-done/bin/gsd-tools.cjs,
+ * Create a fake 808 install directory structure that mirrors what the installer
+ * produces. 808-tools.cjs lives at <configDir>/808/bin/808-tools.cjs,
  * so the agents dir is at <configDir>/agents/.
  *
- * We use --cwd to point at the project, and GSD_INSTALL_DIR env to override
+ * We use --cwd to point at the project, and 808_INSTALL_DIR env to override
  * the agents directory location for testing.
  */
 function createAgentsDir(configDir, agentNames = []) {
@@ -55,22 +55,22 @@ describe('init commands: agents_installed field (#1371)', () => {
     const phaseDir = path.join(tmpDir, '.planning', 'phases', '01-setup');
     fs.mkdirSync(phaseDir, { recursive: true });
 
-    // Create agents dir as sibling of get-shit-done/ (the installed layout)
-    // gsd-tools.cjs resolves agents from GSD_INSTALL_DIR or __dirname/../../agents
-    const gsdInstallDir = path.resolve(__dirname, '..', 'get-shit-done', 'bin');
+    // Create agents dir as sibling of 808/ (the installed layout)
+    // 808-tools.cjs resolves agents from 808_INSTALL_DIR or __dirname/../../agents
+    const gsdInstallDir = path.resolve(__dirname, '..', '808', 'bin');
     const configDir = path.resolve(gsdInstallDir, '..', '..');
     const agentsDir = path.join(configDir, 'agents');
 
-    // Agents already exist in the repo root /agents/ dir which is sibling to get-shit-done/
+    // Agents already exist in the repo root /agents/ dir which is sibling to 808/
     const result = runGsdTools('init execute-phase 1 --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
     assert.strictEqual(typeof output.agents_installed, 'boolean',
       'init execute-phase must include agents_installed field');
-    // The repo has agents/ dir with all gsd-*.md files, so this should be true
+    // The repo has agents/ dir with all 808-*.md files, so this should be true
     assert.strictEqual(output.agents_installed, true,
-      'agents_installed should be true when agents directory has gsd-*.md files');
+      'agents_installed should be true when agents directory has 808-*.md files');
   });
 
   test('init plan-phase includes agents_installed=true when agents exist', () => {
@@ -144,8 +144,8 @@ describe('validate health: agent installation check W010 (#1371)', () => {
   });
 
   test('health check reports healthy when agents are installed (repo layout)', () => {
-    // In the repo, agents/ exists as a sibling of get-shit-done/, so the
-    // health check should find them via the gsd-tools.cjs path resolution
+    // In the repo, agents/ exists as a sibling of 808/, so the
+    // health check should find them via the 808-tools.cjs path resolution
     const result = runGsdTools('validate health --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 

@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** When `/gsd:new-project` creates `.planning/config.json`, the file contains all effective defaults — not just the 6 user-chosen keys — so developers can see every setting without reading source code.
+**Goal:** When `/808:new-project` creates `.planning/config.json`, the file contains all effective defaults — not just the 6 user-chosen keys — so developers can see every setting without reading source code.
 
 **Architecture:** Add a single JS function `buildNewProjectConfig(cwd, userChoices)` in `config.cjs` as the one source of truth for a new project's full config. Expose it as a CLI command `config-new-project`. Update the `new-project.md` workflow to call this command instead of writing a partial JSON inline.
 
-**Tech Stack:** Node.js/CommonJS, existing gsd-tools CLI, `node:test` for tests.
+**Tech Stack:** Node.js/CommonJS, existing 808-tools CLI, `node:test` for tests.
 
 ---
 
@@ -27,8 +27,8 @@ Missing keys silently resolved by `loadConfig()` at runtime:
 - `search_gitignored: false`
 - `brave_search: false` (or env-detected `true`)
 - `git.branching_strategy: "none"`
-- `git.phase_branch_template: "gsd/phase-{phase}-{slug}"`
-- `git.milestone_branch_template: "gsd/{milestone}-{slug}"`
+- `git.phase_branch_template: "808/phase-{phase}-{slug}"`
+- `git.milestone_branch_template: "808/{milestone}-{slug}"`
 
 Full config that should exist from the start:
 
@@ -43,8 +43,8 @@ Full config that should exist from the start:
   "brave_search": false,
   "git": {
     "branching_strategy": "none",
-    "phase_branch_template": "gsd/phase-{phase}-{slug}",
-    "milestone_branch_template": "gsd/{milestone}-{slug}"
+    "phase_branch_template": "808/phase-{phase}-{slug}",
+    "milestone_branch_template": "808/{milestone}-{slug}"
   },
   "workflow": {
     "research": true,
@@ -61,9 +61,9 @@ Full config that should exist from the start:
 
 | File | Action | Purpose |
 |------|--------|---------|
-| `get-shit-done/bin/lib/config.cjs` | Modify | Add `buildNewProjectConfig()` + `cmdConfigNewProject()` |
-| `get-shit-done/bin/gsd-tools.cjs` | Modify | Register `config-new-project` case + update usage string |
-| `get-shit-done/workflows/new-project.md` | Modify | Steps 2a + 5: replace inline JSON write with CLI call |
+| `808/bin/lib/config.cjs` | Modify | Add `buildNewProjectConfig()` + `cmdConfigNewProject()` |
+| `808/bin/808-tools.cjs` | Modify | Register `config-new-project` case + update usage string |
+| `808/workflows/new-project.md` | Modify | Steps 2a + 5: replace inline JSON write with CLI call |
 | `tests/config.test.cjs` | Modify | Add `config-new-project` test suite |
 
 ---
@@ -72,7 +72,7 @@ Full config that should exist from the start:
 
 **Files:**
 
-- Modify: `get-shit-done/bin/lib/config.cjs`
+- Modify: `808/bin/lib/config.cjs`
 
 - [ ] **Step 1.1: Write the failing tests first**
 
@@ -120,8 +120,8 @@ describe('config-new-project command', () => {
     // git section present with all three keys
     assert.ok(config.git && typeof config.git === 'object', 'git section should exist');
     assert.strictEqual(config.git.branching_strategy, 'none');
-    assert.strictEqual(config.git.phase_branch_template, 'gsd/phase-{phase}-{slug}');
-    assert.strictEqual(config.git.milestone_branch_template, 'gsd/{milestone}-{slug}');
+    assert.strictEqual(config.git.phase_branch_template, '808/phase-{phase}-{slug}');
+    assert.strictEqual(config.git.milestone_branch_template, '808/{milestone}-{slug}');
 
     // workflow section present with all four keys
     assert.ok(config.workflow && typeof config.workflow === 'object', 'workflow section should exist');
@@ -227,7 +227,7 @@ describe('config-new-project command', () => {
 - [ ] **Step 1.2: Run failing tests to confirm they fail**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
+cd /Users/diego/Dev/808
 node --test tests/config.test.cjs 2>&1 | grep -E "config-new-project|FAIL|Error"
 ```
 
@@ -235,7 +235,7 @@ Expected: All `config-new-project` tests fail with "config-new-project is not a 
 
 - [ ] **Step 1.3: Implement `buildNewProjectConfig` and `cmdConfigNewProject` in config.cjs**
 
-In `get-shit-done/bin/lib/config.cjs`, add the following after the `validateKnownConfigKeyPath` function (around line 35) and before `ensureConfigFile`:
+In `808/bin/lib/config.cjs`, add the following after the `validateKnownConfigKeyPath` function (around line 35) and before `ensureConfigFile`:
 
 ```js
 /**
@@ -243,7 +243,7 @@ In `get-shit-done/bin/lib/config.cjs`, add the following after the `validateKnow
  *
  * Merges (in order of increasing priority):
  *   1. Hardcoded defaults
- *   2. User-level defaults from ~/.gsd/defaults.json (if present)
+ *   2. User-level defaults from ~/.808/defaults.json (if present)
  *   3. userChoices (the settings the user explicitly selected during new-project)
  *
  * Returns a plain object — does NOT write any files.
@@ -253,11 +253,11 @@ function buildNewProjectConfig(cwd, userChoices) {
   const homedir = require('os').homedir();
 
   // Detect Brave Search API key availability
-  const braveKeyFile = path.join(homedir, '.gsd', 'brave_api_key');
+  const braveKeyFile = path.join(homedir, '.808', 'brave_api_key');
   const hasBraveSearch = !!(process.env.BRAVE_API_KEY || fs.existsSync(braveKeyFile));
 
-  // Load user-level defaults from ~/.gsd/defaults.json if available
-  const globalDefaultsPath = path.join(homedir, '.gsd', 'defaults.json');
+  // Load user-level defaults from ~/.808/defaults.json if available
+  const globalDefaultsPath = path.join(homedir, '.808', 'defaults.json');
   let userDefaults = {};
   try {
     if (fs.existsSync(globalDefaultsPath)) {
@@ -284,8 +284,8 @@ function buildNewProjectConfig(cwd, userChoices) {
     brave_search: hasBraveSearch,
     git: {
       branching_strategy: 'none',
-      phase_branch_template: 'gsd/phase-{phase}-{slug}',
-      milestone_branch_template: 'gsd/{milestone}-{slug}',
+      phase_branch_template: '808/phase-{phase}-{slug}',
+      milestone_branch_template: '808/{milestone}-{slug}',
     },
     workflow: {
       research: true,
@@ -317,8 +317,8 @@ function buildNewProjectConfig(cwd, userChoices) {
  * Command: create a fully-materialized .planning/config.json for a new project.
  *
  * Accepts user-chosen settings as a JSON string (the keys the user explicitly
- * configured during /gsd:new-project). All remaining keys are filled from
- * hardcoded defaults and optional ~/.gsd/defaults.json.
+ * configured during /808:new-project). All remaining keys are filled from
+ * hardcoded defaults and optional ~/.808/defaults.json.
  *
  * Idempotent: if config.json already exists, returns { created: false }.
  */
@@ -367,7 +367,7 @@ Also add `cmdConfigNewProject` to the `module.exports` at the bottom of `config.
 - [ ] **Step 1.4: Run tests to verify they pass**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
+cd /Users/diego/Dev/808
 node --test tests/config.test.cjs 2>&1 | tail -20
 ```
 
@@ -376,20 +376,20 @@ Expected: All `config-new-project` tests pass. Existing tests still pass.
 - [ ] **Step 1.5: Commit**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
-git add get-shit-done/bin/lib/config.cjs tests/config.test.cjs
+cd /Users/diego/Dev/808
+git add 808/bin/lib/config.cjs tests/config.test.cjs
 git commit -m "feat: add config-new-project command for full config materialization"
 ```
 
 ---
 
-## Task 2: Register `config-new-project` in gsd-tools.cjs
+## Task 2: Register `config-new-project` in 808-tools.cjs
 
 **Files:**
 
-- Modify: `get-shit-done/bin/gsd-tools.cjs`
+- Modify: `808/bin/808-tools.cjs`
 
-- [ ] **Step 2.1: Add the case to the switch in gsd-tools.cjs**
+- [ ] **Step 2.1: Add the case to the switch in 808-tools.cjs**
 
 After the `config-get` case (around line 401), add:
 
@@ -408,18 +408,18 @@ New: `...config-ensure-section, config-new-project, init`
 - [ ] **Step 2.2: Smoke-test the CLI registration**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
-node get-shit-done/bin/gsd-tools.cjs config-new-project '{"mode":"interactive","granularity":"standard"}' --cwd /tmp/gsd-smoke-$(date +%s)
+cd /Users/diego/Dev/808
+node 808/bin/808-tools.cjs config-new-project '{"mode":"interactive","granularity":"standard"}' --cwd /tmp/808-smoke-$(date +%s)
 ```
 
 Expected: outputs `{"created":true,"path":".planning/config.json"}` (or similar).
 
-Clean up: `rm -rf /tmp/gsd-smoke-*`
+Clean up: `rm -rf /tmp/808-smoke-*`
 
 - [ ] **Step 2.3: Run full test suite**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
+cd /Users/diego/Dev/808
 node --test tests/config.test.cjs 2>&1 | tail -10
 ```
 
@@ -428,9 +428,9 @@ Expected: All pass.
 - [ ] **Step 2.4: Commit**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
-git add get-shit-done/bin/gsd-tools.cjs
-git commit -m "feat: register config-new-project in gsd-tools CLI router"
+cd /Users/diego/Dev/808
+git add 808/bin/808-tools.cjs
+git commit -m "feat: register config-new-project in 808-tools CLI router"
 ```
 
 ---
@@ -439,7 +439,7 @@ git commit -m "feat: register config-new-project in gsd-tools CLI router"
 
 **Files:**
 
-- Modify: `get-shit-done/workflows/new-project.md`
+- Modify: `808/workflows/new-project.md`
 
 This is the core change. Two places need updating:
 
@@ -470,7 +470,7 @@ Create `.planning/config.json` using the CLI (fills in all defaults automaticall
 
 ```bash
 mkdir -p .planning
-node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-new-project "$(cat <<'CHOICES'
+node "$HOME/.claude/808/bin/808-tools.cjs" config-new-project "$(cat <<'CHOICES'
 {
   "mode": "yolo",
   "granularity": "[selected: coarse|standard|fine]",
@@ -516,7 +516,7 @@ Create `.planning/config.json` using the CLI (fills in all defaults automaticall
 
 ```bash
 mkdir -p .planning
-node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" config-new-project "$(cat <<'CHOICES'
+node "$HOME/.claude/808/bin/808-tools.cjs" config-new-project "$(cat <<'CHOICES'
 {
   "mode": "[selected: yolo|interactive]",
   "granularity": "[selected: coarse|standard|fine]",
@@ -541,8 +541,8 @@ The command merges your selections with all runtime defaults (`search_gitignored
 - [ ] **Step 3.3: Verify the workflow file reads correctly**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
-grep -n "config-new-project\|config\.json\|CHOICES" get-shit-done/workflows/new-project.md
+cd /Users/diego/Dev/808
+grep -n "config-new-project\|config\.json\|CHOICES" 808/workflows/new-project.md
 ```
 
 Expected: 2 occurrences of `config-new-project` (one per step), no more inline JSON templates for config creation.
@@ -550,8 +550,8 @@ Expected: 2 occurrences of `config-new-project` (one per step), no more inline J
 - [ ] **Step 3.4: Commit**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
-git add get-shit-done/workflows/new-project.md
+cd /Users/diego/Dev/808
+git add 808/workflows/new-project.md
 git commit -m "feat: use config-new-project in new-project workflow for full config materialization"
 ```
 
@@ -562,7 +562,7 @@ git commit -m "feat: use config-new-project in new-project workflow for full con
 - [ ] **Step 4.1: Run the full test suite**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
+cd /Users/diego/Dev/808
 node --test tests/ 2>&1 | tail -30
 ```
 
@@ -578,10 +578,10 @@ TMP=$(mktemp -d)
 cd "$TMP"
 
 # Step 1 simulation: what init new-project returns
-node /Users/diego/Dev/get-shit-done/get-shit-done/bin/gsd-tools.cjs init new-project --cwd "$TMP"
+node /Users/diego/Dev/808/808/bin/808-tools.cjs init new-project --cwd "$TMP"
 
 # Step 5 simulation: create full config
-node /Users/diego/Dev/get-shit-done/get-shit-done/bin/gsd-tools.cjs config-new-project '{
+node /Users/diego/Dev/808/808/bin/808-tools.cjs config-new-project '{
   "mode": "interactive",
   "granularity": "standard",
   "parallelization": true,
@@ -611,11 +611,11 @@ Expected output: a config.json with `mode`, `granularity`, `model_profile`, `com
 TMP=$(mktemp -d)
 CHOICES='{"mode":"yolo","granularity":"coarse"}'
 
-node /Users/diego/Dev/get-shit-done/get-shit-done/bin/gsd-tools.cjs config-new-project "$CHOICES" --cwd "$TMP"
+node /Users/diego/Dev/808/808/bin/808-tools.cjs config-new-project "$CHOICES" --cwd "$TMP"
 FIRST=$(cat "$TMP/.planning/config.json")
 
 # Second call should be no-op
-node /Users/diego/Dev/get-shit-done/get-shit-done/bin/gsd-tools.cjs config-new-project "$CHOICES" --cwd "$TMP"
+node /Users/diego/Dev/808/808/bin/808-tools.cjs config-new-project "$CHOICES" --cwd "$TMP"
 SECOND=$(cat "$TMP/.planning/config.json")
 
 [ "$FIRST" = "$SECOND" ] && echo "IDEMPOTENT: OK" || echo "IDEMPOTENT: FAIL"
@@ -628,17 +628,17 @@ Expected: `IDEMPOTENT: OK`
 
 ```bash
 TMP=$(mktemp -d)
-node /Users/diego/Dev/get-shit-done/get-shit-done/bin/gsd-tools.cjs config-new-project '{
+node /Users/diego/Dev/808/808/bin/808-tools.cjs config-new-project '{
   "mode":"yolo","granularity":"standard","parallelization":true,"commit_docs":true,
   "model_profile":"balanced",
   "workflow":{"research":true,"plan_check":false,"verifier":true,"nyquist_validation":true}
 }' --cwd "$TMP"
 
 # loadConfig should correctly read plan_check (nested as workflow.plan_check)
-node /Users/diego/Dev/get-shit-done/get-shit-done/bin/gsd-tools.cjs config-get workflow.plan_check --cwd "$TMP"
+node /Users/diego/Dev/808/808/bin/808-tools.cjs config-get workflow.plan_check --cwd "$TMP"
 # Expected: false
 
-node /Users/diego/Dev/get-shit-done/get-shit-done/bin/gsd-tools.cjs config-get git.branching_strategy --cwd "$TMP"
+node /Users/diego/Dev/808/808/bin/808-tools.cjs config-get git.branching_strategy --cwd "$TMP"
 # Expected: "none"
 
 rm -rf "$TMP"
@@ -647,7 +647,7 @@ rm -rf "$TMP"
 - [ ] **Step 4.5: Final full test suite + commit**
 
 ```bash
-cd /Users/diego/Dev/get-shit-done
+cd /Users/diego/Dev/808
 node --test tests/ 2>&1 | grep -E "pass|fail|error" | tail -5
 ```
 
@@ -661,7 +661,7 @@ Expected: All pass, 0 failures.
 feat: materialize all config defaults at new-project initialization
 
 **Problem:**
-`/gsd:new-project` creates `.planning/config.json` with only the 6 keys
+`/808:new-project` creates `.planning/config.json` with only the 6 keys
 the user explicitly chose during onboarding. Five additional keys
 (`search_gitignored`, `brave_search`, `git.branching_strategy`,
 `git.phase_branch_template`, `git.milestone_branch_template`) are resolved
@@ -670,12 +670,12 @@ silently by `loadConfig()` at runtime but never written to disk.
 This creates two problems:
 1. **Discoverability**: users can't see or understand `git.branching_strategy`
    without reading source code — it doesn't appear in their config.
-2. **Implicit expansion**: the first time `/gsd:settings` or `config-set`
+2. **Implicit expansion**: the first time `/808:settings` or `config-set`
    writes to the config, those keys still aren't added. The config only
    reflects a fraction of the effective configuration.
 
 **Solution:**
-Add `config-new-project` CLI command to `gsd-tools.cjs`. The command:
+Add `config-new-project` CLI command to `808-tools.cjs`. The command:
 - Accepts user-chosen values as JSON
 - Merges them with all runtime defaults (including env-detected `brave_search`)
 - Writes the fully-materialized config in one shot
@@ -696,5 +696,5 @@ exactly one place: `buildNewProjectConfig()` in `config.cjs`.
 **Why this improves discoverability:**
 A developer opening `.planning/config.json` for the first time can now see
 `git.branching_strategy: "none"` and immediately understand that branching
-is available and configurable, without reading the GSD source.
+is available and configurable, without reading the 808 source.
 ```

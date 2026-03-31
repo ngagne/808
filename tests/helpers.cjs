@@ -1,21 +1,21 @@
 /**
- * GSD Tools Test Helpers
+ * 808 Tools Test Helpers
  */
 
 const { execSync, execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const TOOLS_PATH = path.join(__dirname, '..', 'get-shit-done', 'bin', 'gsd-tools.cjs');
+const TOOLS_PATH = path.join(__dirname, '..', '808', 'bin', '808-tools.cjs');
 
 /**
- * Run gsd-tools command.
+ * Run 808-tools command.
  *
  * @param {string|string[]} args - Command string (shell-interpreted) or array
  *   of arguments (shell-bypassed via execFileSync, safe for JSON and dollar signs).
  * @param {string} cwd - Working directory.
  * @param {object} [env] - Optional env overrides merged on top of process.env.
- *   Pass { HOME: cwd } to sandbox ~/.gsd/ lookups in tests that assert concrete
+ *   Pass { HOME: cwd } to sandbox ~/.808/ lookups in tests that assert concrete
  *   config values that could be overridden by a developer's defaults.json.
  */
 function runGsdTools(args, cwd = process.cwd(), env = {}) {
@@ -48,19 +48,19 @@ function runGsdTools(args, cwd = process.cwd(), env = {}) {
 }
 
 // Create a bare temp directory (no .planning/ structure)
-function createTempDir(prefix = 'gsd-test-') {
+function createTempDir(prefix = '808-test-') {
   return fs.mkdtempSync(path.join(require('os').tmpdir(), prefix));
 }
 
 // Create temp directory structure
-function createTempProject(prefix = 'gsd-test-') {
+function createTempProject(prefix = '808-test-') {
   const tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), prefix));
   fs.mkdirSync(path.join(tmpDir, '.planning', 'phases'), { recursive: true });
   return tmpDir;
 }
 
 // Create temp directory with initialized git repo and at least one commit
-function createTempGitProject(prefix = 'gsd-test-') {
+function createTempGitProject(prefix = '808-test-') {
   const tmpDir = fs.mkdtempSync(path.join(require('os').tmpdir(), prefix));
   fs.mkdirSync(path.join(tmpDir, '.planning', 'phases'), { recursive: true });
 

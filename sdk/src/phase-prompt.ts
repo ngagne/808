@@ -75,7 +75,7 @@ export class PromptFactory {
     projectAgentsDir?: string;
     sdkPromptsDir?: string;
   }) {
-    const gsdInstallDir = options?.gsdInstallDir ?? join(homedir(), '.claude', 'get-shit-done');
+    const gsdInstallDir = options?.808InstallDir ?? join(homedir(), '.claude', '808');
     this.workflowsDir = join(gsdInstallDir, 'workflows');
     this.agentsDir = options?.agentsDir ?? join(homedir(), '.claude', 'agents');
     this.projectAgentsDir = options?.projectAgentsDir;
@@ -149,7 +149,7 @@ export class PromptFactory {
   /**
    * Load the workflow file for a phase type.
    * Tries sdk/prompts/workflows/ first (headless versions), then
-   * falls back to GSD-1 originals in workflowsDir.
+   * falls back to 808-1 originals in workflowsDir.
    * Returns the raw content, or undefined if not found.
    */
   async loadWorkflowFile(phaseType: PhaseType): Promise<string | undefined> {
@@ -160,10 +160,10 @@ export class PromptFactory {
     try {
       return await readFile(sdkPath, 'utf-8');
     } catch {
-      // Not in sdk/prompts/, fall through to GSD-1 originals
+      // Not in sdk/prompts/, fall through to 808-1 originals
     }
 
-    // Fall back to GSD-1 originals
+    // Fall back to 808-1 originals
     const filePath = join(this.workflowsDir, filename);
     try {
       return await readFile(filePath, 'utf-8');
