@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Writable } from 'node:stream';
-import { 808Logger } from './logger.js';
+import { Agent808Logger } from './logger.js';
 import type { LogEntry } from './logger.js';
 import { PhaseType } from './types.js';
 
@@ -29,7 +29,7 @@ describe('808Logger', () => {
   });
 
   it('outputs valid JSON on each log call', () => {
-    const logger = new 808Logger({ output, level: 'debug' });
+    const logger = new Agent808Logger({ output, level: 'debug' });
     logger.info('test message');
 
     expect(output.lines).toHaveLength(1);
@@ -37,7 +37,7 @@ describe('808Logger', () => {
   });
 
   it('includes required fields: timestamp, level, message', () => {
-    const logger = new 808Logger({ output, level: 'debug' });
+    const logger = new Agent808Logger({ output, level: 'debug' });
     logger.info('hello world');
 
     const entry = parseLogEntry(output.lines[0]!);
@@ -47,7 +47,7 @@ describe('808Logger', () => {
   });
 
   it('filters messages below minimum log level', () => {
-    const logger = new 808Logger({ output, level: 'warn' });
+    const logger = new Agent808Logger({ output, level: 'warn' });
 
     logger.debug('should be dropped');
     logger.info('should be dropped');
@@ -60,7 +60,7 @@ describe('808Logger', () => {
   });
 
   it('defaults to info level filtering', () => {
-    const logger = new 808Logger({ output });
+    const logger = new Agent808Logger({ output });
 
     logger.debug('dropped');
     logger.info('kept');
@@ -71,7 +71,7 @@ describe('808Logger', () => {
 
   it('writes to custom output stream', () => {
     const customOutput = new BufferStream();
-    const logger = new 808Logger({ output: customOutput, level: 'debug' });
+    const logger = new Agent808Logger({ output: customOutput, level: 'debug' });
     logger.info('custom');
 
     expect(customOutput.lines).toHaveLength(1);
@@ -79,7 +79,7 @@ describe('808Logger', () => {
   });
 
   it('includes phase, plan, and sessionId context when set', () => {
-    const logger = new 808Logger({
+    const logger = new Agent808Logger({
       output,
       level: 'debug',
       phase: PhaseType.Execute,
@@ -96,7 +96,7 @@ describe('808Logger', () => {
   });
 
   it('includes extra data when provided', () => {
-    const logger = new 808Logger({ output, level: 'debug' });
+    const logger = new Agent808Logger({ output, level: 'debug' });
     logger.info('with data', { count: 42, tool: 'Bash' });
 
     const entry = parseLogEntry(output.lines[0]!);
@@ -104,7 +104,7 @@ describe('808Logger', () => {
   });
 
   it('omits optional fields when not set', () => {
-    const logger = new 808Logger({ output, level: 'debug' });
+    const logger = new Agent808Logger({ output, level: 'debug' });
     logger.info('minimal');
 
     const entry = parseLogEntry(output.lines[0]!);
@@ -115,7 +115,7 @@ describe('808Logger', () => {
   });
 
   it('supports runtime context updates via setters', () => {
-    const logger = new 808Logger({ output, level: 'debug' });
+    const logger = new Agent808Logger({ output, level: 'debug' });
 
     logger.info('before');
     logger.setPhase(PhaseType.Research);
@@ -133,7 +133,7 @@ describe('808Logger', () => {
   });
 
   it('emits all four log levels correctly', () => {
-    const logger = new 808Logger({ output, level: 'debug' });
+    const logger = new Agent808Logger({ output, level: 'debug' });
 
     logger.debug('d');
     logger.info('i');

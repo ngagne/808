@@ -20,24 +20,24 @@ import type {
   InitStepResult,
   InitStepName,
   InitNewProjectInfo,
-  808InitStartEvent,
-  808InitStepStartEvent,
-  808InitStepCompleteEvent,
-  808InitCompleteEvent,
-  808InitResearchSpawnEvent,
+  agent808InitStartEvent,
+  agent808InitStepStartEvent,
+  agent808InitStepCompleteEvent,
+  agent808InitCompleteEvent,
+  agent808InitResearchSpawnEvent,
   PlanResult,
 } from './types.js';
-import { 808EventType, PhaseStepType } from './types.js';
-import type { 808Tools } from './808-tools.js';
-import type { 808EventStream } from './event-stream.js';
+import { agent808EventType, PhaseStepType } from './types.js';
+import type { Agent808Tools } from './808-tools.js';
+import type { Agent808EventStream } from './event-stream.js';
 import { loadConfig } from './config.js';
 import { runPhaseStepSession } from './session-runner.js';
 import { sanitizePrompt } from './prompt-sanitizer.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const 808_TEMPLATES_DIR = join(homedir(), '.claude', '808', 'templates');
-const 808_AGENTS_DIR = join(homedir(), '.claude', 'agents');
+const AGENT_808_TEMPLATES_DIR = join(homedir(), '.claude', '808', 'templates');
+const AGENT_808_AGENTS_DIR = join(homedir(), '.claude', 'agents');
 
 const RESEARCH_TYPES = ['STACK', 'FEATURES', 'ARCHITECTURE', 'PITFALLS'] as const;
 type ResearchType = (typeof RESEARCH_TYPES)[number];
@@ -67,8 +67,8 @@ const AUTO_MODE_CONFIG = {
 
 export interface InitRunnerDeps {
   projectDir: string;
-  tools: 808Tools;
-  eventStream: 808EventStream;
+  tools: Agent808Tools;
+  eventStream: Agent808EventStream;
   config?: Partial<InitConfig>;
   /** Override for SDK prompts directory. Defaults to package-relative sdk/prompts/. */
   sdkPromptsDir?: string;
@@ -76,8 +76,8 @@ export interface InitRunnerDeps {
 
 export class InitRunner {
   private readonly projectDir: string;
-  private readonly tools: 808Tools;
-  private readonly eventStream: 808EventStream;
+  private readonly tools: Agent808Tools;
+  private readonly eventStream: Agent808EventStream;
   private readonly config: InitConfig;
   private readonly sessionId: string;
   private readonly sdkPromptsDir: string;
@@ -110,8 +110,8 @@ export class InitRunner {
     const steps: InitStepResult[] = [];
     const artifacts: string[] = [];
 
-    this.emitEvent<808InitStartEvent>({
-      type: 808EventType.InitStart,
+    this.emitEvent<agent808InitStartEvent>({
+      type: agent808EventType.InitStart,
       input: input.slice(0, 200),
       projectDir: this.projectDir,
     });
@@ -275,8 +275,8 @@ export class InitRunner {
   ): Promise<{ stepResult: InitStepResult; value?: T }> {
     const stepStart = Date.now();
 
-    this.emitEvent<808InitStepStartEvent>({
-      type: 808EventType.InitStepStart,
+    this.emitEvent<agent808InitStepStartEvent>({
+      type: agent808EventType.InitStepStart,
       step,
     });
 
@@ -292,8 +292,8 @@ export class InitRunner {
         costUsd,
       };
 
-      this.emitEvent<808InitStepCompleteEvent>({
-        type: 808EventType.InitStepComplete,
+      this.emitEvent<agent808InitStepCompleteEvent>({
+        type: agent808EventType.InitStepComplete,
         step,
         success: true,
         durationMs,
@@ -313,8 +313,8 @@ export class InitRunner {
         error: errorMsg,
       };
 
-      this.emitEvent<808InitStepCompleteEvent>({
-        type: 808EventType.InitStepComplete,
+      this.emitEvent<agent808InitStepCompleteEvent>({
+        type: agent808EventType.InitStepComplete,
         step,
         success: false,
         durationMs,
@@ -332,8 +332,8 @@ export class InitRunner {
     input: string,
     projectInfo: InitNewProjectInfo,
   ): Promise<InitStepResult[]> {
-    this.emitEvent<808InitResearchSpawnEvent>({
-      type: 808EventType.InitResearchSpawn,
+    this.emitEvent<agent808InitResearchSpawnEvent>({
+      type: agent808EventType.InitResearchSpawn,
       sessionCount: RESEARCH_TYPES.length,
       researchTypes: [...RESEARCH_TYPES],
     });
@@ -633,7 +633,7 @@ export class InitRunner {
     }
 
     // Fall back to 808-1 originals
-    const fullPath = join(808_TEMPLATES_DIR, '..', relativePath);
+    const fullPath = join(AGENT_808_TEMPLATES_DIR, '..', relativePath);
     try {
       return await readFile(fullPath, 'utf-8');
     } catch {
@@ -657,7 +657,7 @@ export class InitRunner {
     }
 
     // Fall back to 808-1 originals
-    const fullPath = join(808_AGENTS_DIR, filename);
+    const fullPath = join(AGENT_808_AGENTS_DIR, filename);
     try {
       return await readFile(fullPath, 'utf-8');
     } catch {
@@ -684,14 +684,14 @@ export class InitRunner {
 
   // ─── Event helpers ─────────────────────────────────────────────────────────
 
-  private emitEvent<T extends { type: 808EventType }>(
-    partial: Omit<T, 'timestamp' | 'sessionId'> & { type: 808EventType },
+  private emitEvent<T extends { type: agent808EventType }>(
+    partial: Omit<T, 'timestamp' | 'sessionId'> & { type: agent808EventType },
   ): void {
     this.eventStream.emitEvent({
       timestamp: new Date().toISOString(),
       sessionId: this.sessionId,
       ...partial,
-    } as unknown as import('./types.js').808Event);
+    } as unknown as import('./types.js').agent808Event);
   }
 
   // ─── Result helpers ────────────────────────────────────────────────────────
@@ -705,8 +705,8 @@ export class InitRunner {
     const totalCostUsd = steps.reduce((sum, s) => sum + s.costUsd, 0);
     const totalDurationMs = Date.now() - startTime;
 
-    this.emitEvent<808InitCompleteEvent>({
-      type: 808EventType.InitComplete,
+    this.emitEvent<agent808InitCompleteEvent>({
+      type: agent808EventType.InitComplete,
       success,
       totalCostUsd,
       totalDurationMs,

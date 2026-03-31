@@ -33,7 +33,7 @@ export interface LogEntry {
 
 // ─── Logger options ──────────────────────────────────────────────────────────
 
-export interface 808LoggerOptions {
+export interface agent808LoggerOptions {
   /** Minimum log level to output. Default: 'info'. */
   level?: LogLevel;
   /** Output stream. Default: process.stderr. */
@@ -48,14 +48,14 @@ export interface 808LoggerOptions {
 
 // ─── Logger class ────────────────────────────────────────────────────────────
 
-export class 808Logger {
+export class Agent808Logger {
   private readonly minLevel: number;
   private readonly output: Writable;
   private phase?: PhaseType;
   private plan?: string;
   private sessionId?: string;
 
-  constructor(options: 808LoggerOptions = {}) {
+  constructor(options: agent808LoggerOptions = {}) {
     this.minLevel = LOG_LEVEL_PRIORITY[options.level ?? 'info'];
     this.output = options.output ?? process.stderr;
     this.phase = options.phase;

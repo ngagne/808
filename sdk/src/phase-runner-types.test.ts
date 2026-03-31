@@ -1,18 +1,18 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { 808Tools, 808ToolsError } from './808-tools.js';
+import { Agent808Tools, Agent808ToolsError } from './808-tools.js';
 import {
   PhaseStepType,
-  808EventType,
+  agentagent808EventType,
   PhaseType,
   type PhaseOpInfo,
   type PhaseStepResult,
   type PhaseRunnerResult,
   type HumanGateCallbacks,
   type PhaseRunnerOptions,
-  type 808PhaseStartEvent,
-  type 808PhaseStepStartEvent,
-  type 808PhaseStepCompleteEvent,
-  type 808PhaseCompleteEvent,
+  type agent808PhaseStartEvent,
+  type agent808PhaseStepStartEvent,
+  type agent808PhaseStepCompleteEvent,
+  type agent808PhaseCompleteEvent,
 } from './types.js';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -41,19 +41,19 @@ describe('Phase lifecycle types', () => {
 
   describe('808EventType phase lifecycle events', () => {
     it('includes PhaseStart', () => {
-      expect(808EventType.PhaseStart).toBe('phase_start');
+      expect(agent808EventType.PhaseStart).toBe('phase_start');
     });
 
     it('includes PhaseStepStart', () => {
-      expect(808EventType.PhaseStepStart).toBe('phase_step_start');
+      expect(agent808EventType.PhaseStepStart).toBe('phase_step_start');
     });
 
     it('includes PhaseStepComplete', () => {
-      expect(808EventType.PhaseStepComplete).toBe('phase_step_complete');
+      expect(agent808EventType.PhaseStepComplete).toBe('phase_step_complete');
     });
 
     it('includes PhaseComplete', () => {
-      expect(808EventType.PhaseComplete).toBe('phase_complete');
+      expect(agent808EventType.PhaseComplete).toBe('phase_complete');
     });
   });
 
@@ -199,7 +199,7 @@ describe('Phase lifecycle types', () => {
   describe('Phase lifecycle event interfaces', () => {
     it('808PhaseStartEvent has correct shape', () => {
       const event: 808PhaseStartEvent = {
-        type: 808EventType.PhaseStart,
+        type: agentagent808EventType.PhaseStart,
         timestamp: new Date().toISOString(),
         sessionId: 'test-session',
         phaseNumber: '3',
@@ -211,7 +211,7 @@ describe('Phase lifecycle types', () => {
 
     it('808PhaseStepStartEvent has correct shape', () => {
       const event: 808PhaseStepStartEvent = {
-        type: 808EventType.PhaseStepStart,
+        type: agentagent808EventType.PhaseStepStart,
         timestamp: new Date().toISOString(),
         sessionId: 'test-session',
         phaseNumber: '3',
@@ -223,7 +223,7 @@ describe('Phase lifecycle types', () => {
 
     it('808PhaseStepCompleteEvent has correct shape', () => {
       const event: 808PhaseStepCompleteEvent = {
-        type: 808EventType.PhaseStepComplete,
+        type: agentagent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: 'test-session',
         phaseNumber: '3',
@@ -237,7 +237,7 @@ describe('Phase lifecycle types', () => {
 
     it('808PhaseStepCompleteEvent can include error', () => {
       const event: 808PhaseStepCompleteEvent = {
-        type: 808EventType.PhaseStepComplete,
+        type: agentagent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: 'test-session',
         phaseNumber: '3',
@@ -251,7 +251,7 @@ describe('Phase lifecycle types', () => {
 
     it('808PhaseCompleteEvent has correct shape', () => {
       const event: 808PhaseCompleteEvent = {
-        type: 808EventType.PhaseComplete,
+        type: agentagent808EventType.PhaseComplete,
         timestamp: new Date().toISOString(),
         sessionId: 'test-session',
         phaseNumber: '3',
@@ -325,7 +325,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new 808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
       const result = await tools.initPhaseOp('5');
 
       expect(result.phase_found).toBe(true);
@@ -346,7 +346,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new 808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
       const result = await tools.initPhaseOp('7') as { received_args: string[] };
 
       expect(result.received_args).toContain('init');
@@ -371,7 +371,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new 808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
       const result = await tools.configGet('model_profile');
 
       expect(result).toBe('balanced');
@@ -390,7 +390,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new 808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
       const result = await tools.configGet('nonexistent_key');
 
       expect(result).toBeNull();
@@ -412,7 +412,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new 808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
       const result = await tools.stateBeginPhase('3');
 
       expect(result).toBe('ok');

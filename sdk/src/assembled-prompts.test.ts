@@ -19,8 +19,8 @@ import { PromptFactory } from './phase-prompt.js';
 import { InitRunner } from './init-runner.js';
 import { PhaseType } from './types.js';
 import type { ParsedPlan, ContextFiles, 808Event } from './types.js';
-import type { 808Tools } from './808-tools.js';
-import type { 808EventStream } from './event-stream.js';
+import type { Agent808Tools } from './808-tools.js';
+import type { Agent808EventStream } from './event-stream.js';
 
 // ─── Paths ───────────────────────────────────────────────────────────────────
 
@@ -155,7 +155,7 @@ describe('InitRunner assembled output', () => {
   let runner: InitRunner;
 
   // Minimal stub tools and event stream — we only call build*Prompt(), not run()
-  const stubTools: 808Tools = {
+  const stubTools: Agent808Tools = {
     initNewProject: async () => ({
       researcher_model: 'test',
       synthesizer_model: 'test',
@@ -167,11 +167,11 @@ describe('InitRunner assembled output', () => {
     }),
     configSet: async () => {},
     commit: async () => {},
-  } as unknown as 808Tools;
+  } as unknown as Agent808Tools;
 
-  const stubEventStream: 808EventStream = {
-    emitEvent: (_event: 808Event) => {},
-  } as unknown as 808EventStream;
+  const stubEventStream: Agent808EventStream = {
+    emitEvent: (_event: agent808Event) => {},
+  } as unknown as Agent808EventStream;
 
   beforeAll(async () => {
     // Create temp directory with .planning/ structure for InitRunner file reads

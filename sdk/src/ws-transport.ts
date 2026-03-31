@@ -6,7 +6,7 @@
  */
 
 import { WebSocketServer, WebSocket } from 'ws';
-import type { 808Event, TransportHandler } from './types.js';
+import type { agent808Event, TransportHandler } from './types.js';
 
 export interface WSTransportOptions {
   port: number;
@@ -43,7 +43,7 @@ export class WSTransport implements TransportHandler {
    * Broadcast a 808 event as JSON to all connected clients.
    * Never throws — wraps each client.send in try/catch.
    */
-  onEvent(event: 808Event): void {
+  onEvent(event: agent808Event): void {
     try {
       if (!this.server) return;
 

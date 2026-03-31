@@ -1,25 +1,25 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { 808EventStream } from './event-stream.js';
+import { Agent808EventStream } from './event-stream.js';
 import {
-  808EventType,
+  agentagent808EventType,
   PhaseType,
-  type 808Event,
-  type 808SessionInitEvent,
-  type 808SessionCompleteEvent,
-  type 808SessionErrorEvent,
-  type 808AssistantTextEvent,
-  type 808ToolCallEvent,
-  type 808ToolProgressEvent,
-  type 808ToolUseSummaryEvent,
-  type 808TaskStartedEvent,
-  type 808TaskProgressEvent,
-  type 808TaskNotificationEvent,
-  type 808APIRetryEvent,
-  type 808RateLimitEvent,
-  type 808StatusChangeEvent,
-  type 808CompactBoundaryEvent,
-  type 808StreamEvent,
-  type 808CostUpdateEvent,
+  type agent808Event,
+  type agent808SessionInitEvent,
+  type agent808SessionCompleteEvent,
+  type agent808SessionErrorEvent,
+  type agent808AssistantTextEvent,
+  type agent808ToolCallEvent,
+  type agent808ToolProgressEvent,
+  type agent808ToolUseSummaryEvent,
+  type agent808TaskStartedEvent,
+  type agent808TaskProgressEvent,
+  type agent808TaskNotificationEvent,
+  type agent808APIRetryEvent,
+  type agent808RateLimitEvent,
+  type agent808StatusChangeEvent,
+  type agent808CompactBoundaryEvent,
+  type agent808StreamEvent,
+  type agent808CostUpdateEvent,
   type TransportHandler,
 } from './types.js';
 import type {
@@ -237,17 +237,17 @@ function makeCompactBoundary(): SDKCompactBoundaryMessage {
 // ─── SDKMessage → 808Event mapping tests ─────────────────────────────────────
 
 describe('808EventStream', () => {
-  let stream: 808EventStream;
+  let stream: Agent808EventStream;
 
   beforeEach(() => {
-    stream = new 808EventStream();
+    stream = new Agent808EventStream();
   });
 
   describe('mapSDKMessage', () => {
     it('maps SDKSystemMessage init → SessionInit', () => {
       const event = stream.mapSDKMessage(makeSystemInit());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.SessionInit);
+      expect(event!.type).toBe(agent808EventType.SessionInit);
 
       const init = event as 808SessionInitEvent;
       expect(init.model).toBe('claude-sonnet-4-6');
@@ -263,7 +263,7 @@ describe('808EventStream', () => {
       ]);
       const event = stream.mapSDKMessage(msg);
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.AssistantText);
+      expect(event!.type).toBe(agent808EventType.AssistantText);
       expect((event as 808AssistantTextEvent).text).toBe('Hello world');
     });
 
@@ -273,7 +273,7 @@ describe('808EventStream', () => {
       ]);
       const event = stream.mapSDKMessage(msg);
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.ToolCall);
+      expect(event!.type).toBe(agent808EventType.ToolCall);
 
       const tc = event as 808ToolCallEvent;
       expect(tc.toolName).toBe('Read');
@@ -282,8 +282,8 @@ describe('808EventStream', () => {
     });
 
     it('handles multi-block assistant messages (text + tool_use)', () => {
-      const events: 808Event[] = [];
-      stream.on('event', (e: 808Event) => events.push(e));
+      const events: agent808Event[] = [];
+      stream.on('event', (e: agent808Event) => events.push(e));
 
       const msg = makeAssistantMsg([
         { type: 'text', text: 'Let me check that.' },
@@ -296,14 +296,14 @@ describe('808EventStream', () => {
 
       // Should have received 2 events total
       expect(events).toHaveLength(2);
-      expect(events[0]!.type).toBe(808EventType.AssistantText);
-      expect(events[1]!.type).toBe(808EventType.ToolCall);
+      expect(events[0]!.type).toBe(agent808EventType.AssistantText);
+      expect(events[1]!.type).toBe(agent808EventType.ToolCall);
     });
 
     it('maps SDKResultSuccess → SessionComplete', () => {
       const event = stream.mapSDKMessage(makeResultSuccess());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.SessionComplete);
+      expect(event!.type).toBe(agent808EventType.SessionComplete);
 
       const complete = event as 808SessionCompleteEvent;
       expect(complete.success).toBe(true);
@@ -316,7 +316,7 @@ describe('808EventStream', () => {
     it('maps SDKResultError → SessionError', () => {
       const event = stream.mapSDKMessage(makeResultError());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.SessionError);
+      expect(event!.type).toBe(agent808EventType.SessionError);
 
       const err = event as 808SessionErrorEvent;
       expect(err.success).toBe(false);
@@ -327,7 +327,7 @@ describe('808EventStream', () => {
     it('maps SDKToolProgressMessage → ToolProgress', () => {
       const event = stream.mapSDKMessage(makeToolProgress());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.ToolProgress);
+      expect(event!.type).toBe(agent808EventType.ToolProgress);
 
       const tp = event as 808ToolProgressEvent;
       expect(tp.toolName).toBe('Bash');
@@ -338,7 +338,7 @@ describe('808EventStream', () => {
     it('maps SDKToolUseSummaryMessage → ToolUseSummary', () => {
       const event = stream.mapSDKMessage(makeToolUseSummary());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.ToolUseSummary);
+      expect(event!.type).toBe(agent808EventType.ToolUseSummary);
 
       const tus = event as 808ToolUseSummaryEvent;
       expect(tus.summary).toBe('Ran 3 bash commands');
@@ -348,7 +348,7 @@ describe('808EventStream', () => {
     it('maps SDKTaskStartedMessage → TaskStarted', () => {
       const event = stream.mapSDKMessage(makeTaskStarted());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.TaskStarted);
+      expect(event!.type).toBe(agent808EventType.TaskStarted);
 
       const ts = event as 808TaskStartedEvent;
       expect(ts.taskId).toBe('task-1');
@@ -359,7 +359,7 @@ describe('808EventStream', () => {
     it('maps SDKTaskProgressMessage → TaskProgress', () => {
       const event = stream.mapSDKMessage(makeTaskProgress());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.TaskProgress);
+      expect(event!.type).toBe(agent808EventType.TaskProgress);
 
       const tp = event as 808TaskProgressEvent;
       expect(tp.taskId).toBe('task-1');
@@ -371,7 +371,7 @@ describe('808EventStream', () => {
     it('maps SDKTaskNotificationMessage → TaskNotification', () => {
       const event = stream.mapSDKMessage(makeTaskNotification());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.TaskNotification);
+      expect(event!.type).toBe(agent808EventType.TaskNotification);
 
       const tn = event as 808TaskNotificationEvent;
       expect(tn.taskId).toBe('task-1');
@@ -382,7 +382,7 @@ describe('808EventStream', () => {
     it('maps SDKAPIRetryMessage → APIRetry', () => {
       const event = stream.mapSDKMessage(makeAPIRetry());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.APIRetry);
+      expect(event!.type).toBe(agent808EventType.APIRetry);
 
       const retry = event as 808APIRetryEvent;
       expect(retry.attempt).toBe(2);
@@ -394,7 +394,7 @@ describe('808EventStream', () => {
     it('maps SDKRateLimitEvent → RateLimit', () => {
       const event = stream.mapSDKMessage(makeRateLimitEvent());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.RateLimit);
+      expect(event!.type).toBe(agent808EventType.RateLimit);
 
       const rl = event as 808RateLimitEvent;
       expect(rl.status).toBe('allowed_warning');
@@ -404,14 +404,14 @@ describe('808EventStream', () => {
     it('maps SDKStatusMessage → StatusChange', () => {
       const event = stream.mapSDKMessage(makeStatusMessage());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.StatusChange);
+      expect(event!.type).toBe(agent808EventType.StatusChange);
       expect((event as 808StatusChangeEvent).status).toBe('compacting');
     });
 
     it('maps SDKCompactBoundaryMessage → CompactBoundary', () => {
       const event = stream.mapSDKMessage(makeCompactBoundary());
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.CompactBoundary);
+      expect(event!.type).toBe(agent808EventType.CompactBoundary);
 
       const cb = event as 808CompactBoundaryEvent;
       expect(cb.trigger).toBe('auto');
@@ -499,7 +499,7 @@ describe('808EventStream', () => {
 
   describe('transport management', () => {
     it('delivers events to subscribed transports', () => {
-      const received: 808Event[] = [];
+      const received: agent808Event[] = [];
       const transport: TransportHandler = {
         onEvent: (event) => received.push(event),
         close: () => {},
@@ -509,12 +509,12 @@ describe('808EventStream', () => {
       stream.mapAndEmit(makeSystemInit());
 
       expect(received).toHaveLength(1);
-      expect(received[0]!.type).toBe(808EventType.SessionInit);
+      expect(received[0]!.type).toBe(agent808EventType.SessionInit);
     });
 
     it('delivers events to multiple transports', () => {
-      const received1: 808Event[] = [];
-      const received2: 808Event[] = [];
+      const received1: agent808Event[] = [];
+      const received2: agent808Event[] = [];
 
       stream.addTransport({
         onEvent: (e) => received1.push(e),
@@ -532,7 +532,7 @@ describe('808EventStream', () => {
     });
 
     it('stops delivering events after transport removal', () => {
-      const received: 808Event[] = [];
+      const received: agent808Event[] = [];
       const transport: TransportHandler = {
         onEvent: (e) => received.push(e),
         close: () => {},
@@ -552,7 +552,7 @@ describe('808EventStream', () => {
         onEvent: () => { throw new Error('transport failed'); },
         close: () => {},
       };
-      const goodReceived: 808Event[] = [];
+      const goodReceived: agent808Event[] = [];
       const goodTransport: TransportHandler = {
         onEvent: (e) => goodReceived.push(e),
         close: () => {},
@@ -581,8 +581,8 @@ describe('808EventStream', () => {
       expect(closeCalled).toHaveLength(2);
 
       // No more deliveries after closeAll
-      const events: 808Event[] = [];
-      stream.on('event', (e: 808Event) => events.push(e));
+      const events: agent808Event[] = [];
+      stream.on('event', (e: agent808Event) => events.push(e));
       stream.mapAndEmit(makeSystemInit());
       // EventEmitter listeners still work, but transports are gone
       expect(events).toHaveLength(1);
@@ -593,26 +593,26 @@ describe('808EventStream', () => {
 
   describe('EventEmitter integration', () => {
     it('emits typed events via "event" channel', () => {
-      const events: 808Event[] = [];
-      stream.on('event', (e: 808Event) => events.push(e));
+      const events: agent808Event[] = [];
+      stream.on('event', (e: agent808Event) => events.push(e));
 
       stream.mapAndEmit(makeSystemInit());
       stream.mapAndEmit(makeResultSuccess());
 
       expect(events).toHaveLength(2);
-      expect(events[0]!.type).toBe(808EventType.SessionInit);
-      expect(events[1]!.type).toBe(808EventType.SessionComplete);
+      expect(events[0]!.type).toBe(agent808EventType.SessionInit);
+      expect(events[1]!.type).toBe(agent808EventType.SessionComplete);
     });
 
     it('emits events on per-type channels', () => {
-      const initEvents: 808Event[] = [];
-      stream.on(808EventType.SessionInit, (e: 808Event) => initEvents.push(e));
+      const initEvents: agent808Event[] = [];
+      stream.on(agent808EventType.SessionInit, (e: agent808Event) => initEvents.push(e));
 
       stream.mapAndEmit(makeSystemInit());
       stream.mapAndEmit(makeResultSuccess());
 
       expect(initEvents).toHaveLength(1);
-      expect(initEvents[0]!.type).toBe(808EventType.SessionInit);
+      expect(initEvents[0]!.type).toBe(agent808EventType.SessionInit);
     });
   });
 
@@ -630,7 +630,7 @@ describe('808EventStream', () => {
 
       const event = stream.mapSDKMessage(msg);
       expect(event).not.toBeNull();
-      expect(event!.type).toBe(808EventType.StreamEvent);
+      expect(event!.type).toBe(agent808EventType.StreamEvent);
       expect((event as 808StreamEvent).event).toEqual({ type: 'content_block_delta' });
     });
   });

@@ -23,14 +23,14 @@ import { readFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { homedir } from 'node:os';
 
-import type { 808Options, PlanResult, SessionOptions, 808Event, TransportHandler, PhaseRunnerOptions, PhaseRunnerResult, MilestoneRunnerOptions, MilestoneRunnerResult, RoadmapPhaseInfo } from './types.js';
-import { 808EventType } from './types.js';
+import type { agent808Options, PlanResult, SessionOptions, agent808Event, TransportHandler, PhaseRunnerOptions, PhaseRunnerResult, MilestoneRunnerOptions, MilestoneRunnerResult, RoadmapPhaseInfo } from './types.js';
+import { agent808EventType } from './types.js';
 import { parsePlan, parsePlanFile } from './plan-parser.js';
 import { loadConfig } from './config.js';
-import { 808Tools, resolveGsdToolsPath } from './808-tools.js';
+import { Agent808Tools, resolveGsdToolsPath } from './808-tools.js';
 import { runPlanSession } from './session-runner.js';
 import { buildExecutorPrompt, parseAgentTools } from './prompt-builder.js';
-import { 808EventStream } from './event-stream.js';
+import { Agent808EventStream } from './event-stream.js';
 import { PhaseRunner } from './phase-runner.js';
 import { ContextEngine } from './context-engine.js';
 import { PromptFactory } from './phase-prompt.js';
@@ -44,17 +44,17 @@ export class 808 {
   private readonly defaultMaxBudgetUsd: number;
   private readonly defaultMaxTurns: number;
   private readonly autoMode: boolean;
-  readonly eventStream: 808EventStream;
+  readonly eventStream: Agent808EventStream;
 
-  constructor(options: 808Options) {
+  constructor(options: agent808Options) {
     this.projectDir = resolve(options.projectDir);
-    this.808ToolsPath =
-      options.808ToolsPath ?? resolveGsdToolsPath(this.projectDir);
+    this.gsdToolsPath =
+      options.gsdToolsPath ?? resolveGsdToolsPath(this.projectDir);
     this.defaultModel = options.model;
     this.defaultMaxBudgetUsd = options.maxBudgetUsd ?? 5.0;
     this.defaultMaxTurns = options.maxTurns ?? 50;
     this.autoMode = options.autoMode ?? false;
-    this.eventStream = new 808EventStream();
+    this.eventStream = new Agent808EventStream();
   }
 
   /**
@@ -98,7 +98,7 @@ export class 808 {
   /**
    * Subscribe a simple handler to receive all 808 events.
    */
-  onEvent(handler: (event: 808Event) => void): void {
+  onEvent(handler: (event: agent808Event) => void): void {
     this.eventStream.on('event', handler);
   }
 
@@ -113,10 +113,10 @@ export class 808 {
   /**
    * Create a 808Tools instance for state management operations.
    */
-  createTools(): 808Tools {
-    return new 808Tools({
+  createTools(): Agent808Tools {
+    return new Agent808Tools({
       projectDir: this.projectDir,
-      gsdToolsPath: this.808ToolsPath,
+      gsdToolsPath: this.gsdToolsPath,
     });
   }
 
@@ -174,7 +174,7 @@ export class 808 {
 
     // Emit MilestoneStart
     this.eventStream.emitEvent({
-      type: 808EventType.MilestoneStart,
+      type: agent808EventType.MilestoneStart,
       timestamp: new Date().toISOString(),
       sessionId: `milestone-${Date.now()}`,
       phaseCount: incompletePhases.length,
@@ -227,7 +227,7 @@ export class 808 {
 
     // Emit MilestoneComplete
     this.eventStream.emitEvent({
-      type: 808EventType.MilestoneComplete,
+      type: agent808EventType.MilestoneComplete,
       timestamp: new Date().toISOString(),
       sessionId: `milestone-${Date.now()}`,
       success,
@@ -285,21 +285,21 @@ export class 808 {
 
 export { parsePlan, parsePlanFile } from './plan-parser.js';
 export { loadConfig } from './config.js';
-export type { 808Config } from './config.js';
-export { 808Tools, 808ToolsError, resolveGsdToolsPath } from './808-tools.js';
+export type { agent808Config } from './config.js';
+export { Agent808Tools, Agent808ToolsError, resolveGsdToolsPath } from './808-tools.js';
 export { runPlanSession, runPhaseStepSession } from './session-runner.js';
 export { buildExecutorPrompt, parseAgentTools } from './prompt-builder.js';
 export * from './types.js';
 
 // S02: Event stream, context, prompt, and logging modules
-export { 808EventStream } from './event-stream.js';
+export { Agent808EventStream } from './event-stream.js';
 export type { EventStreamContext } from './event-stream.js';
 export { ContextEngine, PHASE_FILE_MANIFEST } from './context-engine.js';
 export type { FileSpec } from './context-engine.js';
 export { getToolsForPhase, PHASE_AGENT_MAP, PHASE_DEFAULT_TOOLS } from './tool-scoping.js';
 export { PromptFactory, extractBlock, extractSteps, PHASE_WORKFLOW_MAP } from './phase-prompt.js';
-export { 808Logger } from './logger.js';
-export type { LogLevel, LogEntry, 808LoggerOptions } from './logger.js';
+export { Agent808Logger } from './logger.js';
+export type { LogLevel, LogEntry, agent808LoggerOptions } from './logger.js';
 
 // S03: Phase lifecycle state machine
 export { PhaseRunner, PhaseRunnerError } from './phase-runner.js';

@@ -194,7 +194,7 @@ export interface PlanResult {
 /**
  * Options for creating a 808 instance.
  */
-export interface 808Options {
+export interface agent808Options {
   /** Root directory of the project. */
   projectDir: string;
   /** Path to 808-tools.cjs. Falls back to <projectDir>/.claude/ then ~/.claude/. */
@@ -226,7 +226,7 @@ export enum PhaseType {
  * Event types emitted by the 808 event stream.
  * Maps from SDKMessage variants to domain-meaningful events.
  */
-export enum 808EventType {
+export enum agent808EventType {
   SessionInit = 'session_init',
   SessionComplete = 'session_complete',
   SessionError = 'session_error',
@@ -261,8 +261,8 @@ export enum 808EventType {
 /**
  * Base fields present on every 808 event.
  */
-export interface 808EventBase {
-  type: 808EventType;
+export interface agent808EventBase {
+  type: agent808EventType;
   timestamp: string;
   sessionId: string;
   phase?: PhaseType;
@@ -272,8 +272,8 @@ export interface 808EventBase {
 /**
  * Session initialized — emitted on SDKSystemMessage subtype 'init'.
  */
-export interface 808SessionInitEvent extends 808EventBase {
-  type: 808EventType.SessionInit;
+export interface agent808SessionInitEvent extends agent808EventBase {
+  type: agent808EventType.SessionInit;
   model: string;
   tools: string[];
   cwd: string;
@@ -282,8 +282,8 @@ export interface 808SessionInitEvent extends 808EventBase {
 /**
  * Session completed successfully — emitted on SDKResultSuccess.
  */
-export interface 808SessionCompleteEvent extends 808EventBase {
-  type: 808EventType.SessionComplete;
+export interface agent808SessionCompleteEvent extends agent808EventBase {
+  type: agent808EventType.SessionComplete;
   success: true;
   totalCostUsd: number;
   durationMs: number;
@@ -294,8 +294,8 @@ export interface 808SessionCompleteEvent extends 808EventBase {
 /**
  * Session ended with an error — emitted on SDKResultError.
  */
-export interface 808SessionErrorEvent extends 808EventBase {
-  type: 808EventType.SessionError;
+export interface agent808SessionErrorEvent extends agent808EventBase {
+  type: agent808EventType.SessionError;
   success: false;
   totalCostUsd: number;
   durationMs: number;
@@ -307,16 +307,16 @@ export interface 808SessionErrorEvent extends 808EventBase {
 /**
  * Assistant produced text output.
  */
-export interface 808AssistantTextEvent extends 808EventBase {
-  type: 808EventType.AssistantText;
+export interface agent808AssistantTextEvent extends agent808EventBase {
+  type: agent808EventType.AssistantText;
   text: string;
 }
 
 /**
  * Tool invocation detected in assistant response.
  */
-export interface 808ToolCallEvent extends 808EventBase {
-  type: 808EventType.ToolCall;
+export interface agent808ToolCallEvent extends agent808EventBase {
+  type: agent808EventType.ToolCall;
   toolName: string;
   toolUseId: string;
   input: Record<string, unknown>;
@@ -325,8 +325,8 @@ export interface 808ToolCallEvent extends 808EventBase {
 /**
  * Tool execution progress update.
  */
-export interface 808ToolProgressEvent extends 808EventBase {
-  type: 808EventType.ToolProgress;
+export interface agent808ToolProgressEvent extends agent808EventBase {
+  type: agent808EventType.ToolProgress;
   toolName: string;
   toolUseId: string;
   elapsedSeconds: number;
@@ -335,8 +335,8 @@ export interface 808ToolProgressEvent extends 808EventBase {
 /**
  * Tool use summary after completion.
  */
-export interface 808ToolUseSummaryEvent extends 808EventBase {
-  type: 808EventType.ToolUseSummary;
+export interface agent808ToolUseSummaryEvent extends agent808EventBase {
+  type: agent808EventType.ToolUseSummary;
   summary: string;
   toolUseIds: string[];
 }
@@ -344,8 +344,8 @@ export interface 808ToolUseSummaryEvent extends 808EventBase {
 /**
  * Subagent task started.
  */
-export interface 808TaskStartedEvent extends 808EventBase {
-  type: 808EventType.TaskStarted;
+export interface agent808TaskStartedEvent extends agent808EventBase {
+  type: agent808EventType.TaskStarted;
   taskId: string;
   description: string;
   taskType?: string;
@@ -354,8 +354,8 @@ export interface 808TaskStartedEvent extends 808EventBase {
 /**
  * Subagent task progress.
  */
-export interface 808TaskProgressEvent extends 808EventBase {
-  type: 808EventType.TaskProgress;
+export interface agent808TaskProgressEvent extends agent808EventBase {
+  type: agent808EventType.TaskProgress;
   taskId: string;
   description: string;
   totalTokens: number;
@@ -367,8 +367,8 @@ export interface 808TaskProgressEvent extends 808EventBase {
 /**
  * Subagent task completed/failed/stopped.
  */
-export interface 808TaskNotificationEvent extends 808EventBase {
-  type: 808EventType.TaskNotification;
+export interface agent808TaskNotificationEvent extends agent808EventBase {
+  type: agent808EventType.TaskNotification;
   taskId: string;
   status: 'completed' | 'failed' | 'stopped';
   summary: string;
@@ -377,8 +377,8 @@ export interface 808TaskNotificationEvent extends 808EventBase {
 /**
  * Cost updated (emitted on session_complete and periodically).
  */
-export interface 808CostUpdateEvent extends 808EventBase {
-  type: 808EventType.CostUpdate;
+export interface agent808CostUpdateEvent extends agent808EventBase {
+  type: agent808EventType.CostUpdate;
   sessionCostUsd: number;
   cumulativeCostUsd: number;
 }
@@ -386,8 +386,8 @@ export interface 808CostUpdateEvent extends 808EventBase {
 /**
  * API retry in progress.
  */
-export interface 808APIRetryEvent extends 808EventBase {
-  type: 808EventType.APIRetry;
+export interface agent808APIRetryEvent extends agent808EventBase {
+  type: agent808EventType.APIRetry;
   attempt: number;
   maxRetries: number;
   retryDelayMs: number;
@@ -397,8 +397,8 @@ export interface 808APIRetryEvent extends 808EventBase {
 /**
  * Rate limit information updated.
  */
-export interface 808RateLimitEvent extends 808EventBase {
-  type: 808EventType.RateLimit;
+export interface agent808RateLimitEvent extends agent808EventBase {
+  type: agent808EventType.RateLimit;
   status: string;
   resetsAt?: number;
   utilization?: number;
@@ -407,16 +407,16 @@ export interface 808RateLimitEvent extends 808EventBase {
 /**
  * System status change (e.g., compacting).
  */
-export interface 808StatusChangeEvent extends 808EventBase {
-  type: 808EventType.StatusChange;
+export interface agent808StatusChangeEvent extends agent808EventBase {
+  type: agent808EventType.StatusChange;
   status: string | null;
 }
 
 /**
  * Compact boundary — context window was compacted.
  */
-export interface 808CompactBoundaryEvent extends 808EventBase {
-  type: 808EventType.CompactBoundary;
+export interface agent808CompactBoundaryEvent extends agent808EventBase {
+  type: agent808EventType.CompactBoundary;
   trigger: 'manual' | 'auto';
   preTokens: number;
 }
@@ -424,16 +424,16 @@ export interface 808CompactBoundaryEvent extends 808EventBase {
 /**
  * Raw stream event from SDK (partial assistant messages).
  */
-export interface 808StreamEvent extends 808EventBase {
-  type: 808EventType.StreamEvent;
+export interface agent808StreamEvent extends agent808EventBase {
+  type: agent808EventType.StreamEvent;
   event: unknown;
 }
 
 /**
  * Phase execution started.
  */
-export interface 808PhaseStartEvent extends 808EventBase {
-  type: 808EventType.PhaseStart;
+export interface agent808PhaseStartEvent extends agent808EventBase {
+  type: agent808EventType.PhaseStart;
   phaseNumber: string;
   phaseName: string;
 }
@@ -441,8 +441,8 @@ export interface 808PhaseStartEvent extends 808EventBase {
 /**
  * A single phase step (discuss, research, etc.) started.
  */
-export interface 808PhaseStepStartEvent extends 808EventBase {
-  type: 808EventType.PhaseStepStart;
+export interface agent808PhaseStepStartEvent extends agent808EventBase {
+  type: agent808EventType.PhaseStepStart;
   phaseNumber: string;
   step: PhaseStepType;
 }
@@ -450,8 +450,8 @@ export interface 808PhaseStepStartEvent extends 808EventBase {
 /**
  * A single phase step completed.
  */
-export interface 808PhaseStepCompleteEvent extends 808EventBase {
-  type: 808EventType.PhaseStepComplete;
+export interface agent808PhaseStepCompleteEvent extends agent808EventBase {
+  type: agent808EventType.PhaseStepComplete;
   phaseNumber: string;
   step: PhaseStepType;
   success: boolean;
@@ -462,8 +462,8 @@ export interface 808PhaseStepCompleteEvent extends 808EventBase {
 /**
  * Full phase execution completed.
  */
-export interface 808PhaseCompleteEvent extends 808EventBase {
-  type: 808EventType.PhaseComplete;
+export interface agent808PhaseCompleteEvent extends agent808EventBase {
+  type: agent808EventType.PhaseComplete;
   phaseNumber: string;
   phaseName: string;
   success: boolean;
@@ -501,8 +501,8 @@ export interface PhasePlanIndex {
 /**
  * Wave execution started — emitted before concurrent plans launch.
  */
-export interface 808WaveStartEvent extends 808EventBase {
-  type: 808EventType.WaveStart;
+export interface agent808WaveStartEvent extends agent808EventBase {
+  type: agent808EventType.WaveStart;
   phaseNumber: string;
   waveNumber: number;
   planCount: number;
@@ -512,8 +512,8 @@ export interface 808WaveStartEvent extends 808EventBase {
 /**
  * Wave execution completed — emitted after all plans in a wave settle.
  */
-export interface 808WaveCompleteEvent extends 808EventBase {
-  type: 808EventType.WaveComplete;
+export interface agent808WaveCompleteEvent extends agent808EventBase {
+  type: agent808EventType.WaveComplete;
   phaseNumber: string;
   waveNumber: number;
   successCount: number;
@@ -563,8 +563,8 @@ export interface MilestoneRunnerResult {
 /**
  * Milestone execution started.
  */
-export interface 808MilestoneStartEvent extends 808EventBase {
-  type: 808EventType.MilestoneStart;
+export interface agent808MilestoneStartEvent extends agent808EventBase {
+  type: agent808EventType.MilestoneStart;
   phaseCount: number;
   prompt: string;
 }
@@ -572,8 +572,8 @@ export interface 808MilestoneStartEvent extends 808EventBase {
 /**
  * Milestone execution completed.
  */
-export interface 808MilestoneCompleteEvent extends 808EventBase {
-  type: 808EventType.MilestoneComplete;
+export interface agent808MilestoneCompleteEvent extends agent808EventBase {
+  type: agent808EventType.MilestoneComplete;
   success: boolean;
   totalCostUsd: number;
   totalDurationMs: number;
@@ -637,8 +637,8 @@ export interface InitResult {
 /**
  * Init workflow started.
  */
-export interface 808InitStartEvent extends 808EventBase {
-  type: 808EventType.InitStart;
+export interface agent808InitStartEvent extends agent808EventBase {
+  type: agent808EventType.InitStart;
   input: string;
   projectDir: string;
 }
@@ -646,16 +646,16 @@ export interface 808InitStartEvent extends 808EventBase {
 /**
  * Init workflow step started.
  */
-export interface 808InitStepStartEvent extends 808EventBase {
-  type: 808EventType.InitStepStart;
+export interface agent808InitStepStartEvent extends agent808EventBase {
+  type: agent808EventType.InitStepStart;
   step: InitStepName;
 }
 
 /**
  * Init workflow step completed.
  */
-export interface 808InitStepCompleteEvent extends 808EventBase {
-  type: 808EventType.InitStepComplete;
+export interface agent808InitStepCompleteEvent extends agent808EventBase {
+  type: agent808EventType.InitStepComplete;
   step: InitStepName;
   success: boolean;
   durationMs: number;
@@ -666,8 +666,8 @@ export interface 808InitStepCompleteEvent extends 808EventBase {
 /**
  * Init workflow completed.
  */
-export interface 808InitCompleteEvent extends 808EventBase {
-  type: 808EventType.InitComplete;
+export interface agent808InitCompleteEvent extends agent808EventBase {
+  type: agent808EventType.InitComplete;
   success: boolean;
   totalCostUsd: number;
   totalDurationMs: number;
@@ -677,8 +677,8 @@ export interface 808InitCompleteEvent extends 808EventBase {
 /**
  * Research sessions spawned in parallel during init.
  */
-export interface 808InitResearchSpawnEvent extends 808EventBase {
-  type: 808EventType.InitResearchSpawn;
+export interface agent808InitResearchSpawnEvent extends agent808EventBase {
+  type: agent808EventType.InitResearchSpawn;
   sessionCount: number;
   researchTypes: string[];
 }
@@ -686,36 +686,36 @@ export interface 808InitResearchSpawnEvent extends 808EventBase {
 /**
  * Discriminated union of all 808 events.
  */
-export type 808Event =
-  | 808SessionInitEvent
-  | 808SessionCompleteEvent
-  | 808SessionErrorEvent
-  | 808AssistantTextEvent
-  | 808ToolCallEvent
-  | 808ToolProgressEvent
-  | 808ToolUseSummaryEvent
-  | 808TaskStartedEvent
-  | 808TaskProgressEvent
-  | 808TaskNotificationEvent
-  | 808CostUpdateEvent
-  | 808APIRetryEvent
-  | 808RateLimitEvent
-  | 808StatusChangeEvent
-  | 808CompactBoundaryEvent
-  | 808StreamEvent
-  | 808PhaseStartEvent
-  | 808PhaseStepStartEvent
-  | 808PhaseStepCompleteEvent
-  | 808PhaseCompleteEvent
-  | 808WaveStartEvent
-  | 808WaveCompleteEvent
-  | 808MilestoneStartEvent
-  | 808MilestoneCompleteEvent
-  | 808InitStartEvent
-  | 808InitStepStartEvent
-  | 808InitStepCompleteEvent
-  | 808InitCompleteEvent
-  | 808InitResearchSpawnEvent;
+export type agent808Event =
+  | agent808SessionInitEvent
+  | agent808SessionCompleteEvent
+  | agent808SessionErrorEvent
+  | agent808AssistantTextEvent
+  | agent808ToolCallEvent
+  | agent808ToolProgressEvent
+  | agent808ToolUseSummaryEvent
+  | agent808TaskStartedEvent
+  | agent808TaskProgressEvent
+  | agent808TaskNotificationEvent
+  | agent808CostUpdateEvent
+  | agent808APIRetryEvent
+  | agent808RateLimitEvent
+  | agent808StatusChangeEvent
+  | agent808CompactBoundaryEvent
+  | agent808StreamEvent
+  | agent808PhaseStartEvent
+  | agent808PhaseStepStartEvent
+  | agent808PhaseStepCompleteEvent
+  | agent808PhaseCompleteEvent
+  | agent808WaveStartEvent
+  | agent808WaveCompleteEvent
+  | agent808MilestoneStartEvent
+  | agent808MilestoneCompleteEvent
+  | agent808InitStartEvent
+  | agent808InitStepStartEvent
+  | agent808InitStepCompleteEvent
+  | agent808InitCompleteEvent
+  | agent808InitResearchSpawnEvent;
 
 /**
  * Transport handler interface for consuming 808 events.
@@ -723,7 +723,7 @@ export type 808Event =
  */
 export interface TransportHandler {
   /** Called for each event. Must not throw. */
-  onEvent(event: 808Event): void;
+  onEvent(event: agent808Event): void;
   /** Called when the stream is closing. Clean up resources. */
   close(): void;
 }

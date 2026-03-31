@@ -37,7 +37,7 @@ export interface HooksConfig {
   context_warnings: boolean;
 }
 
-export interface 808Config {
+export interface agent808Config {
   model_profile: string;
   commit_docs: boolean;
   parallelization: boolean;
@@ -54,7 +54,7 @@ export interface 808Config {
 
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
-export const CONFIG_DEFAULTS: 808Config = {
+export const CONFIG_DEFAULTS: agent808Config = {
   model_profile: 'balanced',
   commit_docs: true,
   parallelization: true,
@@ -96,7 +96,7 @@ export const CONFIG_DEFAULTS: 808Config = {
  * Returns full defaults when file is missing or empty.
  * Throws on malformed JSON with a helpful error message.
  */
-export async function loadConfig(projectDir: string): Promise<808Config> {
+export async function loadConfig(projectDir: string): Promise<agent808Config> {
   const configPath = join(projectDir, '.planning', 'config.json');
 
   let raw: string;

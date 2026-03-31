@@ -12,19 +12,19 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { homedir } from 'node:os';
 
-import { 808Tools } from './808-tools.js';
+import { Agent808Tools } from './808-tools.js';
 import { PhaseRunner } from './phase-runner.js';
 import type { PhaseRunnerDeps } from './phase-runner.js';
 import { ContextEngine } from './context-engine.js';
 import { PromptFactory } from './phase-prompt.js';
-import { 808EventStream } from './event-stream.js';
+import { Agent808EventStream } from './event-stream.js';
 import { loadConfig } from './config.js';
-import type { 808Event } from './types.js';
-import { 808EventType, PhaseStepType } from './types.js';
+import type { agent808Event } from './types.js';
+import { agentagent808EventType, PhaseStepType } from './types.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const 808_TOOLS_PATH = join(homedir(), '.claude', '808', 'bin', '808-tools.cjs');
+const AGENT_808_TOOLS_PATH = join(homedir(), '.claude', '808', 'bin', '808-tools.cjs');
 
 async function createTempPlanningDir(): Promise<string> {
   const tmpDir = await mkdtemp(join(tmpdir(), '808-sdk-phase-int-'));
@@ -67,13 +67,13 @@ async function createTempPlanningDir(): Promise<string> {
 
 describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
   let tmpDir: string;
-  let tools: 808Tools;
+  let tools: Agent808Tools;
 
   beforeAll(async () => {
     tmpDir = await createTempPlanningDir();
-    tools = new 808Tools({
+    tools = new Agent808Tools({
       projectDir: tmpDir,
-      gsdToolsPath: 808_TOOLS_PATH,
+      gsdToolsPath: AGENT_808_TOOLS_PATH,
       timeoutMs: 10_000,
     });
   });
@@ -111,13 +111,13 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
   // ── Test 2: PhaseRunner state machine control flow ──
 
   it('PhaseRunner emits lifecycle events and captures session errors gracefully', { timeout: 300_000 }, async () => {
-    const eventStream = new 808EventStream();
+    const eventStream = new Agent808EventStream();
     const config = await loadConfig(tmpDir);
     const contextEngine = new ContextEngine(tmpDir);
     const promptFactory = new PromptFactory();
 
-    const events: 808Event[] = [];
-    eventStream.on('event', (e: 808Event) => events.push(e));
+    const events: agent808Event[] = [];
+    eventStream.on('event', (e: agent808Event) => events.push(e));
 
     const deps: PhaseRunnerDeps = {
       projectDir: tmpDir,
@@ -136,10 +136,10 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
     });
 
     // ── (a) Phase start event emitted ──
-    const phaseStartEvents = events.filter(e => e.type === 808EventType.PhaseStart);
+    const phaseStartEvents = events.filter(e => e.type === agent808EventType.PhaseStart);
     expect(phaseStartEvents).toHaveLength(1);
     const phaseStart = phaseStartEvents[0]!;
-    if (phaseStart.type === 808EventType.PhaseStart) {
+    if (phaseStart.type === agent808EventType.PhaseStart) {
       expect(phaseStart.phaseNumber).toBe('01');
       expect(phaseStart.phaseName).toBe('integration-test');
     }
@@ -150,7 +150,7 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
     expect(discussSteps).toHaveLength(0);
 
     // ── (c) Step start events emitted for attempted steps ──
-    const stepStartEvents = events.filter(e => e.type === 808EventType.PhaseStepStart);
+    const stepStartEvents = events.filter(e => e.type === agent808EventType.PhaseStepStart);
     expect(stepStartEvents.length).toBeGreaterThanOrEqual(1);
 
     // ── (d) Step results are properly structured ──
@@ -166,7 +166,7 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
     }
 
     // ── (e) Phase complete event emitted ──
-    const phaseCompleteEvents = events.filter(e => e.type === 808EventType.PhaseComplete);
+    const phaseCompleteEvents = events.filter(e => e.type === agent808EventType.PhaseComplete);
     expect(phaseCompleteEvents).toHaveLength(1);
 
     // ── (f) Result structure is valid ──
@@ -180,7 +180,7 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
   // ── Test 3: PhaseRunner with nonexistent phase throws ──
 
   it('PhaseRunner throws PhaseRunnerError for nonexistent phase', async () => {
-    const eventStream = new 808EventStream();
+    const eventStream = new Agent808EventStream();
     const config = await loadConfig(tmpDir);
     const contextEngine = new ContextEngine(tmpDir);
     const promptFactory = new PromptFactory();
@@ -205,7 +205,7 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
     const { 808 } = await import('./index.js');
 
     const app = new 808({ projectDir: tmpDir });
-    const events: 808Event[] = [];
+    const events: agent808Event[] = [];
     app.onEvent((e) => events.push(e));
 
     const result = await app.runPhase('01', {
@@ -217,8 +217,8 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
     expect(result.phaseNumber).toBe('01');
     expect(result.phaseName).toBe('integration-test');
     expect(result.steps.length).toBeGreaterThanOrEqual(1);
-    expect(events.some(e => e.type === 808EventType.PhaseStart)).toBe(true);
-    expect(events.some(e => e.type === 808EventType.PhaseComplete)).toBe(true);
+    expect(events.some(e => e.type === agent808EventType.PhaseStart)).toBe(true);
+    expect(events.some(e => e.type === agent808EventType.PhaseComplete)).toBe(true);
   });
 });
 
@@ -305,13 +305,13 @@ must_haves:
 
 describe('Integration: phasePlanIndex and wave execution', () => {
   let tmpDir: string;
-  let tools: 808Tools;
+  let tools: Agent808Tools;
 
   beforeAll(async () => {
     tmpDir = await createMultiWavePlanningDir();
-    tools = new 808Tools({
+    tools = new Agent808Tools({
       projectDir: tmpDir,
-      gsdToolsPath: 808_TOOLS_PATH,
+      gsdToolsPath: AGENT_808_TOOLS_PATH,
       timeoutMs: 10_000,
     });
   });

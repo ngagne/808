@@ -18,13 +18,13 @@ import type {
   PhasePlanIndex,
   PlanInfo,
 } from './types.js';
-import { PhaseStepType, PhaseType, 808EventType } from './types.js';
-import type { 808Config } from './config.js';
-import type { 808Tools } from './808-tools.js';
-import type { 808EventStream } from './event-stream.js';
+import { PhaseStepType, PhaseType, agent808EventType } from './types.js';
+import type { agent808Config } from './config.js';
+import type { Agent808Tools } from './808-tools.js';
+import type { Agent808EventStream } from './event-stream.js';
 import type { PromptFactory } from './phase-prompt.js';
 import type { ContextEngine } from './context-engine.js';
-import type { 808Logger } from './logger.js';
+import type { Agent808Logger } from './logger.js';
 import { runPhaseStepSession, runPlanSession } from './session-runner.js';
 
 // ─── Error type ──────────────────────────────────────────────────────────────
@@ -49,24 +49,24 @@ export type VerificationOutcome = 'passed' | 'human_needed' | 'gaps_found';
 
 export interface PhaseRunnerDeps {
   projectDir: string;
-  tools: 808Tools;
+  tools: Agent808Tools;
   promptFactory: PromptFactory;
   contextEngine: ContextEngine;
-  eventStream: 808EventStream;
-  config: 808Config;
-  logger?: 808Logger;
+  eventStream: Agent808EventStream;
+  config: agent808Config;
+  logger?: Agent808Logger;
 }
 
 // ─── PhaseRunner ─────────────────────────────────────────────────────────────
 
 export class PhaseRunner {
   private readonly projectDir: string;
-  private readonly tools: 808Tools;
+  private readonly tools: Agent808Tools;
   private readonly promptFactory: PromptFactory;
   private readonly contextEngine: ContextEngine;
-  private readonly eventStream: 808EventStream;
-  private readonly config: 808Config;
-  private readonly logger?: 808Logger;
+  private readonly eventStream: Agent808EventStream;
+  private readonly config: agent808Config;
+  private readonly logger?: Agent808Logger;
 
   constructor(deps: PhaseRunnerDeps) {
     this.projectDir = deps.projectDir;
@@ -115,7 +115,7 @@ export class PhaseRunner {
 
     // Emit phase_start
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStart,
+      type: agentagent808EventType.PhaseStart,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -264,7 +264,7 @@ export class PhaseRunner {
 
     // Emit phase_complete
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseComplete,
+      type: agentagent808EventType.PhaseComplete,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -312,7 +312,7 @@ export class PhaseRunner {
     const stepStart = Date.now();
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepStart,
+      type: agent808EventType.PhaseStepStart,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -344,7 +344,7 @@ export class PhaseRunner {
       const errorMsg = err instanceof Error ? err.message : String(err);
 
       this.eventStream.emitEvent({
-        type: 808EventType.PhaseStepComplete,
+        type: agent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: '',
         phaseNumber,
@@ -367,7 +367,7 @@ export class PhaseRunner {
     const success = planResult.success;
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       timestamp: new Date().toISOString(),
       sessionId: planResult.sessionId,
       phaseNumber,
@@ -398,7 +398,7 @@ export class PhaseRunner {
     const stepStart = Date.now();
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepStart,
+      type: agent808EventType.PhaseStepStart,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -426,7 +426,7 @@ export class PhaseRunner {
       const errorMsg = err instanceof Error ? err.message : String(err);
 
       this.eventStream.emitEvent({
-        type: 808EventType.PhaseStepComplete,
+        type: agent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: '',
         phaseNumber,
@@ -448,7 +448,7 @@ export class PhaseRunner {
     const success = planResult.success;
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       timestamp: new Date().toISOString(),
       sessionId: planResult.sessionId,
       phaseNumber,
@@ -479,7 +479,7 @@ export class PhaseRunner {
     const stepStart = Date.now();
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepStart,
+      type: agent808EventType.PhaseStepStart,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -506,7 +506,7 @@ export class PhaseRunner {
       const errorMsg = err instanceof Error ? err.message : String(err);
 
       this.eventStream.emitEvent({
-        type: 808EventType.PhaseStepComplete,
+        type: agent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: '',
         phaseNumber,
@@ -528,7 +528,7 @@ export class PhaseRunner {
     const success = planResult.success;
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       timestamp: new Date().toISOString(),
       sessionId: planResult.sessionId,
       phaseNumber,
@@ -561,7 +561,7 @@ export class PhaseRunner {
     const stepStart = Date.now();
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepStart,
+      type: agent808EventType.PhaseStepStart,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -576,7 +576,7 @@ export class PhaseRunner {
       const durationMs = Date.now() - stepStart;
       const errorMsg = err instanceof Error ? err.message : String(err);
       this.eventStream.emitEvent({
-        type: 808EventType.PhaseStepComplete,
+        type: agent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: '',
         phaseNumber,
@@ -599,7 +599,7 @@ export class PhaseRunner {
     if (incompletePlans.length === 0) {
       const durationMs = Date.now() - stepStart;
       this.eventStream.emitEvent({
-        type: 808EventType.PhaseStepComplete,
+        type: agent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: '',
         phaseNumber,
@@ -639,7 +639,7 @@ export class PhaseRunner {
 
         // Emit wave_start
         this.eventStream.emitEvent({
-          type: 808EventType.WaveStart,
+          type: agent808EventType.WaveStart,
           timestamp: new Date().toISOString(),
           sessionId: '',
           phaseNumber,
@@ -682,7 +682,7 @@ export class PhaseRunner {
 
         // Emit wave_complete
         this.eventStream.emitEvent({
-          type: 808EventType.WaveComplete,
+          type: agent808EventType.WaveComplete,
           timestamp: new Date().toISOString(),
           sessionId: '',
           phaseNumber,
@@ -698,7 +698,7 @@ export class PhaseRunner {
     const allSucceeded = planResults.every(r => r.success);
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -769,7 +769,7 @@ export class PhaseRunner {
     const stepStart = Date.now();
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepStart,
+      type: agent808EventType.PhaseStepStart,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -802,7 +802,7 @@ export class PhaseRunner {
         const errorMsg = err instanceof Error ? err.message : String(err);
 
         this.eventStream.emitEvent({
-          type: 808EventType.PhaseStepComplete,
+          type: agent808EventType.PhaseStepComplete,
           timestamp: new Date().toISOString(),
           sessionId: '',
           phaseNumber,
@@ -846,7 +846,7 @@ export class PhaseRunner {
           // reject or exceeded retries
           const durationMs = Date.now() - stepStart;
           this.eventStream.emitEvent({
-            type: 808EventType.PhaseStepComplete,
+            type: agent808EventType.PhaseStepComplete,
             timestamp: new Date().toISOString(),
             sessionId: lastResult.sessionId,
             phaseNumber,
@@ -914,7 +914,7 @@ export class PhaseRunner {
     const durationMs = Date.now() - stepStart;
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       timestamp: new Date().toISOString(),
       sessionId: lastResult?.sessionId ?? '',
       phaseNumber,
@@ -943,7 +943,7 @@ export class PhaseRunner {
     const stepStart = Date.now();
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepStart,
+      type: agent808EventType.PhaseStepStart,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,
@@ -973,7 +973,7 @@ export class PhaseRunner {
     if (!shouldAdvance) {
       const durationMs = Date.now() - stepStart;
       this.eventStream.emitEvent({
-        type: 808EventType.PhaseStepComplete,
+        type: agent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: '',
         phaseNumber,
@@ -997,7 +997,7 @@ export class PhaseRunner {
       const errorMsg = err instanceof Error ? err.message : String(err);
 
       this.eventStream.emitEvent({
-        type: 808EventType.PhaseStepComplete,
+        type: agent808EventType.PhaseStepComplete,
         timestamp: new Date().toISOString(),
         sessionId: '',
         phaseNumber,
@@ -1018,7 +1018,7 @@ export class PhaseRunner {
     const durationMs = Date.now() - stepStart;
 
     this.eventStream.emitEvent({
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       timestamp: new Date().toISOString(),
       sessionId: '',
       phaseNumber,

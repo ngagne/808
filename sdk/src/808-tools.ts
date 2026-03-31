@@ -14,7 +14,7 @@ import type { InitNewProjectInfo, PhaseOpInfo, PhasePlanIndex, RoadmapAnalysis }
 
 // ─── Error type ──────────────────────────────────────────────────────────────
 
-export class 808ToolsError extends Error {
+export class Agent808ToolsError extends Error {
   constructor(
     message: string,
     public readonly command: string,
@@ -23,7 +23,7 @@ export class 808ToolsError extends Error {
     public readonly stderr: string,
   ) {
     super(message);
-    this.name = '808ToolsError';
+    this.name = 'Agent808ToolsError';
   }
 }
 
@@ -31,7 +31,7 @@ export class 808ToolsError extends Error {
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
-export class 808Tools {
+export class Agent808Tools {
   private readonly projectDir: string;
   private readonly gsdToolsPath: string;
   private readonly timeoutMs: number;
@@ -42,8 +42,8 @@ export class 808Tools {
     timeoutMs?: number;
   }) {
     this.projectDir = opts.projectDir;
-    this.808ToolsPath =
-      opts.808ToolsPath ?? resolveGsdToolsPath(opts.projectDir);
+    this.gsdToolsPath =
+      opts.gsdToolsPath ?? resolveGsdToolsPath(opts.projectDir);
     this.timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 
@@ -73,7 +73,7 @@ export class 808Tools {
             // Distinguish timeout from other errors
             if (error.killed || (error as NodeJS.ErrnoException).code === 'ETIMEDOUT') {
               reject(
-                new 808ToolsError(
+                new Agent808ToolsError(
                   `808-tools timed out after ${this.timeoutMs}ms: ${command} ${args.join(' ')}`,
                   command,
                   args,
@@ -85,7 +85,7 @@ export class 808Tools {
             }
 
             reject(
-              new 808ToolsError(
+              new Agent808ToolsError(
                 `808-tools exited with code ${error.code ?? 'unknown'}: ${command} ${args.join(' ')}${stderrStr ? `\n${stderrStr}` : ''}`,
                 command,
                 args,
@@ -103,7 +103,7 @@ export class 808Tools {
             resolve(parsed);
           } catch (parseErr) {
             reject(
-              new 808ToolsError(
+              new Agent808ToolsError(
                 `Failed to parse 808-tools output for "${command}": ${parseErr instanceof Error ? parseErr.message : String(parseErr)}\nRaw output: ${raw.slice(0, 500)}`,
                 command,
                 args,
@@ -118,7 +118,7 @@ export class 808Tools {
       // Safety net: kill if child doesn't respond to timeout signal
       child.on('error', (err) => {
         reject(
-          new 808ToolsError(
+          new Agent808ToolsError(
             `Failed to execute 808-tools: ${err.message}`,
             command,
             args,
@@ -172,7 +172,7 @@ export class 808Tools {
           const stderrStr = stderr?.toString() ?? '';
           if (error) {
             reject(
-              new 808ToolsError(
+              new Agent808ToolsError(
                 `808-tools exited with code ${error.code ?? 'unknown'}: ${command} ${args.join(' ')}${stderrStr ? `\n${stderrStr}` : ''}`,
                 command,
                 args,
@@ -188,7 +188,7 @@ export class 808Tools {
 
       child.on('error', (err) => {
         reject(
-          new 808ToolsError(
+          new Agent808ToolsError(
             `Failed to execute 808-tools: ${err.message}`,
             command,
             args,

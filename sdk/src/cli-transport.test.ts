@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { PassThrough } from 'node:stream';
 import { CLITransport } from './cli-transport.js';
-import { 808EventType, type 808Event, type 808EventBase } from './types.js';
+import { agent808EventType, type agent808Event, type agent808EventBase } from './types.js';
 
 // ─── ANSI constants (mirror the source for readable assertions) ──────────────
 
@@ -41,11 +41,11 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.SessionInit,
+      type: agent808EventType.SessionInit,
       model: 'claude-sonnet-4-20250514',
       tools: ['Read', 'Write', 'Bash'],
       cwd: '/home/project',
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toBe(
@@ -59,13 +59,13 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.SessionComplete,
+      type: agent808EventType.SessionComplete,
       success: true,
       totalCostUsd: 1.234,
       durationMs: 45600,
       numTurns: 12,
       result: 'done',
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toBe(
@@ -79,14 +79,14 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.SessionError,
+      type: agent808EventType.SessionError,
       success: false,
       totalCostUsd: 0.5,
       durationMs: 3000,
       numTurns: 2,
       errorSubtype: 'tool_error',
       errors: ['file not found', 'permission denied'],
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toBe(
@@ -100,21 +100,21 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.PhaseStart,
+      type: agent808EventType.PhaseStart,
       phaseNumber: '01',
       phaseName: 'Authentication',
-    } as 808Event);
+    } as agent808Event);
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.PhaseComplete,
+      type: agent808EventType.PhaseComplete,
       phaseNumber: '01',
       phaseName: 'Authentication',
       success: true,
       totalCostUsd: 2.50,
       totalDurationMs: 60000,
       stepsCompleted: 5,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     const lines = output.split('\n');
@@ -130,11 +130,11 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.ToolCall,
+      type: agent808EventType.ToolCall,
       toolName: 'Write',
       toolUseId: 'tool-123',
       input: longInput,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toMatch(/^\[14:30:45\] \[TOOL\] Write\(.+…\)$/);
@@ -149,19 +149,19 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.MilestoneStart,
+      type: agent808EventType.MilestoneStart,
       phaseCount: 3,
       prompt: 'build the app',
-    } as 808Event);
+    } as agent808Event);
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.MilestoneComplete,
+      type: agent808EventType.MilestoneComplete,
       success: true,
       totalCostUsd: 8.75,
       totalDurationMs: 300000,
       phasesCompleted: 3,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     const lines = output.split('\n');
@@ -185,11 +185,11 @@ describe('CLITransport', () => {
     // Use a known event type that hits the default/fallback branch
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.ToolProgress,
+      type: agent808EventType.ToolProgress,
       toolName: 'Bash',
       toolUseId: 'tool-456',
       elapsedSeconds: 12,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toBe('[14:30:45] [EVENT] tool_progress');
@@ -203,9 +203,9 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.AssistantText,
+      type: agent808EventType.AssistantText,
       text: longText,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toMatch(new RegExp(`^${escRe(DIM)}\\[14:30:45\\] A+…${escRe(RESET)}$`));
@@ -221,22 +221,22 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.WaveStart,
+      type: agent808EventType.WaveStart,
       phaseNumber: '01',
       waveNumber: 2,
       planCount: 4,
       planIds: ['plan-a', 'plan-b', 'plan-c', 'plan-d'],
-    } as 808Event);
+    } as agent808Event);
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.WaveComplete,
+      type: agent808EventType.WaveComplete,
       phaseNumber: '01',
       waveNumber: 2,
       successCount: 3,
       failureCount: 1,
       durationMs: 25000,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     const lines = output.split('\n');
@@ -254,10 +254,10 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.PhaseStepStart,
+      type: agent808EventType.PhaseStepStart,
       phaseNumber: '01',
       step: 'research',
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toBe(`${CYAN}◆ research${RESET}`);
@@ -269,21 +269,21 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       phaseNumber: '01',
       step: 'plan',
       success: true,
       durationMs: 5200,
-    } as 808Event);
+    } as agent808Event);
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.PhaseStepComplete,
+      type: agent808EventType.PhaseStepComplete,
       phaseNumber: '01',
       step: 'execute',
       success: false,
       durationMs: 12000,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     const lines = output.split('\n');
@@ -297,10 +297,10 @@ describe('CLITransport', () => {
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.InitResearchSpawn,
+      type: agent808EventType.InitResearchSpawn,
       sessionCount: 4,
       researchTypes: ['stack', 'features', 'architecture', 'pitfalls'],
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     expect(output).toBe(`${CYAN}◆ Spawning 4 researchers...${RESET}`);
@@ -313,18 +313,18 @@ describe('CLITransport', () => {
     // First cost update
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.CostUpdate,
+      type: agent808EventType.CostUpdate,
       sessionCostUsd: 0.50,
       cumulativeCostUsd: 0.50,
-    } as 808Event);
+    } as agent808Event);
 
     // Second cost update
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.CostUpdate,
+      type: agent808EventType.CostUpdate,
       sessionCostUsd: 0.75,
       cumulativeCostUsd: 1.25,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     const lines = output.split('\n');
@@ -339,30 +339,30 @@ describe('CLITransport', () => {
     // Accumulate some cost
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.CostUpdate,
+      type: agent808EventType.CostUpdate,
       sessionCostUsd: 1.50,
       cumulativeCostUsd: 1.50,
-    } as 808Event);
+    } as agent808Event);
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.PhaseComplete,
+      type: agent808EventType.PhaseComplete,
       phaseNumber: '02',
       phaseName: 'Build',
       success: true,
       totalCostUsd: 1.50,
       totalDurationMs: 30000,
       stepsCompleted: 3,
-    } as 808Event);
+    } as agent808Event);
 
     transport.onEvent({
       ...makeBase(),
-      type: 808EventType.MilestoneComplete,
+      type: agent808EventType.MilestoneComplete,
       success: true,
       totalCostUsd: 1.50,
       totalDurationMs: 30000,
       phasesCompleted: 2,
-    } as 808Event);
+    } as agent808Event);
 
     const output = readOutput(stream);
     const lines = output.split('\n');

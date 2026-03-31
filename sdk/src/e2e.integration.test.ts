@@ -13,8 +13,8 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
-import { 808, parsePlanFile, 808EventType } from './index.js';
-import type { 808Event } from './index.js';
+import { 808, parsePlanFile, agent808EventType } from './index.js';
+import type { agent808Event } from './index.js';
 
 // ─── CLI availability check ─────────────────────────────────────────────────
 
@@ -124,7 +124,7 @@ describe.skipIf(!cliAvailable)('E2E: Event stream during plan execution (R007)',
   });
 
   it('event stream emits events during plan execution (R007)', async () => {
-    const events: 808Event[] = [];
+    const events: agent808Event[] = [];
     const app = new 808({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
 
     // Subscribe to all events
@@ -136,30 +136,30 @@ describe.skipIf(!cliAvailable)('E2E: Event stream during plan execution (R007)',
     expect(result.success).toBe(true);
 
     // (a) At least one session_init event received
-    const initEvents = events.filter(e => e.type === 808EventType.SessionInit);
+    const initEvents = events.filter(e => e.type === agent808EventType.SessionInit);
     expect(initEvents.length).toBeGreaterThanOrEqual(1);
 
     // (b) At least one tool_call event received
-    const toolCallEvents = events.filter(e => e.type === 808EventType.ToolCall);
+    const toolCallEvents = events.filter(e => e.type === agent808EventType.ToolCall);
     expect(toolCallEvents.length).toBeGreaterThanOrEqual(1);
 
     // (c) Exactly one session_complete event with cost >= 0
-    const completeEvents = events.filter(e => e.type === 808EventType.SessionComplete);
+    const completeEvents = events.filter(e => e.type === agent808EventType.SessionComplete);
     expect(completeEvents).toHaveLength(1);
     const completeEvent = completeEvents[0]!;
-    if (completeEvent.type === 808EventType.SessionComplete) {
+    if (completeEvent.type === agent808EventType.SessionComplete) {
       expect(completeEvent.totalCostUsd).toBeGreaterThanOrEqual(0);
     }
 
     // (d) Events arrived in order: session_init before tool_call before session_complete
-    const initIdx = events.findIndex(e => e.type === 808EventType.SessionInit);
-    const toolCallIdx = events.findIndex(e => e.type === 808EventType.ToolCall);
-    const completeIdx = events.findIndex(e => e.type === 808EventType.SessionComplete);
+    const initIdx = events.findIndex(e => e.type === agent808EventType.SessionInit);
+    const toolCallIdx = events.findIndex(e => e.type === agent808EventType.ToolCall);
+    const completeIdx = events.findIndex(e => e.type === agent808EventType.SessionComplete);
     expect(initIdx).toBeLessThan(toolCallIdx);
     expect(toolCallIdx).toBeLessThan(completeIdx);
 
     // Bonus: at least one cost_update event was emitted
-    const costEvents = events.filter(e => e.type === 808EventType.CostUpdate);
+    const costEvents = events.filter(e => e.type === agent808EventType.CostUpdate);
     expect(costEvents.length).toBeGreaterThanOrEqual(1);
   }, 120_000);
 });

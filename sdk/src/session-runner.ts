@@ -7,11 +7,11 @@
 
 import { query } from '@anthropic-ai/claude-agent-sdk';
 import type { SDKMessage, SDKResultMessage, SDKResultSuccess, SDKResultError } from '@anthropic-ai/claude-agent-sdk';
-import type { ParsedPlan, PlanResult, SessionOptions, SessionUsage, 808CostUpdateEvent, PhaseStepType } from './types.js';
-import { 808EventType, PhaseType } from './types.js';
-import type { 808Config } from './config.js';
+import type { ParsedPlan, PlanResult, SessionOptions, SessionUsage, agent808CostUpdateEvent, PhaseStepType } from './types.js';
+import { agent808EventType, PhaseType } from './types.js';
+import type { agent808Config } from './config.js';
 import { buildExecutorPrompt, parseAgentTools, DEFAULT_ALLOWED_TOOLS } from './prompt-builder.js';
-import type { 808EventStream, EventStreamContext } from './event-stream.js';
+import type { Agent808EventStream, EventStreamContext } from './event-stream.js';
 import { getToolsForPhase } from './tool-scoping.js';
 
 // ─── Model resolution ────────────────────────────────────────────────────────
@@ -21,7 +21,7 @@ import { getToolsForPhase } from './tool-scoping.js';
  *
  * Priority: explicit model option > config model_profile > default.
  */
-function resolveModel(options?: SessionOptions, config?: 808Config): string | undefined {
+function resolveModel(options?: SessionOptions, config?: agent808Config): string | undefined {
   if (options?.model) return options.model;
 
   // Map model_profile names to model IDs
@@ -54,10 +54,10 @@ function resolveModel(options?: SessionOptions, config?: 808Config): string | un
  */
 export async function runPlanSession(
   plan: ParsedPlan,
-  config: 808Config,
+  config: agent808Config,
   options?: SessionOptions,
   agentDef?: string,
-  eventStream?: 808EventStream,
+  eventStream?: Agent808EventStream,
   streamContext?: EventStreamContext,
 ): Promise<PlanResult> {
   // Build the executor prompt
@@ -166,7 +166,7 @@ function extractResult(msg: SDKResultMessage): PlanResult {
  */
 async function processQueryStream(
   queryStream: AsyncIterable<SDKMessage>,
-  eventStream?: 808EventStream,
+  eventStream?: Agent808EventStream,
   streamContext?: EventStreamContext,
 ): Promise<PlanResult> {
   let resultMessage: SDKResultMessage | undefined;
@@ -215,14 +215,14 @@ async function processQueryStream(
   if (eventStream) {
     const cost = eventStream.getCost();
     eventStream.emitEvent({
-      type: 808EventType.CostUpdate,
+      type: agent808EventType.CostUpdate,
       timestamp: new Date().toISOString(),
       sessionId: resultMessage.session_id,
       phase: streamContext?.phase,
       planName: streamContext?.planName,
       sessionCostUsd: result.totalCostUsd,
       cumulativeCostUsd: cost.cumulative,
-    } as 808CostUpdateEvent);
+    } as agent808CostUpdateEvent);
   }
 
   return result;
@@ -264,9 +264,9 @@ function stepTypeToPhaseType(step: PhaseStepType): PhaseType {
 export async function runPhaseStepSession(
   prompt: string,
   phaseStep: PhaseStepType,
-  config: 808Config,
+  config: agent808Config,
   options?: SessionOptions,
-  eventStream?: 808EventStream,
+  eventStream?: Agent808EventStream,
   streamContext?: EventStreamContext,
 ): Promise<PlanResult> {
   const phaseType = stepTypeToPhaseType(phaseStep);

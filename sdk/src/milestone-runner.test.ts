@@ -6,7 +6,7 @@ import type {
   808Event,
   MilestoneRunnerOptions,
 } from './types.js';
-import { 808EventType } from './types.js';
+import { agent808EventType } from './types.js';
 
 // ─── Mock modules ────────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ vi.mock('./prompt-builder.js', () => ({
 
 vi.mock('./event-stream.js', () => {
   return {
-    808EventStream: vi.fn().mockImplementation(() => ({
+    Agent808EventStream: vi.fn().mockImplementation(() => ({
       emitEvent: vi.fn(),
       on: vi.fn(),
       emit: vi.fn(),
@@ -65,7 +65,7 @@ vi.mock('./phase-prompt.js', () => ({
 }));
 
 vi.mock('./808-tools.js', () => ({
-  808Tools: vi.fn().mockImplementation(() => ({
+  Agent808Tools: vi.fn().mockImplementation(() => ({
     roadmapAnalyze: vi.fn(),
   })),
   808ToolsError: class extends Error {
@@ -75,7 +75,7 @@ vi.mock('./808-tools.js', () => ({
 }));
 
 import { 808 } from './index.js';
-import { 808Tools } from './808-tools.js';
+import { Agent808Tools } from './808-tools.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -108,9 +108,9 @@ function makeAnalysis(phases: RoadmapPhaseInfo[]): RoadmapAnalysis {
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe('808.run()', () => {
-  let 808: 808;
+  let app: 808;
   let mockRoadmapAnalyze: ReturnType<typeof vi.fn>;
-  let events: 808Event[];
+  let events: agent808Event[];
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -120,12 +120,12 @@ describe('808.run()', () => {
 
     // Capture emitted events
     (app.eventStream.emitEvent as ReturnType<typeof vi.fn>).mockImplementation(
-      (event: 808Event) => events.push(event),
+      (event: agent808Event) => events.push(event),
     );
 
     // Wire mock roadmapAnalyze on the 808Tools instance
     mockRoadmapAnalyze = vi.fn();
-    vi.mocked(808Tools).mockImplementation(
+    vi.mocked(Agent808Tools).mockImplementation(
       () =>
         ({
           roadmapAnalyze: mockRoadmapAnalyze,
@@ -267,8 +267,8 @@ describe('808.run()', () => {
 
     await app.run('build it');
 
-    const startEvents = events.filter(e => e.type === 808EventType.MilestoneStart);
-    const completeEvents = events.filter(e => e.type === 808EventType.MilestoneComplete);
+    const startEvents = events.filter(e => e.type === agent808EventType.MilestoneStart);
+    const completeEvents = events.filter(e => e.type === agent808EventType.MilestoneComplete);
 
     expect(startEvents).toHaveLength(1);
     expect(completeEvents).toHaveLength(1);

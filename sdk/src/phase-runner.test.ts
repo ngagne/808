@@ -11,8 +11,8 @@ import type {
   PhasePlanIndex,
   PlanInfo,
 } from './types.js';
-import { PhaseStepType, PhaseType, 808EventType } from './types.js';
-import type { 808Config } from './config.js';
+import { PhaseStepType, PhaseType, agent808EventType } from './types.js';
+import type { agent808Config } from './config.js';
 import { CONFIG_DEFAULTS } from './config.js';
 
 // ─── Mock modules ────────────────────────────────────────────────────────────
@@ -106,7 +106,7 @@ function makePlanIndex(planCount: number, overrides: Partial<PhasePlanIndex> = {
   };
 }
 
-function makeConfig(overrides: Partial<808Config> = {}): 808Config {
+function makeConfig(overrides: Partial<agent808Config> = {}): agent808Config {
   return {
     ...structuredClone(CONFIG_DEFAULTS),
     ...overrides,
@@ -114,11 +114,11 @@ function makeConfig(overrides: Partial<808Config> = {}): 808Config {
       ...CONFIG_DEFAULTS.workflow,
       ...(overrides.workflow ?? {}),
     },
-  } as 808Config;
+  } as agent808Config;
 }
 
 function makeDeps(overrides: Partial<PhaseRunnerDeps> = {}): PhaseRunnerDeps {
-  const events: 808Event[] = [];
+  const events: agent808Event[] = [];
 
   return {
     projectDir: '/tmp/project',
@@ -143,7 +143,7 @@ function makeDeps(overrides: Partial<PhaseRunnerDeps> = {}): PhaseRunnerDeps {
       resolveContextFiles: vi.fn().mockResolvedValue({}),
     } as any,
     eventStream: {
-      emitEvent: vi.fn((event: 808Event) => events.push(event)),
+      emitEvent: vi.fn((event: agent808Event) => events.push(event)),
       on: vi.fn(),
       emit: vi.fn(),
     } as any,
@@ -153,11 +153,11 @@ function makeDeps(overrides: Partial<PhaseRunnerDeps> = {}): PhaseRunnerDeps {
 }
 
 /** Collect events from a deps object. */
-function getEmittedEvents(deps: PhaseRunnerDeps): 808Event[] {
-  const events: 808Event[] = [];
+function getEmittedEvents(deps: PhaseRunnerDeps): agent808Event[] {
+  const events: agent808Event[] = [];
   const emitFn = deps.eventStream.emitEvent as ReturnType<typeof vi.fn>;
   for (const call of emitFn.mock.calls) {
-    events.push(call[0] as 808Event);
+    events.push(call[0] as agent808Event);
   }
   return events;
 }
@@ -790,14 +790,14 @@ describe('PhaseRunner', () => {
       const eventTypes = events.map(e => e.type);
 
       // First event: phase_start
-      expect(eventTypes[0]).toBe(808EventType.PhaseStart);
+      expect(eventTypes[0]).toBe(agent808EventType.PhaseStart);
 
       // Last event: phase_complete
-      expect(eventTypes[eventTypes.length - 1]).toBe(808EventType.PhaseComplete);
+      expect(eventTypes[eventTypes.length - 1]).toBe(agent808EventType.PhaseComplete);
 
       // Each step has start + complete pair
-      const stepStarts = events.filter(e => e.type === 808EventType.PhaseStepStart);
-      const stepCompletes = events.filter(e => e.type === 808EventType.PhaseStepComplete);
+      const stepStarts = events.filter(e => e.type === agent808EventType.PhaseStepStart);
+      const stepCompletes = events.filter(e => e.type === agent808EventType.PhaseStepComplete);
       expect(stepStarts.length).toBeGreaterThan(0);
       expect(stepStarts.length).toBe(stepCompletes.length);
     });
@@ -812,7 +812,7 @@ describe('PhaseRunner', () => {
       await runner.run('5');
 
       const events = getEmittedEvents(deps);
-      const phaseStart = events.find(e => e.type === 808EventType.PhaseStart) as any;
+      const phaseStart = events.find(e => e.type === agent808EventType.PhaseStart) as any;
       expect(phaseStart.phaseNumber).toBe('5');
       expect(phaseStart.phaseName).toBe('Auth Phase');
     });
@@ -827,7 +827,7 @@ describe('PhaseRunner', () => {
       await runner.run('1');
 
       const events = getEmittedEvents(deps);
-      const phaseComplete = events.find(e => e.type === 808EventType.PhaseComplete) as any;
+      const phaseComplete = events.find(e => e.type === agent808EventType.PhaseComplete) as any;
       expect(phaseComplete.success).toBe(true);
       expect(phaseComplete.stepsCompleted).toBe(3); // plan, execute, advance
     });
@@ -842,7 +842,7 @@ describe('PhaseRunner', () => {
 
       const events = getEmittedEvents(deps);
       const stepStarts = events
-        .filter(e => e.type === 808EventType.PhaseStepStart)
+        .filter(e => e.type === agent808EventType.PhaseStepStart)
         .map(e => (e as any).step);
 
       // With all config defaults: discuss, research, plan, execute, verify, advance
@@ -1418,8 +1418,8 @@ describe('PhaseRunner', () => {
       await runner.run('1');
 
       const events = getEmittedEvents(deps);
-      const waveStarts = events.filter(e => e.type === 808EventType.WaveStart) as any[];
-      const waveCompletes = events.filter(e => e.type === 808EventType.WaveComplete) as any[];
+      const waveStarts = events.filter(e => e.type === agent808EventType.WaveStart) as any[];
+      const waveCompletes = events.filter(e => e.type === agent808EventType.WaveComplete) as any[];
 
       // Two waves → two start + two complete events
       expect(waveStarts).toHaveLength(2);
@@ -1526,7 +1526,7 @@ describe('PhaseRunner', () => {
 
       const events = getEmittedEvents(deps);
       const waveEvents = events.filter(
-        e => e.type === 808EventType.WaveStart || e.type === 808EventType.WaveComplete,
+        e => e.type === agent808EventType.WaveStart || e.type === agent808EventType.WaveComplete,
       );
       expect(waveEvents).toHaveLength(0);
     });
@@ -1688,10 +1688,10 @@ describe('PhaseRunner', () => {
 
       const events = getEmittedEvents(deps);
       const planCheckStarts = events.filter(
-        e => e.type === 808EventType.PhaseStepStart && (e as any).step === PhaseStepType.PlanCheck,
+        e => e.type === agent808EventType.PhaseStepStart && (e as any).step === PhaseStepType.PlanCheck,
       );
       const planCheckCompletes = events.filter(
-        e => e.type === 808EventType.PhaseStepComplete && (e as any).step === PhaseStepType.PlanCheck,
+        e => e.type === agent808EventType.PhaseStepComplete && (e as any).step === PhaseStepType.PlanCheck,
       );
 
       expect(planCheckStarts.length).toBeGreaterThanOrEqual(1);

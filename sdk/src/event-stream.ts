@@ -26,24 +26,24 @@ import type {
   SDKPartialAssistantMessage,
 } from '@anthropic-ai/claude-agent-sdk';
 import {
-  808EventType,
-  type 808Event,
-  type 808SessionInitEvent,
-  type 808SessionCompleteEvent,
-  type 808SessionErrorEvent,
-  type 808AssistantTextEvent,
-  type 808ToolCallEvent,
-  type 808ToolProgressEvent,
-  type 808ToolUseSummaryEvent,
-  type 808TaskStartedEvent,
-  type 808TaskProgressEvent,
-  type 808TaskNotificationEvent,
-  type 808CostUpdateEvent,
-  type 808APIRetryEvent,
-  type 808RateLimitEvent as 808RateLimitEventType,
-  type 808StatusChangeEvent,
-  type 808CompactBoundaryEvent,
-  type 808StreamEvent,
+  agent808EventType,
+  type agent808Event,
+  type agent808SessionInitEvent,
+  type agent808SessionCompleteEvent,
+  type agent808SessionErrorEvent,
+  type agent808AssistantTextEvent,
+  type agent808ToolCallEvent,
+  type agent808ToolProgressEvent,
+  type agent808ToolUseSummaryEvent,
+  type agent808TaskStartedEvent,
+  type agent808TaskProgressEvent,
+  type agent808TaskNotificationEvent,
+  type agent808CostUpdateEvent,
+  type agent808APIRetryEvent,
+  type agent808RateLimitEvent as agent808RateLimitEventType,
+  type agent808StatusChangeEvent,
+  type agent808CompactBoundaryEvent,
+  type agent808StreamEvent,
   type TransportHandler,
   type CostBucket,
   type CostTracker,
@@ -59,7 +59,7 @@ export interface EventStreamContext {
 
 // ─── 808EventStream ──────────────────────────────────────────────────────────
 
-export class 808EventStream extends EventEmitter {
+export class Agent808EventStream extends EventEmitter {
   private readonly transports: Set<TransportHandler> = new Set();
   private readonly costTracker: CostTracker = {
     sessions: new Map(),
@@ -98,7 +98,7 @@ export class 808EventStream extends EventEmitter {
   // ─── Event emission ──────────────────────────────────────────────────
 
   /** Emit a typed 808 event to all listeners and transports. */
-  emitEvent(event: 808Event): void {
+  emitEvent(event: agent808Event): void {
     // Emit via EventEmitter for listener-based consumers
     this.emit('event', event);
     this.emit(event.type, event);
@@ -120,7 +120,7 @@ export class 808EventStream extends EventEmitter {
    * Map an SDKMessage to a 808Event.
    * Returns null for non-actionable message types (user messages, replays, etc.).
    */
-  mapSDKMessage(msg: SDKMessage, context: EventStreamContext = {}): 808Event | null {
+  mapSDKMessage(msg: SDKMessage, context: EventStreamContext = {}): agent808Event | null {
     const base = {
       timestamp: new Date().toISOString(),
       sessionId: 'session_id' in msg ? (msg.session_id as string) : '',
@@ -165,7 +165,7 @@ export class 808EventStream extends EventEmitter {
    * Map an SDKMessage and emit the resulting event (if any).
    * Convenience method combining mapSDKMessage + emitEvent.
    */
-  mapAndEmit(msg: SDKMessage, context: EventStreamContext = {}): 808Event | null {
+  mapAndEmit(msg: SDKMessage, context: EventStreamContext = {}): agent808Event | null {
     const event = this.mapSDKMessage(msg, context);
     if (event) {
       this.emitEvent(event);
@@ -204,8 +204,8 @@ export class 808EventStream extends EventEmitter {
 
   private mapSystemMessage(
     msg: SDKSystemMessage | SDKAPIRetryMessage | SDKStatusMessage | SDKCompactBoundaryMessage | SDKTaskStartedMessage | SDKTaskProgressMessage | SDKTaskNotificationMessage,
-    base: Omit<808Event, 'type'>,
-  ): 808Event | null {
+    base: Omit<agent808Event, 'type'>,
+  ): agent808Event | null {
     // All system messages have a subtype
     const subtype = (msg as { subtype: string }).subtype;
 
@@ -214,78 +214,78 @@ export class 808EventStream extends EventEmitter {
         const initMsg = msg as SDKSystemMessage;
         return {
           ...base,
-          type: 808EventType.SessionInit,
+          type: agent808EventType.SessionInit,
           model: initMsg.model,
           tools: initMsg.tools,
           cwd: initMsg.cwd,
-        } as 808SessionInitEvent;
+        } as agent808SessionInitEvent;
       }
 
       case 'api_retry': {
         const retryMsg = msg as SDKAPIRetryMessage;
         return {
           ...base,
-          type: 808EventType.APIRetry,
+          type: agent808EventType.APIRetry,
           attempt: retryMsg.attempt,
           maxRetries: retryMsg.max_retries,
           retryDelayMs: retryMsg.retry_delay_ms,
           errorStatus: retryMsg.error_status,
-        } as 808APIRetryEvent;
+        } as agent808APIRetryEvent;
       }
 
       case 'status': {
         const statusMsg = msg as SDKStatusMessage;
         return {
           ...base,
-          type: 808EventType.StatusChange,
+          type: agent808EventType.StatusChange,
           status: statusMsg.status,
-        } as 808StatusChangeEvent;
+        } as agent808StatusChangeEvent;
       }
 
       case 'compact_boundary': {
         const compactMsg = msg as SDKCompactBoundaryMessage;
         return {
           ...base,
-          type: 808EventType.CompactBoundary,
+          type: agent808EventType.CompactBoundary,
           trigger: compactMsg.compact_metadata.trigger,
           preTokens: compactMsg.compact_metadata.pre_tokens,
-        } as 808CompactBoundaryEvent;
+        } as agent808CompactBoundaryEvent;
       }
 
       case 'task_started': {
         const taskMsg = msg as SDKTaskStartedMessage;
         return {
           ...base,
-          type: 808EventType.TaskStarted,
+          type: agent808EventType.TaskStarted,
           taskId: taskMsg.task_id,
           description: taskMsg.description,
           taskType: taskMsg.task_type,
-        } as 808TaskStartedEvent;
+        } as agent808TaskStartedEvent;
       }
 
       case 'task_progress': {
         const progressMsg = msg as SDKTaskProgressMessage;
         return {
           ...base,
-          type: 808EventType.TaskProgress,
+          type: agent808EventType.TaskProgress,
           taskId: progressMsg.task_id,
           description: progressMsg.description,
           totalTokens: progressMsg.usage.total_tokens,
           toolUses: progressMsg.usage.tool_uses,
           durationMs: progressMsg.usage.duration_ms,
           lastToolName: progressMsg.last_tool_name,
-        } as 808TaskProgressEvent;
+        } as agent808TaskProgressEvent;
       }
 
       case 'task_notification': {
         const notifMsg = msg as SDKTaskNotificationMessage;
         return {
           ...base,
-          type: 808EventType.TaskNotification,
+          type: agent808EventType.TaskNotification,
           taskId: notifMsg.task_id,
           status: notifMsg.status,
           summary: notifMsg.summary,
-        } as 808TaskNotificationEvent;
+        } as agent808TaskNotificationEvent;
       }
 
       // Non-actionable system subtypes
@@ -305,9 +305,9 @@ export class 808EventStream extends EventEmitter {
 
   private mapAssistantMessage(
     msg: SDKAssistantMessage,
-    base: Omit<808Event, 'type'>,
-  ): 808Event | null {
-    const events: 808Event[] = [];
+    base: Omit<agent808Event, 'type'>,
+  ): agent808Event | null {
+    const events: agent808Event[] = [];
 
     // Extract text blocks — content blocks are a discriminated union with a 'type' field
     const content = msg.message.content as Array<{ type: string; [key: string]: unknown }>;
@@ -320,9 +320,9 @@ export class 808EventStream extends EventEmitter {
       if (text.length > 0) {
         events.push({
           ...base,
-          type: 808EventType.AssistantText,
+          type: agent808EventType.AssistantText,
           text,
-        } as 808AssistantTextEvent);
+        } as agent808AssistantTextEvent);
       }
     }
 
@@ -334,11 +334,11 @@ export class 808EventStream extends EventEmitter {
     for (const block of toolUseBlocks) {
       events.push({
         ...base,
-        type: 808EventType.ToolCall,
+        type: agent808EventType.ToolCall,
         toolName: block.name,
         toolUseId: block.id,
         input: block.input as Record<string, unknown>,
-      } as 808ToolCallEvent);
+      } as agent808ToolCallEvent);
     }
 
     // Return the first event — for multi-event messages, emit the rest
@@ -357,8 +357,8 @@ export class 808EventStream extends EventEmitter {
 
   private mapResultMessage(
     msg: SDKResultSuccess | SDKResultError,
-    base: Omit<808Event, 'type'>,
-  ): 808Event {
+    base: Omit<agent808Event, 'type'>,
+  ): agent808Event {
     // Update cost tracking
     this.updateCost(msg.session_id, msg.total_cost_usd);
 
@@ -366,74 +366,74 @@ export class 808EventStream extends EventEmitter {
       const successMsg = msg as SDKResultSuccess;
       return {
         ...base,
-        type: 808EventType.SessionComplete,
+        type: agent808EventType.SessionComplete,
         success: true,
         totalCostUsd: successMsg.total_cost_usd,
         durationMs: successMsg.duration_ms,
         numTurns: successMsg.num_turns,
         result: successMsg.result,
-      } as 808SessionCompleteEvent;
+      } as agent808SessionCompleteEvent;
     }
 
     const errorMsg = msg as SDKResultError;
     return {
       ...base,
-      type: 808EventType.SessionError,
+      type: agent808EventType.SessionError,
       success: false,
       totalCostUsd: errorMsg.total_cost_usd,
       durationMs: errorMsg.duration_ms,
       numTurns: errorMsg.num_turns,
       errorSubtype: errorMsg.subtype,
       errors: errorMsg.errors,
-    } as 808SessionErrorEvent;
+    } as agent808SessionErrorEvent;
   }
 
   private mapToolProgressMessage(
     msg: SDKToolProgressMessage,
-    base: Omit<808Event, 'type'>,
-  ): 808ToolProgressEvent {
+    base: Omit<agent808Event, 'type'>,
+  ): agent808ToolProgressEvent {
     return {
       ...base,
-      type: 808EventType.ToolProgress,
+      type: agent808EventType.ToolProgress,
       toolName: msg.tool_name,
       toolUseId: msg.tool_use_id,
       elapsedSeconds: msg.elapsed_time_seconds,
-    } as 808ToolProgressEvent;
+    } as agent808ToolProgressEvent;
   }
 
   private mapToolUseSummaryMessage(
     msg: SDKToolUseSummaryMessage,
-    base: Omit<808Event, 'type'>,
-  ): 808ToolUseSummaryEvent {
+    base: Omit<agent808Event, 'type'>,
+  ): agent808ToolUseSummaryEvent {
     return {
       ...base,
-      type: 808EventType.ToolUseSummary,
+      type: agent808EventType.ToolUseSummary,
       summary: msg.summary,
       toolUseIds: msg.preceding_tool_use_ids,
-    } as 808ToolUseSummaryEvent;
+    } as agent808ToolUseSummaryEvent;
   }
 
   private mapRateLimitMessage(
     msg: SDKRateLimitEvent,
-    base: Omit<808Event, 'type'>,
-  ): 808RateLimitEventType {
+    base: Omit<agent808Event, 'type'>,
+  ): agent808RateLimitEventType {
     return {
       ...base,
-      type: 808EventType.RateLimit,
+      type: agent808EventType.RateLimit,
       status: msg.rate_limit_info.status,
       resetsAt: msg.rate_limit_info.resetsAt,
       utilization: msg.rate_limit_info.utilization,
-    } as 808RateLimitEventType;
+    } as agent808RateLimitEventType;
   }
 
   private mapStreamEvent(
     msg: SDKPartialAssistantMessage,
-    base: Omit<808Event, 'type'>,
-  ): 808StreamEvent {
+    base: Omit<agent808Event, 'type'>,
+  ): agent808StreamEvent {
     return {
       ...base,
-      type: 808EventType.StreamEvent,
+      type: agent808EventType.StreamEvent,
       event: msg.event,
-    } as 808StreamEvent;
+    } as agent808StreamEvent;
   }
 }

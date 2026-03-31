@@ -21,10 +21,10 @@ import { homedir } from 'node:os';
 
 import { 808 } from './index.js';
 import { InitRunner } from './init-runner.js';
-import { 808Tools } from './808-tools.js';
-import { 808EventStream } from './event-stream.js';
-import { 808EventType, PhaseStepType } from './types.js';
-import type { 808Event, PhaseRunnerResult, RoadmapAnalysis } from './types.js';
+import { Agent808Tools } from './808-tools.js';
+import { Agent808EventStream } from './event-stream.js';
+import { agentagent808EventType, PhaseStepType } from './types.js';
+import type { agent808Event, PhaseRunnerResult, RoadmapAnalysis } from './types.js';
 
 // ─── CLI availability check ─────────────────────────────────────────────────
 
@@ -38,7 +38,7 @@ try {
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const sdkPromptsDir = join(__dirname, '..', 'prompts');
-const 808_TOOLS_PATH = join(homedir(), '.claude', '808', 'bin', '808-tools.cjs');
+const AGENT_808_TOOLS_PATH = join(homedir(), '.claude', '808', 'bin', '808-tools.cjs');
 
 // ─── Lifecycle step ordering for monotonicity check ──────────────────────────
 
@@ -58,7 +58,7 @@ describe.skipIf(!cliAvailable)('E2E Lifecycle: InitRunner → 808.runPhase() ful
   let tmpDir: string;
   let initSuccess: boolean = false;
   let phase1Number: string | null = null;
-  let tools: 808Tools;
+  let tools: Agent808Tools;
 
   // ── Bootstrap: create temp dir, git init, run InitRunner ──────────────
   beforeAll(async () => {
@@ -69,14 +69,14 @@ describe.skipIf(!cliAvailable)('E2E Lifecycle: InitRunner → 808.runPhase() ful
     execSync('git config user.email "test@test.com"', { cwd: tmpDir, stdio: 'ignore' });
     execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
 
-    tools = new 808Tools({
+    tools = new Agent808Tools({
       projectDir: tmpDir,
-      gsdToolsPath: 808_TOOLS_PATH,
+      gsdToolsPath: AGENT_808_TOOLS_PATH,
       timeoutMs: 30_000,
     });
 
     // Run InitRunner to bootstrap the project
-    const initEventStream = new 808EventStream();
+    const initEventStream = new Agent808EventStream();
     const initRunner = new InitRunner({
       projectDir: tmpDir,
       tools,
@@ -158,14 +158,14 @@ describe.skipIf(!cliAvailable)('E2E Lifecycle: InitRunner → 808.runPhase() ful
     expect(phaseOp.phase_found).toBe(true);
 
     // Collect all events during the phase lifecycle
-    const events: 808Event[] = [];
+    const events: agent808Event[] = [];
 
     // Construct 808 with autoMode: true
     const app = new 808({
       projectDir: tmpDir,
       autoMode: true,
     });
-    app.onEvent((e: 808Event) => events.push(e));
+    app.onEvent((e: agent808Event) => events.push(e));
 
     // Run the discovered first phase with tight budget to minimize cost
     const result: PhaseRunnerResult = await app.runPhase(phase1Number!, {
@@ -184,19 +184,19 @@ describe.skipIf(!cliAvailable)('E2E Lifecycle: InitRunner → 808.runPhase() ful
     expect(result.steps.length).toBeGreaterThanOrEqual(1);
 
     // ── Assert: events include PhaseStart ──
-    const phaseStartEvents = events.filter(e => e.type === 808EventType.PhaseStart);
+    const phaseStartEvents = events.filter(e => e.type === agent808EventType.PhaseStart);
     expect(phaseStartEvents.length).toBe(1);
     const phaseStart = phaseStartEvents[0]!;
-    if (phaseStart.type === 808EventType.PhaseStart) {
+    if (phaseStart.type === agent808EventType.PhaseStart) {
       expect(phaseStart.phaseNumber).toBe(phase1Number);
       expect(phaseStart.phaseName).toBeTruthy();
     }
 
     // ── Assert: events include PhaseComplete ──
-    const phaseCompleteEvents = events.filter(e => e.type === 808EventType.PhaseComplete);
+    const phaseCompleteEvents = events.filter(e => e.type === agent808EventType.PhaseComplete);
     expect(phaseCompleteEvents.length).toBe(1);
     const phaseComplete = phaseCompleteEvents[0]!;
-    if (phaseComplete.type === 808EventType.PhaseComplete) {
+    if (phaseComplete.type === agent808EventType.PhaseComplete) {
       expect(phaseComplete.phaseNumber).toBe(phase1Number);
       expect(typeof phaseComplete.totalCostUsd).toBe('number');
       expect(typeof phaseComplete.totalDurationMs).toBe('number');
@@ -204,8 +204,8 @@ describe.skipIf(!cliAvailable)('E2E Lifecycle: InitRunner → 808.runPhase() ful
 
     // ── Assert: PhaseStepStart events show step progression ──
     const stepStartEvents = events.filter(
-      (e): e is Extract<808Event, { type: 808EventType.PhaseStepStart }> =>
-        e.type === 808EventType.PhaseStepStart,
+      (e): e is Extract<agent808Event, { type: agentagent808EventType.PhaseStepStart }> =>
+        e.type === agent808EventType.PhaseStepStart,
     );
     expect(stepStartEvents.length).toBeGreaterThanOrEqual(1);
 
@@ -248,8 +248,8 @@ describe.skipIf(!cliAvailable)('E2E Lifecycle: InitRunner → 808.runPhase() ful
 
     // ── Assert: PhaseStepComplete events match step results ──
     const stepCompleteEvents = events.filter(
-      (e): e is Extract<808Event, { type: 808EventType.PhaseStepComplete }> =>
-        e.type === 808EventType.PhaseStepComplete,
+      (e): e is Extract<agent808Event, { type: agentagent808EventType.PhaseStepComplete }> =>
+        e.type === agent808EventType.PhaseStepComplete,
     );
     // At least as many complete events as step results
     expect(stepCompleteEvents.length).toBeGreaterThanOrEqual(result.steps.length);

@@ -6,7 +6,7 @@
  */
 
 import type { Writable } from 'node:stream';
-import { 808EventType, type 808Event, type TransportHandler } from './types.js';
+import { agent808EventType, type agent808Event, type TransportHandler } from './types.js';
 
 // ─── ANSI escape constants (no dependency per D021) ──────────────────────────
 
@@ -53,7 +53,7 @@ export class CLITransport implements TransportHandler {
   }
 
   /** Format and write a 808 event as a rich ANSI-colored line. Never throws. */
-  onEvent(event: 808Event): void {
+  onEvent(event: agent808Event): void {
     try {
       const line = this.formatEvent(event);
       this.out.write(line + '\n');
@@ -69,57 +69,57 @@ export class CLITransport implements TransportHandler {
 
   // ─── Private formatting ────────────────────────────────────────────
 
-  private formatEvent(event: 808Event): string {
+  private formatEvent(event: agent808Event): string {
     const time = formatTime(event.timestamp);
 
     switch (event.type) {
-      case 808EventType.SessionInit:
+      case agent808EventType.SessionInit:
         return `[${time}] [INIT] Session started — model: ${event.model}, tools: ${event.tools.length}, cwd: ${event.cwd}`;
 
-      case 808EventType.SessionComplete:
+      case agent808EventType.SessionComplete:
         return `[${time}] ${GREEN}✓ Session complete — cost: ${usd(event.totalCostUsd)}, turns: ${event.numTurns}, duration: ${(event.durationMs / 1000).toFixed(1)}s${RESET}`;
 
-      case 808EventType.SessionError:
+      case agent808EventType.SessionError:
         return `[${time}] ${RED}✗ Session failed — subtype: ${event.errorSubtype}, errors: [${event.errors.join(', ')}]${RESET}`;
 
-      case 808EventType.ToolCall:
+      case agent808EventType.ToolCall:
         return `[${time}] [TOOL] ${event.toolName}(${truncate(JSON.stringify(event.input), 80)})`;
 
-      case 808EventType.PhaseStart:
+      case agent808EventType.PhaseStart:
         return `${BOLD}${CYAN}━━━ 808 ► PHASE ${event.phaseNumber}: ${event.phaseName} ━━━${RESET}`;
 
-      case 808EventType.PhaseComplete:
+      case agent808EventType.PhaseComplete:
         return `[${time}] [PHASE] Phase ${event.phaseNumber} complete — success: ${event.success}, cost: ${usd(event.totalCostUsd)}, running: ${usd(this.runningCostUsd)}`;
 
-      case 808EventType.PhaseStepStart:
+      case agent808EventType.PhaseStepStart:
         return `${CYAN}◆ ${event.step}${RESET}`;
 
-      case 808EventType.PhaseStepComplete:
+      case agent808EventType.PhaseStepComplete:
         return event.success
           ? `${GREEN}✓ ${event.step}${RESET} ${DIM}${event.durationMs}ms${RESET}`
           : `${RED}✗ ${event.step}${RESET} ${DIM}${event.durationMs}ms${RESET}`;
 
-      case 808EventType.WaveStart:
+      case agent808EventType.WaveStart:
         return `${YELLOW}⟫ Wave ${event.waveNumber} (${event.planCount} plans)${RESET}`;
 
-      case 808EventType.WaveComplete:
+      case agent808EventType.WaveComplete:
         return `[${time}] [WAVE] Wave ${event.waveNumber} complete — ${GREEN}${event.successCount} success${RESET}, ${RED}${event.failureCount} failed${RESET}, ${event.durationMs}ms`;
 
-      case 808EventType.CostUpdate: {
+      case agent808EventType.CostUpdate: {
         this.runningCostUsd += event.sessionCostUsd;
         return `${DIM}[${time}] Cost: session ${usd(event.sessionCostUsd)}, running ${usd(this.runningCostUsd)}${RESET}`;
       }
 
-      case 808EventType.MilestoneStart:
+      case agent808EventType.MilestoneStart:
         return `${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}\n${BOLD}  808 Milestone — ${event.phaseCount} phases${RESET}\n${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}`;
 
-      case 808EventType.MilestoneComplete:
+      case agent808EventType.MilestoneComplete:
         return `${BOLD}━━━ Milestone complete — success: ${event.success}, cost: ${usd(event.totalCostUsd)}, running: ${usd(this.runningCostUsd)} ━━━${RESET}`;
 
-      case 808EventType.AssistantText:
+      case agent808EventType.AssistantText:
         return `${DIM}[${time}] ${truncate(event.text, 200)}${RESET}`;
 
-      case 808EventType.InitResearchSpawn:
+      case agent808EventType.InitResearchSpawn:
         return `${CYAN}◆ Spawning ${event.sessionCount} researchers...${RESET}`;
 
       // Generic fallback for event types without specific formatting

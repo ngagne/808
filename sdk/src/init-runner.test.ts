@@ -12,7 +12,7 @@ import type {
   InitNewProjectInfo,
   InitStepResult,
 } from './types.js';
-import { 808EventType } from './types.js';
+import { agent808EventType } from './types.js';
 
 // ─── Mock modules ────────────────────────────────────────────────────────────
 
@@ -120,9 +120,9 @@ function makeTools(overrides: Record<string, unknown> = {}) {
 }
 
 function makeEventStream() {
-  const events: 808Event[] = [];
+  const events: agent808Event[] = [];
   return {
-    emitEvent: vi.fn((event: 808Event) => events.push(event)),
+    emitEvent: vi.fn((event: agent808Event) => events.push(event)),
     on: vi.fn(),
     emit: vi.fn(),
     addTransport: vi.fn(),
@@ -130,7 +130,7 @@ function makeEventStream() {
   } as any;
 }
 
-function makeDeps(overrides: Partial<InitRunnerDeps> & { tmpDir: string }): InitRunnerDeps & { events: 808Event[] } {
+function makeDeps(overrides: Partial<InitRunnerDeps> & { tmpDir: string }): InitRunnerDeps & { events: agent808Event[] } {
   const tools = makeTools();
   const eventStream = makeEventStream();
   return {
@@ -172,7 +172,7 @@ describe('InitRunner', () => {
       eventStream,
       config: configOverrides as any,
     });
-    return { runner, tools, eventStream, events: eventStream.events as 808Event[] };
+    return { runner, tools, eventStream, events: eventStream.events as agent808Event[] };
   }
 
   // ─── Core workflow tests ─────────────────────────────────────────────────
@@ -330,8 +330,8 @@ describe('InitRunner', () => {
 
     await runner.run('build a todo app');
 
-    const startEvents = events.filter(e => e.type === 808EventType.InitStart);
-    const completeEvents = events.filter(e => e.type === 808EventType.InitComplete);
+    const startEvents = events.filter(e => e.type === agent808EventType.InitStart);
+    const completeEvents = events.filter(e => e.type === agent808EventType.InitComplete);
 
     expect(startEvents.length).toBe(1);
     expect(completeEvents.length).toBe(1);
@@ -352,8 +352,8 @@ describe('InitRunner', () => {
 
     await runner.run('build a todo app');
 
-    const stepStarts = events.filter(e => e.type === 808EventType.InitStepStart);
-    const stepCompletes = events.filter(e => e.type === 808EventType.InitStepComplete);
+    const stepStarts = events.filter(e => e.type === agent808EventType.InitStepStart);
+    const stepCompletes = events.filter(e => e.type === agent808EventType.InitStepComplete);
 
     // Steps: setup, config, project, 4x research, synthesis, requirements, roadmap = 10
     expect(stepStarts.length).toBe(10);
@@ -383,7 +383,7 @@ describe('InitRunner', () => {
 
     await runner.run('build a todo app');
 
-    const spawnEvents = events.filter(e => e.type === 808EventType.InitResearchSpawn);
+    const spawnEvents = events.filter(e => e.type === agent808EventType.InitResearchSpawn);
     expect(spawnEvents.length).toBe(1);
 
     const spawn = spawnEvents[0] as any;
@@ -622,7 +622,7 @@ describe('InitRunner', () => {
         config: configOverrides as any,
         sdkPromptsDir,
       });
-      return { runner, tools, eventStream, events: eventStream.events as 808Event[] };
+      return { runner, tools, eventStream, events: eventStream.events as agent808Event[] };
     }
 
     it('read808File prefers sdk/prompts/ template over 808-1 path', async () => {

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { ContextEngine, PHASE_FILE_MANIFEST } from './context-engine.js';
 import { PhaseType } from './types.js';
-import type { 808Logger } from './logger.js';
+import type { Agent808Logger } from './logger.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ async function createPlanningDir(projectDir: string, files: Record<string, strin
   }
 }
 
-function makeMockLogger(): 808Logger {
+function makeMockLogger(): Agent808Logger {
   return {
     debug: vi.fn(),
     info: vi.fn(),
@@ -29,7 +29,7 @@ function makeMockLogger(): 808Logger {
     setPhase: vi.fn(),
     setPlan: vi.fn(),
     setSessionId: vi.fn(),
-  } as unknown as 808Logger;
+  } as unknown as Agent808Logger;
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────

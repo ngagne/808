@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { WebSocket } from 'ws';
 import { WSTransport } from './ws-transport.js';
-import { 808EventType, type 808Event, type 808EventBase } from './types.js';
+import { agent808EventType, type agent808Event, type agent808EventBase } from './types.js';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -67,13 +67,13 @@ describe('WSTransport', () => {
     const address = (transport as any).server?.address();
     const client = await connectClient(address.port);
 
-    const event: 808Event = {
+    const event: agent808Event = {
       ...makeBase(),
-      type: 808EventType.SessionInit,
+      type: agent808EventType.SessionInit,
       model: 'claude-sonnet-4-20250514',
       tools: ['Read', 'Write'],
       cwd: '/tmp/test',
-    } as 808Event;
+    } as agent808Event;
 
     const msgPromise = waitForMessage(client);
     transport.onEvent(event);
@@ -97,10 +97,10 @@ describe('WSTransport', () => {
     expect(() => {
       transport.onEvent({
         ...makeBase(),
-        type: 808EventType.MilestoneStart,
+        type: agent808EventType.MilestoneStart,
         phaseCount: 2,
         prompt: 'test',
-      } as 808Event);
+      } as agent808Event);
     }).not.toThrow();
   });
 
@@ -135,14 +135,14 @@ describe('WSTransport', () => {
     const client1 = await connectClient(address.port);
     const client2 = await connectClient(address.port);
 
-    const event: 808Event = {
+    const event: agent808Event = {
       ...makeBase(),
-      type: 808EventType.MilestoneComplete,
+      type: agent808EventType.MilestoneComplete,
       success: true,
       totalCostUsd: 5.0,
       totalDurationMs: 120000,
       phasesCompleted: 3,
-    } as 808Event;
+    } as agent808Event;
 
     const msg1Promise = waitForMessage(client1);
     const msg2Promise = waitForMessage(client2);
