@@ -6,7 +6,7 @@
  * literal parts of skill/subagent names.
  */
 
-process.env.808_TEST_MODE = '1';
+process.env.EOE_TEST_MODE = '1';
 
 const { describe, test } = require('node:test');
 const assert = require('node:assert');

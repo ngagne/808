@@ -7,7 +7,7 @@
  * Requirements: CLI-01, CLI-02, CLI-03, CLI-04, CLI-05, CLI-06
  */
 
-process.env.808_TEST_MODE = '1';
+process.env.EOE_TEST_MODE = '1';
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
@@ -1098,7 +1098,7 @@ const EXPECTED_AGENTS = fs.readdirSync(path.join(__dirname, '..', 'agents'))
 
 function runCopilotInstall(cwd) {
   const env = { ...process.env };
-  delete env.808_TEST_MODE;
+  delete env.EOE_TEST_MODE;
   return execFileSync(process.execPath, [INSTALL_PATH, '--copilot', '--local'], {
     cwd,
     encoding: 'utf-8',
@@ -1109,7 +1109,7 @@ function runCopilotInstall(cwd) {
 
 function runCopilotUninstall(cwd) {
   const env = { ...process.env };
-  delete env.808_TEST_MODE;
+  delete env.EOE_TEST_MODE;
   return execFileSync(process.execPath, [INSTALL_PATH, '--copilot', '--local', '--uninstall'], {
     cwd,
     encoding: 'utf-8',

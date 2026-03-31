@@ -13,13 +13,53 @@ const yellow = '\x1b[33m';
 const dim = '\x1b[2m';
 const reset = '\x1b[0m';
 
+// Gradient colors (RGB values for smooth interpolation)
+// #DD1D00 (red) -> #F27900 (orange) -> #DDDA00 (yellow) -> #E6E8BF (light yellow/white)
+const gradientStops = [
+  { r: 0xDD, g: 0x1D, b: 0x00 },  // red
+  { r: 0xF2, g: 0x79, b: 0x00 },  // orange
+  { r: 0xDD, g: 0xDA, b: 0x00 },  // yellow
+  { r: 0xE6, g: 0xE8, b: 0xBF },  // light yellow/white
+];
+
+// Interpolate between two RGB values
+function interpolateColor(color1, color2, factor) {
+  return {
+    r: Math.round(color1.r + (color2.r - color1.r) * factor),
+    g: Math.round(color1.g + (color2.g - color1.g) * factor),
+    b: Math.round(color1.b + (color2.b - color1.b) * factor),
+  };
+}
+
+// Get interpolated color for a position (0 to 1)
+function getColorAtPosition(position) {
+  const numStops = gradientStops.length;
+  // Clamp position to 0-1 range
+  const clampedPosition = Math.max(0, Math.min(1, position));
+  const segment = Math.min(Math.floor(clampedPosition * (numStops - 1)), numStops - 2);
+  const localFactor = (clampedPosition * (numStops - 1)) - segment;
+  return interpolateColor(gradientStops[segment], gradientStops[segment + 1], localFactor);
+}
+
+// Apply horizontal gradient to a string using true color (24-bit)
+function applyGradient(str) {
+  const len = str.length;
+  let result = '';
+  for (let i = 0; i < len; i++) {
+    const position = len > 1 ? i / (len - 1) : 0;
+    const color = getColorAtPosition(position);
+    result += `\x1b[38;2;${color.r};${color.g};${color.b}m${str[i]}`;
+  }
+  return result + reset;
+}
+
 // Codex config.toml constants
-const 808_CODEX_MARKER = '# 808 Agent Configuration \u2014 managed by 808 installer';
-const 808_CODEX_HOOKS_OWNERSHIP_PREFIX = '# 808 codex_hooks ownership: ';
+const EOE_CODEX_MARKER = '# 808 Agent Configuration \u2014 managed by 808 installer';
+const EOE_CODEX_HOOKS_OWNERSHIP_PREFIX = '# 808 codex_hooks ownership: ';
 
 // Copilot instructions marker constants
-const 808_COPILOT_INSTRUCTIONS_MARKER = '<!-- 808 Configuration \u2014 managed by 808 installer -->';
-const 808_COPILOT_INSTRUCTIONS_CLOSE_MARKER = '<!-- /808 Configuration -->';
+const EOE_COPILOT_INSTRUCTIONS_MARKER = '<!-- 808 Configuration \u2014 managed by 808 installer -->';
+const EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER = '<!-- /808 Configuration -->';
 
 const CODEX_AGENT_SANDBOX = {
   '808-executor': 'workspace-write',
@@ -281,17 +321,16 @@ function getGlobalDir(runtime, explicitDir = null) {
 }
 
 const banner = '\n' +
-  orange + 
-  ' █████╗   █████╗   █████╗ \n' +
-  '██╔══██╗ ██╔══██╗ ██╔══██╗\n' +
-  '╚█████╔╝ ██║  ██║ ╚█████╔╝\n' +
-  '██╔══██╗ ██║  ██║ ██╔══██╗\n' +
-  '╚█████╔╝ ╚█████╔╝ ╚█████╔╝\n' +
-  ' ╚════╝   ╚════╝   ╚════╝ ' + reset + '\n' +
+  applyGradient(' █████╗   █████╗   █████╗ \n') +
+  applyGradient('██╔══██╗ ██╔══██╗ ██╔══██╗\n') +
+  applyGradient('╚█████╔╝ ██║  ██║ ╚█████╔╝\n') +
+  applyGradient('██╔══██╗ ██║  ██║ ██╔══██╗\n') +
+  applyGradient('╚█████╔╝ ╚█████╔╝ ╚█████╔╝\n') +
+  applyGradient(' ╚════╝   ╚════╝   ╚════╝ ') + '\n' +
   '\n' +
   '  808 ' + dim + 'v' + pkg.version + reset + '\n' +
   '  A meta-prompting, context engineering and spec-driven\n' +
-  '  development system for Claude Code, OpenCode, Gemini, Codex, Copilot, Antigravity, Cursor, and Windsurf by TÂCHES.\n';
+  '  development system with multi-agent verification.\n';
 
 // Parse --config-dir argument
 function parseConfigDirArg() {
@@ -1137,7 +1176,7 @@ function generateCodexConfigBlock(agents, targetDir) {
     ? path.join(targetDir, 'agents').replace(/\\/g, '/')
     : 'agents';
   const lines = [
-    808_CODEX_MARKER,
+    EOE_CODEX_MARKER,
     '',
   ];
 
@@ -1161,7 +1200,7 @@ function stripCodex808AgentSections(content) {
  */
 function strip808FromCodexConfig(content) {
   const eol = detectLineEnding(content);
-  const markerIndex = content.indexOf(808_CODEX_MARKER);
+  const markerIndex = content.indexOf(EOE_CODEX_MARKER);
   const codexHooksOwnership = getManagedCodexHooksOwnership(content);
 
   if (markerIndex !== -1) {
@@ -1784,24 +1823,24 @@ function stripCodexHooksFeatureAssignments(content, ownership = null) {
 }
 
 function getManagedCodexHooksOwnership(content) {
-  const markerIndex = content.indexOf(808_CODEX_MARKER);
+  const markerIndex = content.indexOf(EOE_CODEX_MARKER);
   if (markerIndex === -1) {
     return null;
   }
 
-  const afterMarker = content.slice(markerIndex + 808_CODEX_MARKER.length);
+  const afterMarker = content.slice(markerIndex + EOE_CODEX_MARKER.length);
   const match = afterMarker.match(/^\r?\n# 808 codex_hooks ownership: (section|root_dotted)\r?\n/);
   return match ? match[1] : null;
 }
 
 function setManagedCodexHooksOwnership(content, ownership) {
-  const markerIndex = content.indexOf(808_CODEX_MARKER);
+  const markerIndex = content.indexOf(EOE_CODEX_MARKER);
   if (markerIndex === -1) {
     return content;
   }
 
   const eol = detectLineEnding(content);
-  const markerEnd = markerIndex + 808_CODEX_MARKER.length;
+  const markerEnd = markerIndex + EOE_CODEX_MARKER.length;
   const afterMarker = content.slice(markerEnd);
   const normalizedAfterMarker = afterMarker.replace(
     /^\r?\n# 808 codex_hooks ownership: (?:section|root_dotted)\r?\n/,
@@ -1815,7 +1854,7 @@ function setManagedCodexHooksOwnership(content, ownership) {
   const remainder = normalizedAfterMarker.replace(/^\r?\n/, '');
   return content.slice(0, markerEnd) +
     eol +
-    `${808_CODEX_HOOKS_OWNERSHIP_PREFIX}${ownership}${eol}` +
+    `${EOE_CODEX_HOOKS_OWNERSHIP_PREFIX}${ownership}${eol}` +
     remainder;
 }
 
@@ -2025,7 +2064,7 @@ function mergeCodexConfig(configPath, gsdBlock) {
   const existing = fs.readFileSync(configPath, 'utf8');
   const eol = detectLineEnding(existing);
   const normalized808Block = gsdBlock.replace(/\r?\n/g, eol);
-  const markerIndex = existing.indexOf(808_CODEX_MARKER);
+  const markerIndex = existing.indexOf(EOE_CODEX_MARKER);
 
   // Case 2: Has 808 marker — truncate and re-append
   if (markerIndex !== -1) {
@@ -2266,9 +2305,9 @@ function hasEnabledCodexHooksFeature(configContent) {
  * @param {string} gsdContent - Template content (without markers)
  */
 function mergeCopilotInstructions(filePath, gsdContent) {
-  const gsdBlock = 808_COPILOT_INSTRUCTIONS_MARKER + '\n' +
+  const gsdBlock = EOE_COPILOT_INSTRUCTIONS_MARKER + '\n' +
     gsdContent.trim() + '\n' +
-    808_COPILOT_INSTRUCTIONS_CLOSE_MARKER;
+    EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER;
 
   // Case 1: No file — create fresh
   if (!fs.existsSync(filePath)) {
@@ -2277,13 +2316,13 @@ function mergeCopilotInstructions(filePath, gsdContent) {
   }
 
   const existing = fs.readFileSync(filePath, 'utf8');
-  const openIndex = existing.indexOf(808_COPILOT_INSTRUCTIONS_MARKER);
-  const closeIndex = existing.indexOf(808_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
+  const openIndex = existing.indexOf(EOE_COPILOT_INSTRUCTIONS_MARKER);
+  const closeIndex = existing.indexOf(EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
 
   // Case 2: Has 808 markers — replace between markers
   if (openIndex !== -1 && closeIndex !== -1) {
     const before = existing.substring(0, openIndex).trimEnd();
-    const after = existing.substring(closeIndex + 808_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
+    const after = existing.substring(closeIndex + EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
     let newContent = '';
     if (before) newContent += before + '\n\n';
     newContent += gsdBlock;
@@ -2305,12 +2344,12 @@ function mergeCopilotInstructions(filePath, gsdContent) {
  * @returns {string|null} - Cleaned content or null if empty
  */
 function strip808FromCopilotInstructions(content) {
-  const openIndex = content.indexOf(808_COPILOT_INSTRUCTIONS_MARKER);
-  const closeIndex = content.indexOf(808_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
+  const openIndex = content.indexOf(EOE_COPILOT_INSTRUCTIONS_MARKER);
+  const closeIndex = content.indexOf(EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
 
   if (openIndex !== -1 && closeIndex !== -1) {
     const before = content.substring(0, openIndex).trimEnd();
-    const after = content.substring(closeIndex + 808_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
+    const after = content.substring(closeIndex + EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
     const cleaned = (before + (before && after ? '\n\n' : '') + after).trim();
     if (!cleaned) return null;
     return cleaned + '\n';
@@ -4922,7 +4961,7 @@ function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 }
 
 // Test-only exports — skip main logic when loaded as a module for testing
-if (process.env.808_TEST_MODE) {
+if (process.env.EOE_TEST_MODE) {
   module.exports = {
     yamlIdentifier,
     getCodexSkillAdapterHeader,
@@ -4939,7 +4978,7 @@ if (process.env.808_TEST_MODE) {
     convertClaudeCommandToCodexSkill,
     convertClaudeToOpencodeFrontmatter,
     neutralizeAgentReferences,
-    808_CODEX_MARKER,
+    EOE_CODEX_MARKER,
     CODEX_AGENT_SANDBOX,
     getDirName,
     getGlobalDir,
@@ -4950,8 +4989,8 @@ if (process.env.808_TEST_MODE) {
     convertClaudeCommandToCopilotSkill,
     convertClaudeAgentToCopilotAgent,
     copyCommandsAsCopilotSkills,
-    808_COPILOT_INSTRUCTIONS_MARKER,
-    808_COPILOT_INSTRUCTIONS_CLOSE_MARKER,
+    EOE_COPILOT_INSTRUCTIONS_MARKER,
+    EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER,
     mergeCopilotInstructions,
     strip808FromCopilotInstructions,
     convertClaudeToAntigravityContent,
@@ -5007,4 +5046,4 @@ if (hasGlobal && hasLocal) {
   }
 }
 
-} // end of else block for 808_TEST_MODE
+} // end of else block for EOE_TEST_MODE

@@ -16,11 +16,10 @@
       .white { fill: #c0caf5; }
     </style>
     <linearGradient id="808-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#2F2E3E" />
-      <stop offset="25%" style="stop-color:#E6E8BF" />
-      <stop offset="50%" style="stop-color:#DDDA00" />
-      <stop offset="75%" style="stop-color:#F27900" />
-      <stop offset="100%" style="stop-color:#DD1D00" />
+      <stop offset="25%" style="stop-color:#DD1D00" />
+      <stop offset="50%" style="stop-color:#F27900" />
+      <stop offset="75%" style="stop-color:#DDDA00" />
+      <stop offset="100%" style="stop-color:#E6E8BF" />
     </linearGradient>
   </defs>
 
@@ -49,27 +48,28 @@
 
     <!-- Banner -->
     <text font-size="14" y="48" xml:space="preserve" fill="url(#808-gradient)" >  █████╗       █████╗       █████╗ </text>
-    <text font-size="14" y="68" xml:space="preserve" fill="url(#808-gradient)" >██╔══██╗ ██╔══██╗ ██╔══██╗</text>
-    <text font-size="14" y="88" xml:space="preserve" fill="url(#808-gradient)" >╚█████╔╝ ██║      ██║ ╚█████╔╝</text>
-    <text font-size="14" y="108" xml:space="preserve" fill="url(#808-gradient)">██╔══██╗ ██║      ██║ ██╔══██╗</text>
-    <text font-size="14" y="128" xml:space="preserve" fill="url(#808-gradient)">╚█████╔╝ ╚█████╔╝ ╚█████╔╝</text>
-    <text font-size="14" y="148" xml:space="preserve" fill="url(#808-gradient)">  ╚════╝       ╚════╝       ╚════╝ </text>
+    <text font-size="14" y="65" xml:space="preserve" fill="url(#808-gradient)" >██╔══██╗ ██╔══██╗ ██╔══██╗</text>
+    <text font-size="14" y="82" xml:space="preserve" fill="url(#808-gradient)" >╚█████╔╝ ██║      ██║ ╚█████╔╝</text>
+    <text font-size="14" y="99" xml:space="preserve" fill="url(#808-gradient)">██╔══██╗ ██║      ██║ ██╔══██╗</text>
+    <text font-size="14" y="116" xml:space="preserve" fill="url(#808-gradient)">╚█████╔╝ ╚█████╔╝ ╚█████╔╝</text>
+    <text font-size="14" y="133" xml:space="preserve" fill="url(#808-gradient)">  ╚════╝       ╚════╝       ╚════╝ </text>
 
     <!-- Title and subtitle -->
     <text class="text white" font-size="15" y="188">  808 <tspan class="dim">v1.0.1</tspan></text>
     <text class="text white" font-size="15" y="212">  A meta-prompting, context engineering and spec-driven</text>
-    <text class="text white" font-size="15" y="232">  development system for Claude Code by TÂCHES.</text>
+    <text class="text white" font-size="15" y="232">  development system with multi-agent verification.</text>
+    <text class="text white" font-size="15" y="252"><tspan fill="#565f89">  Built on GSD-CC by TÂCHES.</tspan></text>
 
     <!-- Install output -->
-    <text class="text" font-size="15" y="280"><tspan class="green">  ✓</tspan><tspan class="white"> Installed commands/808</tspan></text>
-    <text class="text" font-size="15" y="304"><tspan class="green">  ✓</tspan><tspan class="white"> Installed 808</tspan></text>
+    <text class="text" font-size="15" y="300"><tspan class="green">  ✓</tspan><tspan class="white"> Installed commands/808</tspan></text>
+    <text class="text" font-size="15" y="324"><tspan class="green">  ✓</tspan><tspan class="white"> Installed 808</tspan></text>
 
     <!-- Done message -->
-    <text class="text" font-size="15" y="352"><tspan class="green">  Done!</tspan><tspan class="white"> Run </tspan><tspan class="cyan">/808:help</tspan><tspan class="white"> to get started.</tspan></text>
+    <text class="text" font-size="15" y="372"><tspan class="green">  Done!</tspan><tspan class="white"> Run </tspan><tspan class="cyan">/808:help</tspan><tspan class="white"> to get started.</tspan></text>
 
     <!-- New prompt -->
-    <text class="text prompt" font-size="15" y="400">~</text>
-    <text class="text dim" font-size="15" x="16" y="400">$</text>
-    <text class="text white" font-size="15" x="36" y="400">▌</text>
+    <text class="text prompt" font-size="15" y="420">~</text>
+    <text class="text dim" font-size="15" x="16" y="420">$</text>
+    <text class="text white" font-size="15" x="36" y="420">▌</text>
   </g>
 </svg>

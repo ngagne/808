@@ -7,7 +7,7 @@
 
 'use strict';
 
-process.env.808_TEST_MODE = '1';
+process.env.EOE_TEST_MODE = '1';
 
 const { test, describe } = require('node:test');
 const assert = require('node:assert');

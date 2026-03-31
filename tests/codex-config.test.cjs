@@ -6,7 +6,7 @@
  */
 
 // Enable test exports from install.js (skips main CLI logic)
-process.env.808_TEST_MODE = '1';
+process.env.EOE_TEST_MODE = '1';
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
