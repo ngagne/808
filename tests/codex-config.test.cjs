@@ -6,7 +6,7 @@
  */
 
 // Enable test exports from install.js (skips main CLI logic)
-process.env.EOE_TEST_MODE = '1';
+process.env.AGENT_808_TEST_MODE = '1';
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
@@ -19,7 +19,7 @@ const {
   convertClaudeAgentToCodexAgent,
   generateCodexAgentToml,
   generateCodexConfigBlock,
-  stripGsdFromCodexConfig,
+  strip808FromCodexConfig,
   mergeCodexConfig,
   install,
   808_CODEX_MARKER,
@@ -293,18 +293,18 @@ describe('generateCodexConfigBlock', () => {
   });
 });
 
-// ─── stripGsdFromCodexConfig ────────────────────────────────────────────────────
+// ─── strip808FromCodexConfig ────────────────────────────────────────────────────
 
-describe('stripGsdFromCodexConfig', () => {
+describe('strip808FromCodexConfig', () => {
   test('returns null for 808-only config', () => {
     const content = `${808_CODEX_MARKER}\n[features]\nmulti_agent = true\n`;
-    const result = stripGsdFromCodexConfig(content);
+    const result = strip808FromCodexConfig(content);
     assert.strictEqual(result, null, 'returns null when 808-only');
   });
 
   test('preserves user content before marker', () => {
     const content = `[model]\nname = "o3"\n\n${808_CODEX_MARKER}\n[features]\nmulti_agent = true\n`;
-    const result = stripGsdFromCodexConfig(content);
+    const result = strip808FromCodexConfig(content);
     assert.ok(result.includes('[model]'), 'preserves user section');
     assert.ok(result.includes('name = "o3"'), 'preserves user values');
     assert.ok(!result.includes('multi_agent'), 'removes 808 content');
@@ -313,7 +313,7 @@ describe('stripGsdFromCodexConfig', () => {
 
   test('strips injected feature keys without marker', () => {
     const content = `[features]\nmulti_agent = true\ndefault_mode_request_user_input = true\nother_feature = false\n`;
-    const result = stripGsdFromCodexConfig(content);
+    const result = strip808FromCodexConfig(content);
     assert.ok(!result.includes('multi_agent'), 'removes multi_agent');
     assert.ok(!result.includes('default_mode_request_user_input'), 'removes request_user_input');
     assert.ok(result.includes('other_feature = false'), 'preserves user features');
@@ -321,7 +321,7 @@ describe('stripGsdFromCodexConfig', () => {
 
   test('removes empty [features] section', () => {
     const content = `[features]\nmulti_agent = true\n[model]\nname = "o3"\n`;
-    const result = stripGsdFromCodexConfig(content);
+    const result = strip808FromCodexConfig(content);
     assert.ok(!result.includes('[features]'), 'removes empty features section');
     assert.ok(result.includes('[model]'), 'preserves other sections');
   });
@@ -329,7 +329,7 @@ describe('stripGsdFromCodexConfig', () => {
   test('strips injected keys above marker on uninstall', () => {
     // Case 3 install injects keys into [features] AND appends marker block
     const content = `[model]\nname = "o3"\n\n[features]\nmulti_agent = true\ndefault_mode_request_user_input = true\nsome_custom_flag = true\n\n${808_CODEX_MARKER}\n[agents]\nmax_threads = 4\n`;
-    const result = stripGsdFromCodexConfig(content);
+    const result = strip808FromCodexConfig(content);
     assert.ok(result.includes('[model]'), 'preserves user model section');
     assert.ok(result.includes('some_custom_flag = true'), 'preserves user feature');
     assert.ok(!result.includes('multi_agent'), 'strips injected multi_agent');
@@ -339,7 +339,7 @@ describe('stripGsdFromCodexConfig', () => {
 
   test('removes [agents.808-*] sections', () => {
     const content = `[agents.808-executor]\ndescription = "test"\nconfig_file = "agents/808-executor.toml"\n\n[agents.custom-agent]\ndescription = "user agent"\n`;
-    const result = stripGsdFromCodexConfig(content);
+    const result = strip808FromCodexConfig(content);
     assert.ok(!result.includes('[agents.808-executor]'), 'removes 808 agent section');
     assert.ok(result.includes('[agents.custom-agent]'), 'preserves user agent section');
   });
@@ -441,12 +441,12 @@ describe('mergeCodexConfig', () => {
     mergeCodexConfig(configPath, sampleBlock);
 
     const content = fs.readFileSync(configPath, 'utf8');
-    const gsdAgentCount = (content.match(/^\[agents\.808-executor\]\s*$/gm) || []).length;
+    const agent808AgentCount = (content.match(/^\[agents\.808-executor\]\s*$/gm) || []).length;
     const markerCount = (content.match(new RegExp(808_CODEX_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
 
     assert.ok(content.includes('[model]'), 'preserves user content');
     assert.ok(content.includes('[agents.custom-agent]'), 'preserves non-808 agent section');
-    assert.strictEqual(gsdAgentCount, 1, 'keeps exactly one 808 agent section');
+    assert.strictEqual(agent808AgentCount, 1, 'keeps exactly one 808 agent section');
     assert.strictEqual(markerCount, 1, 'adds exactly one marker block');
     assert.ok(!/\n{3,}# 808 Agent Configuration/.test(content), 'does not leave extra blank lines before marker block');
   });
@@ -1372,7 +1372,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
   test('fresh install removes the 808-added codex_hooks feature on uninstall', () => {
     runCodexInstall(codexHome);
 
-    const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+    const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
     assert.strictEqual(cleaned, null, 'fresh 808-only config strips back to nothing');
   });
 
@@ -1393,7 +1393,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
 
     runCodexInstall(codexHome);
 
-    const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+    const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
     assert.ok(cleaned, 'preserves user config after uninstall cleanup');
     assert.strictEqual(countMatches(cleaned, /^\[features\](?:\s*#.*)?$/gm), 1, 'keeps the existing features table');
     assert.strictEqual(countMatches(cleaned, /^codex_hooks = true$/gm), 0, 'removes the 808-added codex_hooks key');
@@ -1420,7 +1420,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
 
     runCodexInstall(codexHome);
 
-    const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+    const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
     assert.ok(cleaned.includes('features.other_feature = true'), 'preserves other dotted feature keys');
     assert.strictEqual(countMatches(cleaned, /^features\.codex_hooks = true$/gm), 0, 'removes the dotted 808 codex_hooks key');
     assert.strictEqual(countMatches(cleaned, /^\[features\]\s*$/gm), 0, 'does not leave behind a [features] table');
@@ -1441,7 +1441,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
 
     runCodexInstall(codexHome);
 
-    const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+    const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
     assert.ok(cleaned.includes('[features]\ncodex_hooks = true\nother_feature = true'), 'preserves the user-authored codex_hooks assignment');
     assert.strictEqual(countMatches(cleaned, /^codex_hooks = true$/gm), 1, 'keeps the pre-existing codex_hooks key');
     assert.strictEqual(countMatches(cleaned, /808-update-check\.js/g), 0, 'removes the 808 update hook');
@@ -1461,7 +1461,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
 
     runCodexInstall(codexHome);
 
-    const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+    const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
     assert.ok(cleaned.includes('[features]\n"codex_hooks" = true\nother_feature = true'), 'preserves the user-authored quoted codex_hooks assignment');
     assert.strictEqual(countMatches(cleaned, /^"codex_hooks" = true$/gm), 1, 'keeps the pre-existing quoted codex_hooks key');
     assert.strictEqual(countMatches(cleaned, /808-update-check\.js/g), 0, 'removes the 808 update hook');
@@ -1480,7 +1480,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
 
     runCodexInstall(codexHome);
 
-    const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+    const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
     assert.ok(cleaned.includes('features.codex_hooks = true\nfeatures.other_feature = true'), 'preserves the user-authored dotted codex_hooks assignment');
     assert.strictEqual(countMatches(cleaned, /^features\.codex_hooks = true$/gm), 1, 'keeps the pre-existing dotted codex_hooks key');
     assert.strictEqual(countMatches(cleaned, /808-update-check\.js/g), 0, 'removes the 808 update hook');
@@ -1497,7 +1497,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
       writeCodexConfig(codexHome, initialContent);
       runCodexInstall(codexHome);
 
-      const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+      const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
       assert.strictEqual(cleaned, initialContent, `preserves short-circuited root features assignment: ${initialContent.split('\n')[0]}`);
 
       fs.rmSync(codexHome, { recursive: true, force: true });
@@ -1519,7 +1519,7 @@ describe('Codex uninstall symmetry for hook-enabled configs', () => {
     writeCodexConfig(codexHome, initialContent);
     runCodexInstall(codexHome);
 
-    const cleaned = stripGsdFromCodexConfig(readCodexConfig(codexHome));
+    const cleaned = strip808FromCodexConfig(readCodexConfig(codexHome));
     assert.ok(cleaned.includes('# first line wins\n[features]\r\nother_feature = true\r\n\r\n[model]\r\nname = "o3"'), 'preserves the original mixed-EOL user content');
     assert.strictEqual(countMatches(cleaned, /^codex_hooks = true$/gm), 0, 'removes the injected codex_hooks key');
     assert.strictEqual(countMatches(cleaned, /808-update-check\.js/g), 0, 'removes the 808 update hook');

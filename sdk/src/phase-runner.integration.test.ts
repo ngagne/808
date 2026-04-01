@@ -73,7 +73,7 @@ describe('Integration: PhaseRunner against real 808-tools.cjs', () => {
     tmpDir = await createTempPlanningDir();
     tools = new Agent808Tools({
       projectDir: tmpDir,
-      gsdToolsPath: AGENT_808_TOOLS_PATH,
+      agent808ToolsPath: AGENT_808_TOOLS_PATH,
       timeoutMs: 10_000,
     });
   });
@@ -311,7 +311,7 @@ describe('Integration: phasePlanIndex and wave execution', () => {
     tmpDir = await createMultiWavePlanningDir();
     tools = new Agent808Tools({
       projectDir: tmpDir,
-      gsdToolsPath: AGENT_808_TOOLS_PATH,
+      agent808ToolsPath: AGENT_808_TOOLS_PATH,
       timeoutMs: 10_000,
     });
   });

@@ -108,7 +108,7 @@ Use `--sdk` to also install the 808 SDK CLI (`808-sdk`) for headless autonomous 
 Clone the repository and run the installer locally:
 
 ```bash
-git clone https://github.com/808-build/808.git
+git clone https://github.com/ngagne/808.git
 cd 808
 node bin/install.js --claude --local
 ```

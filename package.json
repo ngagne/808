@@ -25,15 +25,15 @@
     "codex",
     "codex-cli"
   ],
-  "author": "TÂCHES",
+  "author": "Nick Gagne",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/808-build/808.git"
+    "url": "git+https://github.com/ngagne/808.git"
   },
-  "homepage": "https://github.com/808-build/808",
+  "homepage": "https://github.com/ngagne/808",
   "bugs": {
-    "url": "https://github.com/808-build/808/issues"
+    "url": "https://github.com/ngagne/808/issues"
   },
   "engines": {
     "node": ">=20.0.0"

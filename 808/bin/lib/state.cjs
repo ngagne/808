@@ -967,8 +967,8 @@ function cmdStateBeginPhase(cwd, phaseNumber, phaseName, planCount, raw) {
  * Fixes #1034.
  */
 function cmdSignalWaiting(cwd, type, question, options, phase, raw) {
-  const gsdDir = fs.existsSync(path.join(cwd, '.808')) ? path.join(cwd, '.808') : planningDir(cwd);
-  const waitingPath = path.join(gsdDir, 'WAITING.json');
+  const agent808Dir = fs.existsSync(path.join(cwd, '.808')) ? path.join(cwd, '.808') : planningDir(cwd);
+  const waitingPath = path.join(agent808Dir, 'WAITING.json');
 
   const signal = {
     status: 'waiting',
@@ -980,7 +980,7 @@ function cmdSignalWaiting(cwd, type, question, options, phase, raw) {
   };
 
   try {
-    fs.mkdirSync(gsdDir, { recursive: true });
+    fs.mkdirSync(agent808Dir, { recursive: true });
     fs.writeFileSync(waitingPath, JSON.stringify(signal, null, 2), 'utf-8');
     output({ signaled: true, path: waitingPath }, raw, 'true');
   } catch (e) {

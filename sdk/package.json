@@ -20,12 +20,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/808-build/808.git",
+    "url": "git+https://github.com/ngagne/808.git",
     "directory": "sdk"
   },
-  "homepage": "https://github.com/808-build/808/tree/main/sdk",
+  "homepage": "https://github.com/ngagne/808/tree/main/sdk",
   "bugs": {
-    "url": "https://github.com/808-build/808/issues"
+    "url": "https://github.com/ngagne/808/issues"
   },
   "author": "TÂCHES",
   "license": "MIT",

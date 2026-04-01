@@ -18,7 +18,7 @@ const TOOLS_PATH = path.join(__dirname, '..', '808', 'bin', '808-tools.cjs');
  *   Pass { HOME: cwd } to sandbox ~/.808/ lookups in tests that assert concrete
  *   config values that could be overridden by a developer's defaults.json.
  */
-function runGsdTools(args, cwd = process.cwd(), env = {}) {
+function run808Tools(args, cwd = process.cwd(), env = {}) {
   try {
     let result;
     const childEnv = { ...process.env, ...env };
@@ -84,4 +84,4 @@ function cleanup(tmpDir) {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 }
 
-module.exports = { runGsdTools, createTempDir, createTempProject, createTempGitProject, cleanup, TOOLS_PATH };
+module.exports = { run808Tools, createTempDir, createTempProject, createTempGitProject, cleanup, TOOLS_PATH };

@@ -11,7 +11,7 @@ const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { runGsdTools, createTempProject, cleanup } = require('./helpers.cjs');
+const { run808Tools, createTempProject, cleanup } = require('./helpers.cjs');
 
 const AGENTS_DIR_NAME = 'agents';
 const MODEL_PROFILES = require('../808/bin/lib/model-profiles.cjs').MODEL_PROFILES;
@@ -57,12 +57,12 @@ describe('init commands: agents_installed field (#1371)', () => {
 
     // Create agents dir as sibling of 808/ (the installed layout)
     // 808-tools.cjs resolves agents from 808_INSTALL_DIR or __dirname/../../agents
-    const gsdInstallDir = path.resolve(__dirname, '..', '808', 'bin');
-    const configDir = path.resolve(gsdInstallDir, '..', '..');
+    const agent808InstallDir = path.resolve(__dirname, '..', '808', 'bin');
+    const configDir = path.resolve(agent808InstallDir, '..', '..');
     const agentsDir = path.join(configDir, 'agents');
 
     // Agents already exist in the repo root /agents/ dir which is sibling to 808/
-    const result = runGsdTools('init execute-phase 1 --raw', tmpDir);
+    const result = run808Tools('init execute-phase 1 --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -77,7 +77,7 @@ describe('init commands: agents_installed field (#1371)', () => {
     const phaseDir = path.join(tmpDir, '.planning', 'phases', '01-setup');
     fs.mkdirSync(phaseDir, { recursive: true });
 
-    const result = runGsdTools('init plan-phase 1 --raw', tmpDir);
+    const result = run808Tools('init plan-phase 1 --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -90,7 +90,7 @@ describe('init commands: agents_installed field (#1371)', () => {
     const phaseDir = path.join(tmpDir, '.planning', 'phases', '01-setup');
     fs.mkdirSync(phaseDir, { recursive: true });
 
-    const result = runGsdTools('init execute-phase 1 --raw', tmpDir);
+    const result = run808Tools('init execute-phase 1 --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -99,7 +99,7 @@ describe('init commands: agents_installed field (#1371)', () => {
   });
 
   test('init quick includes agents_installed field', () => {
-    const result = runGsdTools(['init', 'quick', 'test description', '--raw'], tmpDir);
+    const result = run808Tools(['init', 'quick', 'test description', '--raw'], tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -146,7 +146,7 @@ describe('validate health: agent installation check W010 (#1371)', () => {
   test('health check reports healthy when agents are installed (repo layout)', () => {
     // In the repo, agents/ exists as a sibling of 808/, so the
     // health check should find them via the 808-tools.cjs path resolution
-    const result = runGsdTools('validate health --raw', tmpDir);
+    const result = run808Tools('validate health --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -170,7 +170,7 @@ describe('validate agents subcommand (#1371)', () => {
   });
 
   test('validate agents returns status with agent list', () => {
-    const result = runGsdTools('validate agents --raw', tmpDir);
+    const result = run808Tools('validate agents --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -181,7 +181,7 @@ describe('validate agents subcommand (#1371)', () => {
   });
 
   test('validate agents lists all expected agent types', () => {
-    const result = runGsdTools('validate agents --raw', tmpDir);
+    const result = run808Tools('validate agents --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);

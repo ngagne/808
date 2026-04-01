@@ -119,7 +119,7 @@ describe('PromptFactory', () => {
     // sdkPromptsDir points to a non-existent temp subdir so real sdk/prompts/ files
     // don't interfere — tests control exactly which files exist on disk.
     return new PromptFactory({
-      gsdInstallDir: tempDir,
+      agent808InstallDir: tempDir,
       agentsDir,
       sdkPromptsDir: join(tempDir, 'sdk-prompts-does-not-exist'),
     });
@@ -365,7 +365,7 @@ describe('PromptFactory', () => {
       );
 
       const factory = new PromptFactory({
-        gsdInstallDir: tempDir,
+        agent808InstallDir: tempDir,
         agentsDir,
         projectAgentsDir,
         sdkPromptsDir: join(tempDir, 'sdk-prompts-does-not-exist'),
@@ -382,7 +382,7 @@ describe('PromptFactory', () => {
       await writeFile(join(projectAgentsDir, '808-executor.md'), 'project agent');
 
       const factory = new PromptFactory({
-        gsdInstallDir: tempDir,
+        agent808InstallDir: tempDir,
         agentsDir,
         projectAgentsDir,
         sdkPromptsDir: join(tempDir, 'sdk-prompts-does-not-exist'),
@@ -405,7 +405,7 @@ describe('PromptFactory', () => {
       await writeFile(join(sdkDir, 'workflows', 'research-phase.md'), 'SDK headless version');
 
       const factory = new PromptFactory({
-        gsdInstallDir: tempDir,
+        agent808InstallDir: tempDir,
         agentsDir,
         sdkPromptsDir: sdkDir,
       });
@@ -422,7 +422,7 @@ describe('PromptFactory', () => {
       await writeFile(join(workflowsDir, 'research-phase.md'), '808-1 original');
 
       const factory = new PromptFactory({
-        gsdInstallDir: tempDir,
+        agent808InstallDir: tempDir,
         agentsDir,
         sdkPromptsDir: sdkDir,
       });
@@ -440,7 +440,7 @@ describe('PromptFactory', () => {
       await writeFile(join(sdkDir, 'agents', '808-executor.md'), 'SDK headless agent');
 
       const factory = new PromptFactory({
-        gsdInstallDir: tempDir,
+        agent808InstallDir: tempDir,
         agentsDir,
         sdkPromptsDir: sdkDir,
       });
@@ -457,7 +457,7 @@ describe('PromptFactory', () => {
       await writeFile(join(agentsDir, '808-executor.md'), 'user agent');
 
       const factory = new PromptFactory({
-        gsdInstallDir: tempDir,
+        agent808InstallDir: tempDir,
         agentsDir,
         sdkPromptsDir: sdkDir,
       });

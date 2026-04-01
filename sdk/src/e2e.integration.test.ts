@@ -69,11 +69,11 @@ describe.skipIf(!cliAvailable)('E2E: Single plan execution', () => {
     await cp(fixturesDir, tmpDir2, { recursive: true });
 
     try {
-      const gsd1 = new 808({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
-      const gsd2 = new 808({ projectDir: tmpDir2, maxBudgetUsd: 1.0, maxTurns: 20 });
+      const agent8081 = new 808({ projectDir: tmpDir, maxBudgetUsd: 1.0, maxTurns: 20 });
+      const agent8082 = new 808({ projectDir: tmpDir2, maxBudgetUsd: 1.0, maxTurns: 20 });
 
-      const result1 = await gsd1.executePlan('sample-plan.md');
-      const result2 = await gsd2.executePlan('sample-plan.md');
+      const result1 = await agent8081.executePlan('sample-plan.md');
+      const result2 = await agent8082.executePlan('sample-plan.md');
 
       // Different sessions must have different session IDs
       expect(result1.sessionId).not.toBe(result2.sessionId);

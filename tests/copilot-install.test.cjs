@@ -7,7 +7,7 @@
  * Requirements: CLI-01, CLI-02, CLI-03, CLI-04, CLI-05, CLI-06
  */
 
-process.env.EOE_TEST_MODE = '1';
+process.env.AGENT_808_TEST_MODE = '1';
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
@@ -28,7 +28,7 @@ const {
   808_COPILOT_INSTRUCTIONS_MARKER,
   808_COPILOT_INSTRUCTIONS_CLOSE_MARKER,
   mergeCopilotInstructions,
-  stripGsdFromCopilotInstructions,
+  strip808FromCopilotInstructions,
   writeManifest,
   reportLocalPatches,
 } = require('../bin/install.js');
@@ -786,9 +786,9 @@ describe('Copilot content conversion - engine files', () => {
 describe('Copilot instructions merge/strip', () => {
   let tmpDir;
 
-  const gsdContent = '- Follow project conventions\n- Use structured workflows';
+  const agent808Content = '- Follow project conventions\n- Use structured workflows';
 
-  function makeGsdBlock(content) {
+  function makeagent808Block(content) {
     return 808_COPILOT_INSTRUCTIONS_MARKER + '\n' + content.trim() + '\n' + 808_COPILOT_INSTRUCTIONS_CLOSE_MARKER;
   }
 
@@ -805,7 +805,7 @@ describe('Copilot instructions merge/strip', () => {
 
     test('creates file from scratch when none exists', () => {
       const filePath = path.join(tmpMergeDir, 'copilot-instructions.md');
-      mergeCopilotInstructions(filePath, gsdContent);
+      mergeCopilotInstructions(filePath, agent808Content);
 
       assert.ok(fs.existsSync(filePath), 'file was created');
       const result = fs.readFileSync(filePath, 'utf8');
@@ -817,11 +817,11 @@ describe('Copilot instructions merge/strip', () => {
     test('replaces 808 section when both markers present', () => {
       const filePath = path.join(tmpMergeDir, 'copilot-instructions.md');
       const oldContent = '# User Setup\n\n' +
-        makeGsdBlock('- Old 808 content') +
+        makeagent808Block('- Old 808 content') +
         '\n\n# User Notes\n';
       fs.writeFileSync(filePath, oldContent);
 
-      mergeCopilotInstructions(filePath, gsdContent);
+      mergeCopilotInstructions(filePath, agent808Content);
       const result = fs.readFileSync(filePath, 'utf8');
 
       assert.ok(result.includes('# User Setup'), 'user content before preserved');
@@ -835,7 +835,7 @@ describe('Copilot instructions merge/strip', () => {
       const userContent = '# My Custom Instructions\n\nDo things my way.\n';
       fs.writeFileSync(filePath, userContent);
 
-      mergeCopilotInstructions(filePath, gsdContent);
+      mergeCopilotInstructions(filePath, agent808Content);
       const result = fs.readFileSync(filePath, 'utf8');
 
       assert.ok(result.includes('# My Custom Instructions'), 'original content preserved');
@@ -849,8 +849,8 @@ describe('Copilot instructions merge/strip', () => {
 
     test('handles file that is 808-only (re-creates cleanly)', () => {
       const filePath = path.join(tmpMergeDir, 'copilot-instructions.md');
-      const gsdOnly = makeGsdBlock('- Old instructions') + '\n';
-      fs.writeFileSync(filePath, gsdOnly);
+      const agent808Only = makeagent808Block('- Old instructions') + '\n';
+      fs.writeFileSync(filePath, agent808Only);
 
       const newContent = '- Updated instructions';
       mergeCopilotInstructions(filePath, newContent);
@@ -865,11 +865,11 @@ describe('Copilot instructions merge/strip', () => {
     test('preserves user content before and after markers', () => {
       const filePath = path.join(tmpMergeDir, 'copilot-instructions.md');
       const content = '# My Setup\n\n' +
-        makeGsdBlock('- old content') +
+        makeagent808Block('- old content') +
         '\n\n# My Notes\n';
       fs.writeFileSync(filePath, content);
 
-      mergeCopilotInstructions(filePath, gsdContent);
+      mergeCopilotInstructions(filePath, agent808Content);
       const result = fs.readFileSync(filePath, 'utf8');
 
       assert.ok(result.includes('# My Setup'), 'content before markers preserved');
@@ -884,17 +884,17 @@ describe('Copilot instructions merge/strip', () => {
     });
   });
 
-  describe('stripGsdFromCopilotInstructions', () => {
+  describe('strip808FromCopilotInstructions', () => {
     test('returns null when content is 808-only', () => {
-      const content = makeGsdBlock('- 808 instructions only') + '\n';
-      const result = stripGsdFromCopilotInstructions(content);
+      const content = makeagent808Block('- 808 instructions only') + '\n';
+      const result = strip808FromCopilotInstructions(content);
       assert.strictEqual(result, null, 'returns null for 808-only content');
     });
 
     test('returns cleaned content when user content exists before markers', () => {
       const content = '# My Setup\n\nCustom rules here.\n\n' +
-        makeGsdBlock('- 808 stuff') + '\n';
-      const result = stripGsdFromCopilotInstructions(content);
+        makeagent808Block('- 808 stuff') + '\n';
+      const result = strip808FromCopilotInstructions(content);
 
       assert.ok(result !== null, 'does not return null');
       assert.ok(result.includes('# My Setup'), 'user content preserved');
@@ -905,8 +905,8 @@ describe('Copilot instructions merge/strip', () => {
     });
 
     test('returns cleaned content when user content exists after markers', () => {
-      const content = makeGsdBlock('- 808 stuff') + '\n\n# My Notes\n\nPersonal notes.\n';
-      const result = stripGsdFromCopilotInstructions(content);
+      const content = makeagent808Block('- 808 stuff') + '\n\n# My Notes\n\nPersonal notes.\n';
+      const result = strip808FromCopilotInstructions(content);
 
       assert.ok(result !== null, 'does not return null');
       assert.ok(result.includes('# My Notes'), 'user content after preserved');
@@ -916,8 +916,8 @@ describe('Copilot instructions merge/strip', () => {
     });
 
     test('returns cleaned content preserving both before and after', () => {
-      const content = '# Before\n\n' + makeGsdBlock('- 808 middle') + '\n\n# After\n';
-      const result = stripGsdFromCopilotInstructions(content);
+      const content = '# Before\n\n' + makeagent808Block('- 808 middle') + '\n\n# After\n';
+      const result = strip808FromCopilotInstructions(content);
 
       assert.ok(result !== null, 'does not return null');
       assert.ok(result.includes('# Before'), 'content before preserved');
@@ -928,7 +928,7 @@ describe('Copilot instructions merge/strip', () => {
 
     test('returns original content when no markers found', () => {
       const content = '# Just user content\n\nNo 808 markers here.\n';
-      const result = stripGsdFromCopilotInstructions(content);
+      const result = strip808FromCopilotInstructions(content);
       assert.strictEqual(result, content, 'returns content unchanged');
     });
   });
@@ -959,15 +959,15 @@ describe('Copilot uninstall skill removal', () => {
 
     // Test the pattern: read skills, filter 808-* entries
     const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
-    const gsdSkills = entries
+    const agent808Skills = entries
       .filter(e => e.isDirectory() && e.name.startsWith('808-'))
       .map(e => e.name);
-    const nonGsdSkills = entries
+    const non808Skills = entries
       .filter(e => e.isDirectory() && !e.name.startsWith('808-'))
       .map(e => e.name);
 
-    assert.deepStrictEqual(gsdSkills.sort(), ['808-bar', '808-foo'], 'identifies 808-* skills');
-    assert.deepStrictEqual(nonGsdSkills, ['custom-skill'], 'preserves non-808 skills');
+    assert.deepStrictEqual(agent808Skills.sort(), ['808-bar', '808-foo'], 'identifies 808-* skills');
+    assert.deepStrictEqual(non808Skills, ['custom-skill'], 'preserves non-808 skills');
   });
 
   test('cleans 808 section from copilot-instructions.md on uninstall', () => {
@@ -976,7 +976,7 @@ describe('Copilot uninstall skill removal', () => {
       '- 808 managed content\n' +
       808_COPILOT_INSTRUCTIONS_CLOSE_MARKER + '\n';
 
-    const result = stripGsdFromCopilotInstructions(content);
+    const result = strip808FromCopilotInstructions(content);
 
     assert.ok(result !== null, 'does not return null when user content exists');
     assert.ok(result.includes('# My Setup'), 'user content preserved');
@@ -990,7 +990,7 @@ describe('Copilot uninstall skill removal', () => {
       '- Only 808 content\n' +
       808_COPILOT_INSTRUCTIONS_CLOSE_MARKER + '\n';
 
-    const result = stripGsdFromCopilotInstructions(content);
+    const result = strip808FromCopilotInstructions(content);
 
     assert.strictEqual(result, null, 'returns null signaling file deletion');
   });
@@ -1011,9 +1011,9 @@ describe('Copilot manifest and patches fixes', () => {
 
   test('writeManifest hashes skills for Copilot runtime', () => {
     // Create minimal 808 dir (required by writeManifest)
-    const gsdDir = path.join(tmpDir, '808', 'bin');
-    fs.mkdirSync(gsdDir, { recursive: true });
-    fs.writeFileSync(path.join(gsdDir, 'verify.cjs'), '// verify stub');
+    const agent808Dir = path.join(tmpDir, '808', 'bin');
+    fs.mkdirSync(agent808Dir, { recursive: true });
+    fs.writeFileSync(path.join(agent808Dir, 'verify.cjs'), '// verify stub');
 
     // Create Copilot skills directory
     const skillDir = path.join(tmpDir, 'skills', '808-test');
@@ -1098,7 +1098,7 @@ const EXPECTED_AGENTS = fs.readdirSync(path.join(__dirname, '..', 'agents'))
 
 function runCopilotInstall(cwd) {
   const env = { ...process.env };
-  delete env.EOE_TEST_MODE;
+  delete env.AGENT_808_TEST_MODE;
   return execFileSync(process.execPath, [INSTALL_PATH, '--copilot', '--local'], {
     cwd,
     encoding: 'utf-8',
@@ -1109,7 +1109,7 @@ function runCopilotInstall(cwd) {
 
 function runCopilotUninstall(cwd) {
   const env = { ...process.env };
-  delete env.EOE_TEST_MODE;
+  delete env.AGENT_808_TEST_MODE;
   return execFileSync(process.execPath, [INSTALL_PATH, '--copilot', '--local', '--uninstall'], {
     cwd,
     encoding: 'utf-8',
@@ -1133,16 +1133,16 @@ describe('E2E: Copilot full install verification', () => {
   test('installs expected number of skill directories', () => {
     const skillsDir = path.join(tmpDir, '.github', 'skills');
     const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
-    const gsdSkills = entries.filter(e => e.isDirectory() && e.name.startsWith('808-'));
-    assert.strictEqual(gsdSkills.length, EXPECTED_SKILLS,
-      `Expected ${EXPECTED_SKILLS} skill directories, got ${gsdSkills.length}`);
+    const agent808Skills = entries.filter(e => e.isDirectory() && e.name.startsWith('808-'));
+    assert.strictEqual(agent808Skills.length, EXPECTED_SKILLS,
+      `Expected ${EXPECTED_SKILLS} skill directories, got ${agent808Skills.length}`);
   });
 
   test('each skill directory contains SKILL.md', () => {
     const skillsDir = path.join(tmpDir, '.github', 'skills');
     const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
-    const gsdSkills = entries.filter(e => e.isDirectory() && e.name.startsWith('808-'));
-    for (const skill of gsdSkills) {
+    const agent808Skills = entries.filter(e => e.isDirectory() && e.name.startsWith('808-'));
+    for (const skill of agent808Skills) {
       const skillMdPath = path.join(skillsDir, skill.name, 'SKILL.md');
       assert.ok(fs.existsSync(skillMdPath),
         `Missing SKILL.md in ${skill.name}`);
@@ -1152,15 +1152,15 @@ describe('E2E: Copilot full install verification', () => {
   test('installs expected number of agent files', () => {
     const agentsDir = path.join(tmpDir, '.github', 'agents');
     const files = fs.readdirSync(agentsDir);
-    const gsdAgents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md'));
-    assert.strictEqual(gsdAgents.length, EXPECTED_AGENTS,
-      `Expected ${EXPECTED_AGENTS} agent files, got ${gsdAgents.length}`);
+    const agent808Agents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md'));
+    assert.strictEqual(agent808Agents.length, EXPECTED_AGENTS,
+      `Expected ${EXPECTED_AGENTS} agent files, got ${agent808Agents.length}`);
   });
 
   test('installs all expected agent files', () => {
     const agentsDir = path.join(tmpDir, '.github', 'agents');
     const files = fs.readdirSync(agentsDir);
-    const gsdAgents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md')).sort();
+    const agent808Agents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md')).sort();
     const expected = [
       '808-advisor-researcher.agent.md',
       '808-assumptions-analyzer.agent.md',
@@ -1181,7 +1181,7 @@ describe('E2E: Copilot full install verification', () => {
       '808-user-profiler.agent.md',
       '808-verifier.agent.md',
     ].sort();
-    assert.deepStrictEqual(gsdAgents, expected);
+    assert.deepStrictEqual(agent808Agents, expected);
   });
 
   test('generates copilot-instructions.md with 808 markers', () => {
@@ -1286,9 +1286,9 @@ describe('E2E: Copilot uninstall verification', () => {
     const skillsDir = path.join(tmpDir, '.github', 'skills');
     if (fs.existsSync(skillsDir)) {
       const entries = fs.readdirSync(skillsDir, { withFileTypes: true });
-      const gsdSkills = entries.filter(e => e.isDirectory() && e.name.startsWith('808-'));
-      assert.strictEqual(gsdSkills.length, 0,
-        `Expected 0 808 skill directories after uninstall, found: ${gsdSkills.map(e => e.name).join(', ')}`);
+      const agent808Skills = entries.filter(e => e.isDirectory() && e.name.startsWith('808-'));
+      assert.strictEqual(agent808Skills.length, 0,
+        `Expected 0 808 skill directories after uninstall, found: ${agent808Skills.map(e => e.name).join(', ')}`);
     }
   });
 
@@ -1296,9 +1296,9 @@ describe('E2E: Copilot uninstall verification', () => {
     const agentsDir = path.join(tmpDir, '.github', 'agents');
     if (fs.existsSync(agentsDir)) {
       const files = fs.readdirSync(agentsDir);
-      const gsdAgents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md'));
-      assert.strictEqual(gsdAgents.length, 0,
-        `Expected 0 808 agent files after uninstall, found: ${gsdAgents.join(', ')}`);
+      const agent808Agents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md'));
+      assert.strictEqual(agent808Agents.length, 0,
+        `Expected 0 808 agent files after uninstall, found: ${agent808Agents.join(', ')}`);
     }
   });
 

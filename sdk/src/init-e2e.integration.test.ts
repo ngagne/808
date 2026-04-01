@@ -66,7 +66,7 @@ describe.skipIf(!cliAvailable)('E2E: InitRunner.run() full workflow', () => {
 
     const tools = new Agent808Tools({
       projectDir: tmpDir,
-      gsdToolsPath: AGENT_808_TOOLS_PATH,
+      agent808ToolsPath: AGENT_808_TOOLS_PATH,
       timeoutMs: 30_000,
     });
 

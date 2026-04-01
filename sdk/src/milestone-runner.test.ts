@@ -71,7 +71,7 @@ vi.mock('./808-tools.js', () => ({
   808ToolsError: class extends Error {
     name = '808ToolsError';
   },
-  resolveGsdToolsPath: vi.fn().mockReturnValue('/mock/808-tools.cjs'),
+  resolve808ToolsPath: vi.fn().mockReturnValue('/mock/808-tools.cjs'),
 }));
 
 import { 808 } from './index.js';

@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { execSync } = require('child_process');
-const { runGsdTools, createTempDir, cleanup } = require('./helpers.cjs');
+const { run808Tools, createTempDir, cleanup } = require('./helpers.cjs');
 const { detectChildRepos } = require('../808/bin/lib/init.cjs');
 
 // ─── detectChildRepos ────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ describe('init new-workspace', () => {
   });
 
   test('returns expected JSON fields', () => {
-    const result = runGsdTools('init new-workspace', tmpDir);
+    const result = run808Tools('init new-workspace', tmpDir);
     assert.ok(result.success, `init failed: ${result.error}`);
     const data = JSON.parse(result.output);
     assert.ok('default_workspace_base' in data);
@@ -106,14 +106,14 @@ describe('init new-workspace', () => {
     fs.mkdirSync(repo);
     execSync('git init', { cwd: repo, stdio: 'pipe' });
 
-    const result = runGsdTools('init new-workspace', tmpDir);
+    const result = run808Tools('init new-workspace', tmpDir);
     const data = JSON.parse(result.output);
     assert.strictEqual(data.child_repo_count, 1);
     assert.strictEqual(data.child_repos[0].name, 'my-repo');
   });
 
   test('reports no git repo when cwd is not a git repo', () => {
-    const result = runGsdTools('init new-workspace', tmpDir);
+    const result = run808Tools('init new-workspace', tmpDir);
     const data = JSON.parse(result.output);
     assert.strictEqual(data.is_git_repo, false);
   });
@@ -133,7 +133,7 @@ describe('init list-workspaces', () => {
   });
 
   test('returns empty list when no workspaces exist', () => {
-    const result = runGsdTools('init list-workspaces', tmpDir, { HOME: tmpDir });
+    const result = run808Tools('init list-workspaces', tmpDir, { HOME: tmpDir });
     assert.ok(result.success, `init failed: ${result.error}`);
     const data = JSON.parse(result.output);
     assert.strictEqual(data.workspace_count, 0);
@@ -157,7 +157,7 @@ describe('init list-workspaces', () => {
       '| hr-ui | /tmp/hr-ui | workspace/feature-a | worktree |',
     ].join('\n'));
 
-    const result = runGsdTools('init list-workspaces', tmpDir, { HOME: tmpDir });
+    const result = run808Tools('init list-workspaces', tmpDir, { HOME: tmpDir });
     const data = JSON.parse(result.output);
     assert.strictEqual(data.workspace_count, 1);
     assert.strictEqual(data.workspaces[0].name, 'feature-a');
@@ -180,13 +180,13 @@ describe('init remove-workspace', () => {
   });
 
   test('errors when no name provided', () => {
-    const result = runGsdTools('init remove-workspace', tmpDir);
+    const result = run808Tools('init remove-workspace', tmpDir);
     assert.strictEqual(result.success, false);
     assert.ok(result.error.includes('workspace name required'));
   });
 
   test('errors when workspace not found', () => {
-    const result = runGsdTools('init remove-workspace nonexistent', tmpDir, { HOME: tmpDir });
+    const result = run808Tools('init remove-workspace nonexistent', tmpDir, { HOME: tmpDir });
     assert.strictEqual(result.success, false);
     assert.ok(result.error.includes('Workspace not found'));
   });
@@ -208,7 +208,7 @@ describe('init remove-workspace', () => {
       '| api | /tmp/api | workspace/test-ws | clone |',
     ].join('\n'));
 
-    const result = runGsdTools('init remove-workspace test-ws', tmpDir, { HOME: tmpDir });
+    const result = run808Tools('init remove-workspace test-ws', tmpDir, { HOME: tmpDir });
     assert.ok(result.success, `init failed: ${result.error}`);
     const data = JSON.parse(result.output);
     assert.strictEqual(data.workspace_name, 'test-ws');

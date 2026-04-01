@@ -7,7 +7,7 @@ const assert = require('node:assert');
 const { execSync } = require('node:child_process');
 const fs = require('fs');
 const path = require('path');
-const { runGsdTools, createTempProject, cleanup } = require('./helpers.cjs');
+const { run808Tools, createTempProject, cleanup } = require('./helpers.cjs');
 
 describe('history-digest command', () => {
   let tmpDir;
@@ -21,7 +21,7 @@ describe('history-digest command', () => {
   });
 
   test('empty phases directory returns valid schema', () => {
-    const result = runGsdTools('history-digest', tmpDir);
+    const result = run808Tools('history-digest', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const digest = JSON.parse(result.output);
@@ -62,7 +62,7 @@ key-decisions:
 
     fs.writeFileSync(path.join(phaseDir, '01-01-SUMMARY.md'), summaryContent);
 
-    const result = runGsdTools('history-digest', tmpDir);
+    const result = run808Tools('history-digest', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const digest = JSON.parse(result.output);
@@ -144,7 +144,7 @@ tech-stack:
 `
     );
 
-    const result = runGsdTools('history-digest', tmpDir);
+    const result = run808Tools('history-digest', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const digest = JSON.parse(result.output);
@@ -192,7 +192,7 @@ broken: [unclosed
 `
     );
 
-    const result = runGsdTools('history-digest', tmpDir);
+    const result = run808Tools('history-digest', tmpDir);
     assert.ok(result.success, `Command should succeed despite malformed files: ${result.error}`);
 
     const digest = JSON.parse(result.output);
@@ -217,7 +217,7 @@ provides:
 `
     );
 
-    const result = runGsdTools('history-digest', tmpDir);
+    const result = run808Tools('history-digest', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const digest = JSON.parse(result.output);
@@ -242,7 +242,7 @@ patterns-established: ["Pattern X", "Pattern Y"]
 `
     );
 
-    const result = runGsdTools('history-digest', tmpDir);
+    const result = run808Tools('history-digest', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const digest = JSON.parse(result.output);
@@ -276,7 +276,7 @@ describe('summary-extract command', () => {
   });
 
   test('missing file returns error', () => {
-    const result = runGsdTools('summary-extract .planning/phases/01-test/01-01-SUMMARY.md', tmpDir);
+    const result = run808Tools('summary-extract .planning/phases/01-test/01-01-SUMMARY.md', tmpDir);
     assert.ok(result.success, `Command should succeed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -315,7 +315,7 @@ Full summary content here.
 `
     );
 
-    const result = runGsdTools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
+    const result = run808Tools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -351,7 +351,7 @@ requirements-completed:
 `
     );
 
-    const result = runGsdTools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md --fields one_liner,key_files,requirements_completed', tmpDir);
+    const result = run808Tools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md --fields one_liner,key_files,requirements_completed', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -386,7 +386,7 @@ key-files:
 `
     );
 
-    const result = runGsdTools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
+    const result = run808Tools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -408,7 +408,7 @@ one-liner: Minimal summary
 `
     );
 
-    const result = runGsdTools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
+    const result = run808Tools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -434,7 +434,7 @@ key-decisions:
 `
     );
 
-    const result = runGsdTools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
+    const result = run808Tools('summary-extract .planning/phases/01-foundation/01-01-SUMMARY.md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -472,7 +472,7 @@ describe('progress command', () => {
     fs.writeFileSync(path.join(p1, '01-01-SUMMARY.md'), '# Done');
     fs.writeFileSync(path.join(p1, '01-02-PLAN.md'), '# Plan 2');
 
-    const result = runGsdTools('progress json', tmpDir);
+    const result = run808Tools('progress json', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -493,7 +493,7 @@ describe('progress command', () => {
     fs.writeFileSync(path.join(p1, '01-01-PLAN.md'), '# Plan');
     fs.writeFileSync(path.join(p1, '01-01-SUMMARY.md'), '# Done');
 
-    const result = runGsdTools('progress bar --raw', tmpDir);
+    const result = run808Tools('progress bar --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
     assert.ok(result.output.includes('1/1'), 'should include count');
     assert.ok(result.output.includes('100%'), 'should include 100%');
@@ -508,7 +508,7 @@ describe('progress command', () => {
     fs.mkdirSync(p1, { recursive: true });
     fs.writeFileSync(path.join(p1, '01-01-PLAN.md'), '# Plan');
 
-    const result = runGsdTools('progress table --raw', tmpDir);
+    const result = run808Tools('progress table --raw', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
     assert.ok(result.output.includes('Phase'), 'should have table header');
     assert.ok(result.output.includes('foundation'), 'should include phase name');
@@ -527,16 +527,16 @@ describe('progress command', () => {
     fs.writeFileSync(path.join(p1, '01-02-SUMMARY.md'), '# Orphaned summary');
 
     // bar format - should not crash with RangeError
-    const barResult = runGsdTools('progress bar --raw', tmpDir);
+    const barResult = run808Tools('progress bar --raw', tmpDir);
     assert.ok(barResult.success, `Bar format crashed: ${barResult.error}`);
     assert.ok(barResult.output.includes('100%'), 'percent should be clamped to 100%');
 
     // table format - should not crash with RangeError
-    const tableResult = runGsdTools('progress table --raw', tmpDir);
+    const tableResult = run808Tools('progress table --raw', tmpDir);
     assert.ok(tableResult.success, `Table format crashed: ${tableResult.error}`);
 
     // json format - percent should be clamped
-    const jsonResult = runGsdTools('progress json', tmpDir);
+    const jsonResult = run808Tools('progress json', tmpDir);
     assert.ok(jsonResult.success, `JSON format crashed: ${jsonResult.error}`);
     const output = JSON.parse(jsonResult.output);
     assert.ok(output.percent <= 100, `percent should be <= 100 but got ${output.percent}`);
@@ -567,7 +567,7 @@ describe('todo complete command', () => {
       `title: Add dark mode\narea: ui\ncreated: 2025-01-01\n`
     );
 
-    const result = runGsdTools('todo complete add-dark-mode.md', tmpDir);
+    const result = run808Tools('todo complete add-dark-mode.md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -592,7 +592,7 @@ describe('todo complete command', () => {
   });
 
   test('fails for nonexistent todo', () => {
-    const result = runGsdTools('todo complete nonexistent.md', tmpDir);
+    const result = run808Tools('todo complete nonexistent.md', tmpDir);
     assert.ok(!result.success, 'should fail');
     assert.ok(result.error.includes('not found'), 'error mentions not found');
   });
@@ -611,7 +611,7 @@ describe('todo match-phase command', () => {
   afterEach(() => cleanup(tmpDir));
 
   test('returns empty matches when no todos exist', () => {
-    const result = runGsdTools('todo match-phase 01', tmpDir);
+    const result = run808Tools('todo match-phase 01', tmpDir);
     assert.ok(result.success, 'should succeed');
     const output = JSON.parse(result.output);
     assert.strictEqual(output.todo_count, 0);
@@ -626,7 +626,7 @@ describe('todo match-phase command', () => {
     fs.writeFileSync(path.join(tmpDir, '.planning', 'ROADMAP.md'),
       '# Roadmap\n\n### Phase 01: Authentication and Session Management\n\n**Goal:** Implement OAuth login and session handling\n');
 
-    const result = runGsdTools('todo match-phase 01', tmpDir);
+    const result = run808Tools('todo match-phase 01', tmpDir);
     assert.ok(result.success, 'should succeed');
     const output = JSON.parse(result.output);
     assert.strictEqual(output.todo_count, 1, 'should find 1 todo');
@@ -646,7 +646,7 @@ describe('todo match-phase command', () => {
     fs.writeFileSync(path.join(tmpDir, '.planning', 'ROADMAP.md'),
       '# Roadmap\n\n### Phase 01: Authentication and Session Management\n\n**Goal:** Implement OAuth login and session handling\n');
 
-    const result = runGsdTools('todo match-phase 01', tmpDir);
+    const result = run808Tools('todo match-phase 01', tmpDir);
     assert.ok(result.success, 'should succeed');
     const output = JSON.parse(result.output);
     const matchTitles = output.matches.map(m => m.title);
@@ -662,7 +662,7 @@ describe('todo match-phase command', () => {
     fs.writeFileSync(path.join(tmpDir, '.planning', 'ROADMAP.md'),
       '# Roadmap\n\n### Phase 01: Auth System\n\n**Goal:** Build auth module\n');
 
-    const result = runGsdTools('todo match-phase 01', tmpDir);
+    const result = run808Tools('todo match-phase 01', tmpDir);
     const output = JSON.parse(result.output);
     const authMatch = output.matches.find(m => m.title === 'Add OAuth token refresh');
     assert.ok(authMatch, 'should find auth todo');
@@ -680,7 +680,7 @@ describe('todo match-phase command', () => {
     fs.writeFileSync(path.join(tmpDir, '.planning', 'ROADMAP.md'),
       '# Roadmap\n\n### Phase 01: Authentication and Session Management\n\n**Goal:** Implement OAuth login, session handling, and token management\n');
 
-    const result = runGsdTools('todo match-phase 01', tmpDir);
+    const result = run808Tools('todo match-phase 01', tmpDir);
     const output = JSON.parse(result.output);
     assert.ok(output.matches.length >= 2, 'should have multiple matches');
     for (let i = 1; i < output.matches.length; i++) {
@@ -709,7 +709,7 @@ describe('scaffold command', () => {
   test('scaffolds context file', () => {
     fs.mkdirSync(path.join(tmpDir, '.planning', 'phases', '03-api'), { recursive: true });
 
-    const result = runGsdTools('scaffold context --phase 3', tmpDir);
+    const result = run808Tools('scaffold context --phase 3', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -728,7 +728,7 @@ describe('scaffold command', () => {
   test('scaffolds UAT file', () => {
     fs.mkdirSync(path.join(tmpDir, '.planning', 'phases', '03-api'), { recursive: true });
 
-    const result = runGsdTools('scaffold uat --phase 3', tmpDir);
+    const result = run808Tools('scaffold uat --phase 3', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -745,7 +745,7 @@ describe('scaffold command', () => {
   test('scaffolds verification file', () => {
     fs.mkdirSync(path.join(tmpDir, '.planning', 'phases', '03-api'), { recursive: true });
 
-    const result = runGsdTools('scaffold verification --phase 3', tmpDir);
+    const result = run808Tools('scaffold verification --phase 3', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -759,7 +759,7 @@ describe('scaffold command', () => {
   });
 
   test('scaffolds phase directory', () => {
-    const result = runGsdTools('scaffold phase-dir --phase 5 --name User Dashboard', tmpDir);
+    const result = run808Tools('scaffold phase-dir --phase 5 --name User Dashboard', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -775,7 +775,7 @@ describe('scaffold command', () => {
     fs.mkdirSync(phaseDir, { recursive: true });
     fs.writeFileSync(path.join(phaseDir, '03-CONTEXT.md'), '# Existing content');
 
-    const result = runGsdTools('scaffold context --phase 3', tmpDir);
+    const result = run808Tools('scaffold context --phase 3', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -800,7 +800,7 @@ describe('generate-slug command', () => {
   });
 
   test('converts normal text to slug', () => {
-    const result = runGsdTools('generate-slug "Hello World"', tmpDir);
+    const result = run808Tools('generate-slug "Hello World"', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -808,7 +808,7 @@ describe('generate-slug command', () => {
   });
 
   test('strips special characters', () => {
-    const result = runGsdTools('generate-slug "Test@#$%^Special!!!"', tmpDir);
+    const result = run808Tools('generate-slug "Test@#$%^Special!!!"', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -816,7 +816,7 @@ describe('generate-slug command', () => {
   });
 
   test('preserves numbers', () => {
-    const result = runGsdTools('generate-slug "Phase 3 Plan"', tmpDir);
+    const result = run808Tools('generate-slug "Phase 3 Plan"', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -824,7 +824,7 @@ describe('generate-slug command', () => {
   });
 
   test('strips leading and trailing hyphens', () => {
-    const result = runGsdTools('generate-slug "---leading-trailing---"', tmpDir);
+    const result = run808Tools('generate-slug "---leading-trailing---"', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -832,7 +832,7 @@ describe('generate-slug command', () => {
   });
 
   test('fails when no text provided', () => {
-    const result = runGsdTools('generate-slug', tmpDir);
+    const result = run808Tools('generate-slug', tmpDir);
     assert.ok(!result.success, 'should fail without text');
     assert.ok(result.error.includes('text required'), 'error should mention text required');
   });
@@ -854,7 +854,7 @@ describe('current-timestamp command', () => {
   });
 
   test('date format returns YYYY-MM-DD', () => {
-    const result = runGsdTools('current-timestamp date', tmpDir);
+    const result = run808Tools('current-timestamp date', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -862,7 +862,7 @@ describe('current-timestamp command', () => {
   });
 
   test('filename format returns ISO without colons or fractional seconds', () => {
-    const result = runGsdTools('current-timestamp filename', tmpDir);
+    const result = run808Tools('current-timestamp filename', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -870,7 +870,7 @@ describe('current-timestamp command', () => {
   });
 
   test('full format returns full ISO string', () => {
-    const result = runGsdTools('current-timestamp full', tmpDir);
+    const result = run808Tools('current-timestamp full', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -878,7 +878,7 @@ describe('current-timestamp command', () => {
   });
 
   test('default (no format) returns full ISO string', () => {
-    const result = runGsdTools('current-timestamp', tmpDir);
+    const result = run808Tools('current-timestamp', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -902,7 +902,7 @@ describe('list-todos command', () => {
   });
 
   test('empty directory returns zero count', () => {
-    const result = runGsdTools('list-todos', tmpDir);
+    const result = run808Tools('list-todos', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -917,7 +917,7 @@ describe('list-todos command', () => {
     fs.writeFileSync(path.join(pendingDir, 'add-tests.md'), 'title: Add unit tests\narea: testing\ncreated: 2026-01-15\n');
     fs.writeFileSync(path.join(pendingDir, 'fix-bug.md'), 'title: Fix login bug\narea: auth\ncreated: 2026-01-20\n');
 
-    const result = runGsdTools('list-todos', tmpDir);
+    const result = run808Tools('list-todos', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -938,7 +938,7 @@ describe('list-todos command', () => {
     fs.writeFileSync(path.join(pendingDir, 'ui-task.md'), 'title: UI task\narea: ui\ncreated: 2026-01-01\n');
     fs.writeFileSync(path.join(pendingDir, 'api-task.md'), 'title: API task\narea: api\ncreated: 2026-01-01\n');
 
-    const result = runGsdTools('list-todos ui', tmpDir);
+    const result = run808Tools('list-todos ui', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -952,7 +952,7 @@ describe('list-todos command', () => {
 
     fs.writeFileSync(path.join(pendingDir, 'task.md'), 'title: Some task\narea: backend\ncreated: 2026-01-01\n');
 
-    const result = runGsdTools('list-todos nonexistent-area', tmpDir);
+    const result = run808Tools('list-todos nonexistent-area', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -966,7 +966,7 @@ describe('list-todos command', () => {
     // File with no title or area fields
     fs.writeFileSync(path.join(pendingDir, 'malformed.md'), 'some random content\nno fields here\n');
 
-    const result = runGsdTools('list-todos', tmpDir);
+    const result = run808Tools('list-todos', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -995,7 +995,7 @@ describe('verify-path-exists command', () => {
   test('existing file returns exists=true with type=file', () => {
     fs.writeFileSync(path.join(tmpDir, 'test-file.txt'), 'hello');
 
-    const result = runGsdTools('verify-path-exists test-file.txt', tmpDir);
+    const result = run808Tools('verify-path-exists test-file.txt', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1006,7 +1006,7 @@ describe('verify-path-exists command', () => {
   test('existing directory returns exists=true with type=directory', () => {
     fs.mkdirSync(path.join(tmpDir, 'test-dir'), { recursive: true });
 
-    const result = runGsdTools('verify-path-exists test-dir', tmpDir);
+    const result = run808Tools('verify-path-exists test-dir', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1015,7 +1015,7 @@ describe('verify-path-exists command', () => {
   });
 
   test('missing path returns exists=false', () => {
-    const result = runGsdTools('verify-path-exists nonexistent/path', tmpDir);
+    const result = run808Tools('verify-path-exists nonexistent/path', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1027,7 +1027,7 @@ describe('verify-path-exists command', () => {
     const absFile = path.join(tmpDir, 'abs-test.txt');
     fs.writeFileSync(absFile, 'content');
 
-    const result = runGsdTools(`verify-path-exists ${absFile}`, tmpDir);
+    const result = run808Tools(`verify-path-exists ${absFile}`, tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1036,7 +1036,7 @@ describe('verify-path-exists command', () => {
   });
 
   test('fails when no path provided', () => {
-    const result = runGsdTools('verify-path-exists', tmpDir);
+    const result = run808Tools('verify-path-exists', tmpDir);
     assert.ok(!result.success, 'should fail without path');
     assert.ok(result.error.includes('path required'), 'error should mention path required');
   });
@@ -1058,7 +1058,7 @@ describe('resolve-model command', () => {
   });
 
   test('known agent returns model and profile without unknown_agent', () => {
-    const result = runGsdTools('resolve-model 808-planner', tmpDir);
+    const result = run808Tools('resolve-model 808-planner', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1068,7 +1068,7 @@ describe('resolve-model command', () => {
   });
 
   test('unknown agent returns unknown_agent=true', () => {
-    const result = runGsdTools('resolve-model fake-nonexistent-agent', tmpDir);
+    const result = run808Tools('resolve-model fake-nonexistent-agent', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1077,7 +1077,7 @@ describe('resolve-model command', () => {
 
   test('default profile fallback when no config exists', () => {
     // tmpDir has no config.json, so defaults to balanced profile
-    const result = runGsdTools('resolve-model 808-executor', tmpDir);
+    const result = run808Tools('resolve-model 808-executor', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1086,7 +1086,7 @@ describe('resolve-model command', () => {
   });
 
   test('fails when no agent-type provided', () => {
-    const result = runGsdTools('resolve-model', tmpDir);
+    const result = run808Tools('resolve-model', tmpDir);
     assert.ok(!result.success, 'should fail without agent-type');
     assert.ok(result.error.includes('agent-type required'), 'error should mention agent-type required');
   });
@@ -1116,7 +1116,7 @@ describe('commit command', () => {
       JSON.stringify({ commit_docs: false })
     );
 
-    const result = runGsdTools('commit "test message"', tmpDir);
+    const result = run808Tools('commit "test message"', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1130,7 +1130,7 @@ describe('commit command', () => {
     execSync('git add .gitignore', { cwd: tmpDir, stdio: 'pipe' });
     execSync('git commit -m "add gitignore"', { cwd: tmpDir, stdio: 'pipe' });
 
-    const result = runGsdTools('commit "test message"', tmpDir);
+    const result = run808Tools('commit "test message"', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1140,7 +1140,7 @@ describe('commit command', () => {
 
   test('handles nothing to commit', () => {
     // Don't modify any files after initial commit
-    const result = runGsdTools('commit "test message"', tmpDir);
+    const result = run808Tools('commit "test message"', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1152,7 +1152,7 @@ describe('commit command', () => {
     // Create a new file in .planning/
     fs.writeFileSync(path.join(tmpDir, '.planning', 'test-file.md'), '# Test\n');
 
-    const result = runGsdTools('commit "test: add test file" --files .planning/test-file.md', tmpDir);
+    const result = run808Tools('commit "test: add test file" --files .planning/test-file.md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1175,7 +1175,7 @@ describe('commit command', () => {
     // Modify the file and amend
     fs.writeFileSync(path.join(tmpDir, '.planning', 'amend-file.md'), '# Amended\n');
 
-    const result = runGsdTools('commit "ignored" --files .planning/amend-file.md --amend', tmpDir);
+    const result = run808Tools('commit "ignored" --files .planning/amend-file.md --amend', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1204,7 +1204,7 @@ describe('commit command', () => {
     // Create a file to commit
     fs.writeFileSync(path.join(tmpDir, '.planning', 'test-context.md'), '# Context\n');
 
-    const result = runGsdTools('commit "docs: add context" --files .planning/test-context.md', tmpDir);
+    const result = run808Tools('commit "docs: add context" --files .planning/test-context.md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -1236,7 +1236,7 @@ describe('commit command', () => {
     // Create a context file for phase 1
     fs.writeFileSync(path.join(tmpDir, '.planning', 'phases', '01-setup', '01-CONTEXT.md'), '# Context\n');
 
-    const result = runGsdTools(
+    const result = run808Tools(
       'commit "docs(01): add context" --files .planning/phases/01-setup/01-CONTEXT.md',
       tmpDir
     );
@@ -1389,7 +1389,7 @@ describe('stats command', () => {
   });
 
   test('returns valid JSON with empty project', () => {
-    const result = runGsdTools('stats', tmpDir);
+    const result = run808Tools('stats', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const stats = JSON.parse(result.output);
@@ -1418,7 +1418,7 @@ describe('stats command', () => {
     // Phase 2: 1 plan, 0 summaries (planned)
     fs.writeFileSync(path.join(p2, '02-01-PLAN.md'), '# Plan');
 
-    const result = runGsdTools('stats', tmpDir);
+    const result = run808Tools('stats', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const stats = JSON.parse(result.output);
@@ -1444,7 +1444,7 @@ describe('stats command', () => {
 `
     );
 
-    const result = runGsdTools('stats', tmpDir);
+    const result = run808Tools('stats', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const stats = JSON.parse(result.output);
@@ -1458,7 +1458,7 @@ describe('stats command', () => {
       `# State\n\n**Current Phase:** 01\n**Status:** In progress\n**Last Activity:** 2025-06-15\n**Last Activity Description:** Working\n`
     );
 
-    const result = runGsdTools('stats', tmpDir);
+    const result = run808Tools('stats', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const stats = JSON.parse(result.output);
@@ -1471,7 +1471,7 @@ describe('stats command', () => {
       `# Project State\n\n## Current Position\n\nPhase: 1 of 2 (Foundation)\nPlan: 1 of 1 in current phase\nStatus: In progress\nLast activity: 2025-06-16 — Finished plan 01-01\n`
     );
 
-    const result = runGsdTools('stats', tmpDir);
+    const result = run808Tools('stats', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const stats = JSON.parse(result.output);
@@ -1509,7 +1509,7 @@ describe('stats command', () => {
 `
     );
 
-    const result = runGsdTools('stats', tmpDir);
+    const result = run808Tools('stats', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const stats = JSON.parse(result.output);
@@ -1556,7 +1556,7 @@ describe('stats command', () => {
       },
     });
 
-    const result = runGsdTools('stats', tmpDir);
+    const result = run808Tools('stats', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const stats = JSON.parse(result.output);
@@ -1570,7 +1570,7 @@ describe('stats command', () => {
     fs.writeFileSync(path.join(p1, '01-01-PLAN.md'), '# Plan');
     fs.writeFileSync(path.join(p1, '01-01-SUMMARY.md'), '# Summary');
 
-    const result = runGsdTools('stats table', tmpDir);
+    const result = run808Tools('stats table', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const parsed = JSON.parse(result.output);

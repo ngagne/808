@@ -5,7 +5,7 @@
  * content conversion functions, and integration with the multi-runtime installer.
  */
 
-process.env.EOE_TEST_MODE = '1';
+process.env.AGENT_808_TEST_MODE = '1';
 
 const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
@@ -387,9 +387,9 @@ describe('writeManifest (Antigravity)', () => {
     const skillsDir = path.join(tmpDir, 'skills', '808-help');
     fs.mkdirSync(skillsDir, { recursive: true });
     fs.writeFileSync(path.join(skillsDir, 'SKILL.md'), '---\nname: 808-help\ndescription: Help\n---\n');
-    const gsdDir = path.join(tmpDir, '808');
-    fs.mkdirSync(gsdDir, { recursive: true });
-    fs.writeFileSync(path.join(gsdDir, 'VERSION'), '1.0.0');
+    const agent808Dir = path.join(tmpDir, '808');
+    fs.mkdirSync(agent808Dir, { recursive: true });
+    fs.writeFileSync(path.join(agent808Dir, 'VERSION'), '1.0.0');
     const agentsDir = path.join(tmpDir, 'agents');
     fs.mkdirSync(agentsDir, { recursive: true });
     fs.writeFileSync(path.join(agentsDir, '808-executor.md'), '---\nname: 808-executor\n---\n');

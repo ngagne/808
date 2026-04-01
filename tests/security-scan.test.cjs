@@ -158,7 +158,7 @@ describe('prompt-injection-scan.sh', { skip: IS_WINDOWS }, () => {
 
   test('passes clean markdown documentation', () => {
     const result = runScript(SCRIPTS.injection,
-      '# Getting Started\n\nInstall the package:\n\n```bash\nnpm install 808\n```\n\nRun your first command:\n\n```bash\ngsd init\n```\n');
+      '# Getting Started\n\nInstall the package:\n\n```bash\nnpm install 808\n```\n\nRun your first command:\n\n```bash\n808 init\n```\n');
     assert.equal(result.status, 0, `False positive: ${result.stdout}`);
   });
 

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" width="2000" height="2000">
   <defs>
     <style>
-      .bg { fill: #2F2E3E; }
+      .bg { fill: #292720; }
       .logo { font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', 'Courier New', monospace; }
     </style>
     <linearGradient id="808-gradient" x1="0%" y1="0%" x2="100%" y2="0%">

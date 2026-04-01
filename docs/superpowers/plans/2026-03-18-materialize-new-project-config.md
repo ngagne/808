@@ -101,7 +101,7 @@ describe('config-new-project command', () => {
       model_profile: 'balanced',
       workflow: { research: true, plan_check: true, verifier: true, nyquist_validation: true },
     });
-    const result = runGsdTools(['config-new-project', choices], tmpDir);
+    const result = run808Tools(['config-new-project', choices], tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -140,7 +140,7 @@ describe('config-new-project command', () => {
       model_profile: 'quality',
       workflow: { research: false, plan_check: false, verifier: true, nyquist_validation: false },
     });
-    const result = runGsdTools(['config-new-project', choices], tmpDir);
+    const result = run808Tools(['config-new-project', choices], tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -159,7 +159,7 @@ describe('config-new-project command', () => {
   });
 
   test('works with empty choices — all defaults materialized', () => {
-    const result = runGsdTools(['config-new-project', '{}'], tmpDir);
+    const result = run808Tools(['config-new-project', '{}'], tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -176,13 +176,13 @@ describe('config-new-project command', () => {
   test('is idempotent — returns already_exists if config exists', () => {
     // First call: create
     const choices = JSON.stringify({ mode: 'yolo', granularity: 'fine' });
-    const first = runGsdTools(['config-new-project', choices], tmpDir);
+    const first = run808Tools(['config-new-project', choices], tmpDir);
     assert.ok(first.success, `First call failed: ${first.error}`);
     const firstOut = JSON.parse(first.output);
     assert.strictEqual(firstOut.created, true);
 
     // Second call: idempotent
-    const second = runGsdTools(['config-new-project', choices], tmpDir);
+    const second = run808Tools(['config-new-project', choices], tmpDir);
     assert.ok(second.success, `Second call failed: ${second.error}`);
     const secondOut = JSON.parse(second.output);
     assert.strictEqual(secondOut.created, false);
@@ -200,7 +200,7 @@ describe('config-new-project command', () => {
       granularity: 'standard',
       workflow: { research: true, plan_check: true, verifier: true, nyquist_validation: true, auto_advance: true },
     });
-    const result = runGsdTools(['config-new-project', choices], tmpDir);
+    const result = run808Tools(['config-new-project', choices], tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -208,14 +208,14 @@ describe('config-new-project command', () => {
   });
 
   test('rejects invalid JSON choices', () => {
-    const result = runGsdTools(['config-new-project', '{not-json}'], tmpDir);
+    const result = run808Tools(['config-new-project', '{not-json}'], tmpDir);
     assert.strictEqual(result.success, false);
     assert.ok(result.error.includes('Invalid JSON'), `Expected "Invalid JSON" in: ${result.error}`);
   });
 
   test('output JSON has created:true on success', () => {
     const choices = JSON.stringify({ mode: 'interactive', granularity: 'standard' });
-    const result = runGsdTools(['config-new-project', choices], tmpDir);
+    const result = run808Tools(['config-new-project', choices], tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
     const out = JSON.parse(result.output);
     assert.strictEqual(out.created, true);

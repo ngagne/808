@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { 808 } from '@808-build/sdk';
+ * import { 808 } from '@ngagne/sdk';
  *
  * const app = new 808({ projectDir: '/path/to/project' });
  * const result = await app.executePlan('.planning/phases/01-auth/01-auth-01-PLAN.md');
@@ -27,7 +27,7 @@ import type { agent808Options, PlanResult, SessionOptions, agent808Event, Transp
 import { agent808EventType } from './types.js';
 import { parsePlan, parsePlanFile } from './plan-parser.js';
 import { loadConfig } from './config.js';
-import { Agent808Tools, resolveGsdToolsPath } from './808-tools.js';
+import { Agent808Tools, resolve808ToolsPath } from './808-tools.js';
 import { runPlanSession } from './session-runner.js';
 import { buildExecutorPrompt, parseAgentTools } from './prompt-builder.js';
 import { Agent808EventStream } from './event-stream.js';
@@ -39,7 +39,7 @@ import { PromptFactory } from './phase-prompt.js';
 
 export class 808 {
   private readonly projectDir: string;
-  private readonly gsdToolsPath: string;
+  private readonly agent808ToolsPath: string;
   private readonly defaultModel?: string;
   private readonly defaultMaxBudgetUsd: number;
   private readonly defaultMaxTurns: number;
@@ -48,8 +48,8 @@ export class 808 {
 
   constructor(options: agent808Options) {
     this.projectDir = resolve(options.projectDir);
-    this.gsdToolsPath =
-      options.gsdToolsPath ?? resolveGsdToolsPath(this.projectDir);
+    this.agent808ToolsPath =
+      options.agent808ToolsPath ?? resolve808ToolsPath(this.projectDir);
     this.defaultModel = options.model;
     this.defaultMaxBudgetUsd = options.maxBudgetUsd ?? 5.0;
     this.defaultMaxTurns = options.maxTurns ?? 50;
@@ -116,7 +116,7 @@ export class 808 {
   createTools(): Agent808Tools {
     return new Agent808Tools({
       projectDir: this.projectDir,
-      gsdToolsPath: this.gsdToolsPath,
+      agent808ToolsPath: this.agent808ToolsPath,
     });
   }
 
@@ -286,7 +286,7 @@ export class 808 {
 export { parsePlan, parsePlanFile } from './plan-parser.js';
 export { loadConfig } from './config.js';
 export type { agent808Config } from './config.js';
-export { Agent808Tools, Agent808ToolsError, resolveGsdToolsPath } from './808-tools.js';
+export { Agent808Tools, Agent808ToolsError, resolve808ToolsPath } from './808-tools.js';
 export { runPlanSession, runPhaseStepSession } from './session-runner.js';
 export { buildExecutorPrompt, parseAgentTools } from './prompt-builder.js';
 export * from './types.js';

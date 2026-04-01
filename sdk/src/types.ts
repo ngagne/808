@@ -198,7 +198,7 @@ export interface agent808Options {
   /** Root directory of the project. */
   projectDir: string;
   /** Path to 808-tools.cjs. Falls back to <projectDir>/.claude/ then ~/.claude/. */
-  gsdToolsPath?: string;
+  agent808ToolsPath?: string;
   /** Model to use for execution sessions. */
   model?: string;
   /** Maximum budget per plan execution in USD. Default: 5.0. */

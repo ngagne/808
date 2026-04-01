@@ -54,12 +54,12 @@ function applyGradient(str) {
 }
 
 // Codex config.toml constants
-const EOE_CODEX_MARKER = '# 808 Agent Configuration \u2014 managed by 808 installer';
-const EOE_CODEX_HOOKS_OWNERSHIP_PREFIX = '# 808 codex_hooks ownership: ';
+const AGENT_808_CODEX_MARKER = '# 808 Agent Configuration \u2014 managed by 808 installer';
+const AGENT_808_CODEX_HOOKS_OWNERSHIP_PREFIX = '# 808 codex_hooks ownership: ';
 
 // Copilot instructions marker constants
-const EOE_COPILOT_INSTRUCTIONS_MARKER = '<!-- 808 Configuration \u2014 managed by 808 installer -->';
-const EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER = '<!-- /808 Configuration -->';
+const AGENT_808_COPILOT_INSTRUCTIONS_MARKER = '<!-- 808 Configuration \u2014 managed by 808 installer -->';
+const AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER = '<!-- /808 Configuration -->';
 
 const CODEX_AGENT_SANDBOX = {
   '808-executor': 'workspace-write',
@@ -1176,7 +1176,7 @@ function generateCodexConfigBlock(agents, targetDir) {
     ? path.join(targetDir, 'agents').replace(/\\/g, '/')
     : 'agents';
   const lines = [
-    EOE_CODEX_MARKER,
+    AGENT_808_CODEX_MARKER,
     '',
   ];
 
@@ -1200,7 +1200,7 @@ function stripCodex808AgentSections(content) {
  */
 function strip808FromCodexConfig(content) {
   const eol = detectLineEnding(content);
-  const markerIndex = content.indexOf(EOE_CODEX_MARKER);
+  const markerIndex = content.indexOf(AGENT_808_CODEX_MARKER);
   const codexHooksOwnership = getManagedCodexHooksOwnership(content);
 
   if (markerIndex !== -1) {
@@ -1823,24 +1823,24 @@ function stripCodexHooksFeatureAssignments(content, ownership = null) {
 }
 
 function getManagedCodexHooksOwnership(content) {
-  const markerIndex = content.indexOf(EOE_CODEX_MARKER);
+  const markerIndex = content.indexOf(AGENT_808_CODEX_MARKER);
   if (markerIndex === -1) {
     return null;
   }
 
-  const afterMarker = content.slice(markerIndex + EOE_CODEX_MARKER.length);
+  const afterMarker = content.slice(markerIndex + AGENT_808_CODEX_MARKER.length);
   const match = afterMarker.match(/^\r?\n# 808 codex_hooks ownership: (section|root_dotted)\r?\n/);
   return match ? match[1] : null;
 }
 
 function setManagedCodexHooksOwnership(content, ownership) {
-  const markerIndex = content.indexOf(EOE_CODEX_MARKER);
+  const markerIndex = content.indexOf(AGENT_808_CODEX_MARKER);
   if (markerIndex === -1) {
     return content;
   }
 
   const eol = detectLineEnding(content);
-  const markerEnd = markerIndex + EOE_CODEX_MARKER.length;
+  const markerEnd = markerIndex + AGENT_808_CODEX_MARKER.length;
   const afterMarker = content.slice(markerEnd);
   const normalizedAfterMarker = afterMarker.replace(
     /^\r?\n# 808 codex_hooks ownership: (?:section|root_dotted)\r?\n/,
@@ -1854,7 +1854,7 @@ function setManagedCodexHooksOwnership(content, ownership) {
   const remainder = normalizedAfterMarker.replace(/^\r?\n/, '');
   return content.slice(0, markerEnd) +
     eol +
-    `${EOE_CODEX_HOOKS_OWNERSHIP_PREFIX}${ownership}${eol}` +
+    `${AGENT_808_CODEX_HOOKS_OWNERSHIP_PREFIX}${ownership}${eol}` +
     remainder;
 }
 
@@ -2054,17 +2054,17 @@ function rewriteTomlKeyLines(content, matches, key) {
  * Merge 808 config block into an existing or new config.toml.
  * Three cases: new file, existing with 808 marker, existing without marker.
  */
-function mergeCodexConfig(configPath, gsdBlock) {
+function mergeCodexConfig(configPath, agent808Block) {
   // Case 1: No config.toml — create fresh
   if (!fs.existsSync(configPath)) {
-    fs.writeFileSync(configPath, gsdBlock + '\n');
+    fs.writeFileSync(configPath, agent808Block + '\n');
     return;
   }
 
   const existing = fs.readFileSync(configPath, 'utf8');
   const eol = detectLineEnding(existing);
-  const normalized808Block = gsdBlock.replace(/\r?\n/g, eol);
-  const markerIndex = existing.indexOf(EOE_CODEX_MARKER);
+  const normalized808Block = agent808Block.replace(/\r?\n/g, eol);
+  const markerIndex = existing.indexOf(AGENT_808_CODEX_MARKER);
 
   // Case 2: Has 808 marker — truncate and re-append
   if (markerIndex !== -1) {
@@ -2302,30 +2302,30 @@ function hasEnabledCodexHooksFeature(configContent) {
  * Merge 808 instructions into copilot-instructions.md.
  * Three cases: new file, existing with markers, existing without markers.
  * @param {string} filePath - Full path to copilot-instructions.md
- * @param {string} gsdContent - Template content (without markers)
+ * @param {string} agent808Content - Template content (without markers)
  */
-function mergeCopilotInstructions(filePath, gsdContent) {
-  const gsdBlock = EOE_COPILOT_INSTRUCTIONS_MARKER + '\n' +
-    gsdContent.trim() + '\n' +
-    EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER;
+function mergeCopilotInstructions(filePath, agent808Content) {
+  const agent808Block = AGENT_808_COPILOT_INSTRUCTIONS_MARKER + '\n' +
+    agent808Content.trim() + '\n' +
+    AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER;
 
   // Case 1: No file — create fresh
   if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, gsdBlock + '\n');
+    fs.writeFileSync(filePath, agent808Block + '\n');
     return;
   }
 
   const existing = fs.readFileSync(filePath, 'utf8');
-  const openIndex = existing.indexOf(EOE_COPILOT_INSTRUCTIONS_MARKER);
-  const closeIndex = existing.indexOf(EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
+  const openIndex = existing.indexOf(AGENT_808_COPILOT_INSTRUCTIONS_MARKER);
+  const closeIndex = existing.indexOf(AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
 
   // Case 2: Has 808 markers — replace between markers
   if (openIndex !== -1 && closeIndex !== -1) {
     const before = existing.substring(0, openIndex).trimEnd();
-    const after = existing.substring(closeIndex + EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
+    const after = existing.substring(closeIndex + AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
     let newContent = '';
     if (before) newContent += before + '\n\n';
-    newContent += gsdBlock;
+    newContent += agent808Block;
     if (after) newContent += '\n\n' + after;
     newContent += '\n';
     fs.writeFileSync(filePath, newContent);
@@ -2333,7 +2333,7 @@ function mergeCopilotInstructions(filePath, gsdContent) {
   }
 
   // Case 3: No markers — append at end
-  const content = existing.trimEnd() + '\n\n' + gsdBlock + '\n';
+  const content = existing.trimEnd() + '\n\n' + agent808Block + '\n';
   fs.writeFileSync(filePath, content);
 }
 
@@ -2344,12 +2344,12 @@ function mergeCopilotInstructions(filePath, gsdContent) {
  * @returns {string|null} - Cleaned content or null if empty
  */
 function strip808FromCopilotInstructions(content) {
-  const openIndex = content.indexOf(EOE_COPILOT_INSTRUCTIONS_MARKER);
-  const closeIndex = content.indexOf(EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
+  const openIndex = content.indexOf(AGENT_808_COPILOT_INSTRUCTIONS_MARKER);
+  const closeIndex = content.indexOf(AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER);
 
   if (openIndex !== -1 && closeIndex !== -1) {
     const before = content.substring(0, openIndex).trimEnd();
-    const after = content.substring(closeIndex + EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
+    const after = content.substring(closeIndex + AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER.length).trimStart();
     const cleaned = (before + (before && after ? '\n\n' : '') + after).trim();
     if (!cleaned) return null;
     return cleaned + '\n';
@@ -2389,8 +2389,8 @@ function installCodexConfig(targetDir, agentsSrc) {
     fs.writeFileSync(path.join(agentsTomlDir, `${name}.toml`), tomlContent);
   }
 
-  const gsdBlock = generateCodexConfigBlock(agents, targetDir);
-  mergeCodexConfig(configPath, gsdBlock);
+  const agent808Block = generateCodexConfigBlock(agents, targetDir);
+  mergeCodexConfig(configPath, agent808Block);
 
   return agents.length;
 }
@@ -3527,18 +3527,18 @@ function uninstall(isGlobal, runtime = 'claude') {
       }
     }
   } else {
-    const gsdCommandsDir = path.join(targetDir, 'commands', '808');
-    if (fs.existsSync(gsdCommandsDir)) {
-      fs.rmSync(gsdCommandsDir, { recursive: true });
+    const agent808CommandsDir = path.join(targetDir, 'commands', '808');
+    if (fs.existsSync(agent808CommandsDir)) {
+      fs.rmSync(agent808CommandsDir, { recursive: true });
       removedCount++;
       console.log(`  ${green}✓${reset} Removed commands/808/`);
     }
   }
 
   // 2. Remove 808 directory
-  const gsdDir = path.join(targetDir, '808');
-  if (fs.existsSync(gsdDir)) {
-    fs.rmSync(gsdDir, { recursive: true });
+  const agent808Dir = path.join(targetDir, '808');
+  if (fs.existsSync(agent808Dir)) {
+    fs.rmSync(agent808Dir, { recursive: true });
     removedCount++;
     console.log(`  ${green}✓${reset} Removed 808/`);
   }
@@ -3563,9 +3563,9 @@ function uninstall(isGlobal, runtime = 'claude') {
   // 4. Remove 808 hooks
   const hooksDir = path.join(targetDir, 'hooks');
   if (fs.existsSync(hooksDir)) {
-    const gsdHooks = ['808-statusline.js', '808-check-update.js', '808-check-update.sh', '808-context-monitor.js', '808-prompt-guard.js'];
+    const agent808Hooks = ['808-statusline.js', '808-check-update.js', '808-check-update.sh', '808-context-monitor.js', '808-prompt-guard.js'];
     let hookCount = 0;
-    for (const hook of gsdHooks) {
+    for (const hook of agent808Hooks) {
       const hookPath = path.join(hooksDir, hook);
       if (fs.existsSync(hookPath)) {
         fs.unlinkSync(hookPath);
@@ -3843,7 +3843,7 @@ function configureOpencodePermissions(isGlobal = true) {
   // Build the 808 path using the actual config directory
   // Use ~ shorthand if it's in the default location, otherwise use full path
   const defaultConfigDir = path.join(os.homedir(), '.config', 'opencode');
-  const gsdPath = opencodeConfigDir === defaultConfigDir
+  const agent808Path = opencodeConfigDir === defaultConfigDir
     ? '~/.config/opencode/808/*'
     : `${opencodeConfigDir.replace(/\\/g, '/')}/808/*`;
   
@@ -3853,8 +3853,8 @@ function configureOpencodePermissions(isGlobal = true) {
   if (!config.permission.read || typeof config.permission.read !== 'object') {
     config.permission.read = {};
   }
-  if (config.permission.read[gsdPath] !== 'allow') {
-    config.permission.read[gsdPath] = 'allow';
+  if (config.permission.read[agent808Path] !== 'allow') {
+    config.permission.read[agent808Path] = 'allow';
     modified = true;
   }
 
@@ -3862,8 +3862,8 @@ function configureOpencodePermissions(isGlobal = true) {
   if (!config.permission.external_directory || typeof config.permission.external_directory !== 'object') {
     config.permission.external_directory = {};
   }
-  if (config.permission.external_directory[gsdPath] !== 'allow') {
-    config.permission.external_directory[gsdPath] = 'allow';
+  if (config.permission.external_directory[agent808Path] !== 'allow') {
+    config.permission.external_directory[agent808Path] = 'allow';
     modified = true;
   }
 
@@ -3959,15 +3959,15 @@ function writeManifest(configDir, runtime = 'claude') {
   const isAntigravity = runtime === 'antigravity';
   const isCursor = runtime === 'cursor';
   const isWindsurf = runtime === 'windsurf';
-  const gsdDir = path.join(configDir, '808');
+  const agent808Dir = path.join(configDir, '808');
   const commandsDir = path.join(configDir, 'commands', '808');
   const opencodeCommandDir = path.join(configDir, 'command');
   const codexSkillsDir = path.join(configDir, 'skills');
   const agentsDir = path.join(configDir, 'agents');
   const manifest = { version: pkg.version, timestamp: new Date().toISOString(), files: {} };
 
-  const gsdHashes = generateManifest(gsdDir);
-  for (const [rel, hash] of Object.entries(gsdHashes)) {
+  const agent808Hashes = generateManifest(agent808Dir);
+  for (const [rel, hash] of Object.entries(agent808Hashes)) {
     manifest.files['808/' + rel] = hash;
   }
   if (!isOpencode && !isCodex && !isCopilot && !isAntigravity && !isCursor && !isWindsurf && fs.existsSync(commandsDir)) {
@@ -4148,8 +4148,8 @@ function install(isGlobal, runtime = 'claude') {
     fs.mkdirSync(commandDir, { recursive: true });
     
     // Copy commands/808/*.md as command/808-*.md (flatten structure)
-    const gsdSrc = path.join(src, 'commands', '808');
-    copyFlattenedCommands(gsdSrc, commandDir, '808', pathPrefix, runtime);
+    const agent808Src = path.join(src, 'commands', '808');
+    copyFlattenedCommands(agent808Src, commandDir, '808', pathPrefix, runtime);
     if (verifyInstalled(commandDir, 'command/808-*')) {
       const count = fs.readdirSync(commandDir).filter(f => f.startsWith('808-')).length;
       console.log(`  ${green}✓${reset} Installed ${count} commands to command/`);
@@ -4158,8 +4158,8 @@ function install(isGlobal, runtime = 'claude') {
     }
   } else if (isCodex) {
     const skillsDir = path.join(targetDir, 'skills');
-    const gsdSrc = path.join(src, 'commands', '808');
-    copyCommandsAsCodexSkills(gsdSrc, skillsDir, '808', pathPrefix, runtime);
+    const agent808Src = path.join(src, 'commands', '808');
+    copyCommandsAsCodexSkills(agent808Src, skillsDir, '808', pathPrefix, runtime);
     const installedSkillNames = listCodexSkillNames(skillsDir);
     if (installedSkillNames.length > 0) {
       console.log(`  ${green}✓${reset} Installed ${installedSkillNames.length} skills to skills/`);
@@ -4168,8 +4168,8 @@ function install(isGlobal, runtime = 'claude') {
     }
   } else if (isCopilot) {
     const skillsDir = path.join(targetDir, 'skills');
-    const gsdSrc = path.join(src, 'commands', '808');
-    copyCommandsAsCopilotSkills(gsdSrc, skillsDir, '808', isGlobal);
+    const agent808Src = path.join(src, 'commands', '808');
+    copyCommandsAsCopilotSkills(agent808Src, skillsDir, '808', isGlobal);
     if (fs.existsSync(skillsDir)) {
       const count = fs.readdirSync(skillsDir, { withFileTypes: true })
         .filter(e => e.isDirectory() && e.name.startsWith('808-')).length;
@@ -4183,8 +4183,8 @@ function install(isGlobal, runtime = 'claude') {
     }
   } else if (isAntigravity) {
     const skillsDir = path.join(targetDir, 'skills');
-    const gsdSrc = path.join(src, 'commands', '808');
-    copyCommandsAsAntigravitySkills(gsdSrc, skillsDir, '808', isGlobal);
+    const agent808Src = path.join(src, 'commands', '808');
+    copyCommandsAsAntigravitySkills(agent808Src, skillsDir, '808', isGlobal);
     if (fs.existsSync(skillsDir)) {
       const count = fs.readdirSync(skillsDir, { withFileTypes: true })
         .filter(e => e.isDirectory() && e.name.startsWith('808-')).length;
@@ -4198,8 +4198,8 @@ function install(isGlobal, runtime = 'claude') {
     }
   } else if (isCursor) {
     const skillsDir = path.join(targetDir, 'skills');
-    const gsdSrc = path.join(src, 'commands', '808');
-    copyCommandsAsCursorSkills(gsdSrc, skillsDir, '808', pathPrefix, runtime);
+    const agent808Src = path.join(src, 'commands', '808');
+    copyCommandsAsCursorSkills(agent808Src, skillsDir, '808', pathPrefix, runtime);
     const installedSkillNames = listCodexSkillNames(skillsDir); // reuse — same dir structure
     if (installedSkillNames.length > 0) {
       console.log(`  ${green}✓${reset} Installed ${installedSkillNames.length} skills to skills/`);
@@ -4208,8 +4208,8 @@ function install(isGlobal, runtime = 'claude') {
     }
   } else if (isWindsurf) {
     const skillsDir = path.join(targetDir, 'skills');
-    const gsdSrc = path.join(src, 'commands', '808');
-    copyCommandsAsWindsurfSkills(gsdSrc, skillsDir, '808', pathPrefix, runtime);
+    const agent808Src = path.join(src, 'commands', '808');
+    copyCommandsAsWindsurfSkills(agent808Src, skillsDir, '808', pathPrefix, runtime);
     const installedSkillNames = listCodexSkillNames(skillsDir); // reuse — same dir structure
     if (installedSkillNames.length > 0) {
       console.log(`  ${green}✓${reset} Installed ${installedSkillNames.length} skills to skills/`);
@@ -4221,10 +4221,10 @@ function install(isGlobal, runtime = 'claude') {
     const commandsDir = path.join(targetDir, 'commands');
     fs.mkdirSync(commandsDir, { recursive: true });
     
-    const gsdSrc = path.join(src, 'commands', '808');
-    const gsdDest = path.join(commandsDir, '808');
-    copyWithPathReplacement(gsdSrc, gsdDest, pathPrefix, runtime, true, isGlobal);
-    if (verifyInstalled(gsdDest, 'commands/808')) {
+    const agent808Src = path.join(src, 'commands', '808');
+    const agent808Dest = path.join(commandsDir, '808');
+    copyWithPathReplacement(agent808Src, agent808Dest, pathPrefix, runtime, true, isGlobal);
+    if (verifyInstalled(agent808Dest, 'commands/808')) {
       console.log(`  ${green}✓${reset} Installed commands/808`);
     } else {
       failures.push('commands/808');
@@ -4642,10 +4642,10 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallS
   // that the runtime can't resolve. Users can still use model_overrides for explicit IDs.
   // See #1156.
   if (runtime !== 'claude') {
-    const gsdDir = path.join(os.homedir(), '.808');
-    const defaultsPath = path.join(gsdDir, 'defaults.json');
+    const agent808Dir = path.join(os.homedir(), '.808');
+    const defaultsPath = path.join(agent808Dir, 'defaults.json');
     try {
-      fs.mkdirSync(gsdDir, { recursive: true });
+      fs.mkdirSync(agent808Dir, { recursive: true });
       let defaults = {};
       try { defaults = JSON.parse(fs.readFileSync(defaultsPath, 'utf8')); } catch { /* new file */ }
       if (defaults.resolve_model_ids !== 'omit') {
@@ -4736,7 +4736,7 @@ function handleStatusline(settings, isInteractive, callback) {
  */
 function installSdk() {
   const sdkVersion = pkg.version;
-  const sdkPkg = `@808-build/sdk@${sdkVersion}`;
+  const sdkPkg = `@ngagne/sdk@${sdkVersion}`;
   console.log(`\n  ${cyan}Installing 808 SDK...${reset}`);
   console.log(`  ${dim}npm install -g ${sdkPkg}${reset}\n`);
   try {
@@ -4784,7 +4784,7 @@ function promptSdk(callback) {
     ${dim}808-sdk run "prompt"${reset}    Execute a milestone from text
 
   ${cyan}1${reset}) No
-  ${cyan}2${reset}) Yes ${dim}(runs: npm install -g @808-build/sdk)${reset}
+  ${cyan}2${reset}) Yes ${dim}(runs: npm install -g @ngagne/sdk)${reset}
 `);
 
   rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
@@ -4961,7 +4961,7 @@ function installAllRuntimes(runtimes, isGlobal, isInteractive) {
 }
 
 // Test-only exports — skip main logic when loaded as a module for testing
-if (process.env.EOE_TEST_MODE) {
+if (process.env.AGENT_808_TEST_MODE) {
   module.exports = {
     yamlIdentifier,
     getCodexSkillAdapterHeader,
@@ -4978,7 +4978,7 @@ if (process.env.EOE_TEST_MODE) {
     convertClaudeCommandToCodexSkill,
     convertClaudeToOpencodeFrontmatter,
     neutralizeAgentReferences,
-    EOE_CODEX_MARKER,
+    AGENT_808_CODEX_MARKER,
     CODEX_AGENT_SANDBOX,
     getDirName,
     getGlobalDir,
@@ -4989,8 +4989,8 @@ if (process.env.EOE_TEST_MODE) {
     convertClaudeCommandToCopilotSkill,
     convertClaudeAgentToCopilotAgent,
     copyCommandsAsCopilotSkills,
-    EOE_COPILOT_INSTRUCTIONS_MARKER,
-    EOE_COPILOT_INSTRUCTIONS_CLOSE_MARKER,
+    AGENT_808_COPILOT_INSTRUCTIONS_MARKER,
+    AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER,
     mergeCopilotInstructions,
     strip808FromCopilotInstructions,
     convertClaudeToAntigravityContent,
@@ -5046,4 +5046,4 @@ if (hasGlobal && hasLocal) {
   }
 }
 
-} // end of else block for EOE_TEST_MODE
+} // end of else block for AGENT_808_TEST_MODE

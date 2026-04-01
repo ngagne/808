@@ -70,13 +70,13 @@ export class PromptFactory {
   private readonly sdkPromptsDir: string;
 
   constructor(options?: {
-    gsdInstallDir?: string;
+    agent808InstallDir?: string;
     agentsDir?: string;
     projectAgentsDir?: string;
     sdkPromptsDir?: string;
   }) {
-    const gsdInstallDir = options?.808InstallDir ?? join(homedir(), '.claude', '808');
-    this.workflowsDir = join(gsdInstallDir, 'workflows');
+    const agent808InstallDir = options?.808InstallDir ?? join(homedir(), '.claude', '808');
+    this.workflowsDir = join(agent808InstallDir, 'workflows');
     this.agentsDir = options?.agentsDir ?? join(homedir(), '.claude', 'agents');
     this.projectAgentsDir = options?.projectAgentsDir;
     // SDK prompts dir: explicit override → package-relative default via import.meta.url

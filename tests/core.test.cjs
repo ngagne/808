@@ -977,8 +977,8 @@ describe('stale hook filter', () => {
       'README.md',                       // non-js file
     ];
 
-    const gsdFilter = f => f.startsWith('808-') && f.endsWith('.js');
-    const filtered = files.filter(gsdFilter);
+    const agent808Filter = f => f.startsWith('808-') && f.endsWith('.js');
+    const filtered = files.filter(agent808Filter);
 
     assert.deepStrictEqual(filtered, [
       '808-check-update.js',

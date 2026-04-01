@@ -92,16 +92,16 @@ process.stdin.on('end', () => {
     }
 
     // 808 update available?
-    let gsdUpdate = '';
+    let agent808Update = '';
     const cacheFile = path.join(claudeDir, 'cache', '808-update-check.json');
     if (fs.existsSync(cacheFile)) {
       try {
         const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
         if (cache.update_available) {
-          gsdUpdate = '\x1b[33m⬆ /808:update\x1b[0m │ ';
+          agent808Update = '\x1b[33m⬆ /808:update\x1b[0m │ ';
         }
         if (cache.stale_hooks && cache.stale_hooks.length > 0) {
-          gsdUpdate += '\x1b[31m⚠ stale hooks — run /808:update\x1b[0m │ ';
+          agent808Update += '\x1b[31m⚠ stale hooks — run /808:update\x1b[0m │ ';
         }
       } catch (e) {}
     }
@@ -109,9 +109,9 @@ process.stdin.on('end', () => {
     // Output
     const dirname = path.basename(dir);
     if (task) {
-      process.stdout.write(`${gsdUpdate}\x1b[2m${model}\x1b[0m │ \x1b[1m${task}\x1b[0m │ \x1b[2m${dirname}\x1b[0m${ctx}`);
+      process.stdout.write(`${agent808Update}\x1b[2m${model}\x1b[0m │ \x1b[1m${task}\x1b[0m │ \x1b[2m${dirname}\x1b[0m${ctx}`);
     } else {
-      process.stdout.write(`${gsdUpdate}\x1b[2m${model}\x1b[0m │ \x1b[2m${dirname}\x1b[0m${ctx}`);
+      process.stdout.write(`${agent808Update}\x1b[2m${model}\x1b[0m │ \x1b[2m${dirname}\x1b[0m${ctx}`);
     }
   } catch (e) {
     // Silent fail - don't break statusline on parse errors

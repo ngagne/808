@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { Agent808Tools, Agent808ToolsError, resolveGsdToolsPath } from './808-tools.js';
+import { Agent808Tools, Agent808ToolsError, resolve808ToolsPath } from './808-tools.js';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir, homedir } from 'node:os';
@@ -37,7 +37,7 @@ describe('808Tools', () => {
         `process.stdout.write(JSON.stringify({ status: "ok", count: 42 }));`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.exec('state', ['load']);
 
       expect(result).toEqual({ status: 'ok', count: 42 });
@@ -55,7 +55,7 @@ describe('808Tools', () => {
         `process.stdout.write('@file:${resultFile.replace(/\\/g, '\\\\')}');`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.exec('state', ['load']);
 
       expect(result).toEqual(bigData);
@@ -67,7 +67,7 @@ describe('808Tools', () => {
         `// outputs nothing`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.exec('state', ['load']);
 
       expect(result).toBeNull();
@@ -79,25 +79,25 @@ describe('808Tools', () => {
         `process.stderr.write('something went wrong\\n'); process.exit(1);`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
 
       try {
         await tools.exec('state', ['load']);
         expect.fail('Should have thrown');
       } catch (err) {
         expect(err).toBeInstanceOf(808ToolsError);
-        const gsdErr = err as Agent808ToolsError;
-        expect(gsdErr.command).toBe('state');
-        expect(gsdErr.args).toEqual(['load']);
-        expect(gsdErr.stderr).toContain('something went wrong');
-        expect(gsdErr.exitCode).toBeGreaterThan(0);
+        const agent808Err = err as Agent808ToolsError;
+        expect(agent808Err.command).toBe('state');
+        expect(agent808Err.args).toEqual(['load']);
+        expect(agent808Err.stderr).toContain('something went wrong');
+        expect(agent808Err.exitCode).toBeGreaterThan(0);
       }
     });
 
     it('throws 808ToolsError with context when 808-tools.cjs not found', async () => {
       const tools = new Agent808Tools({
         projectDir: tmpDir,
-        gsdToolsPath: '/nonexistent/path/808-tools.cjs',
+        agent808ToolsPath: '/nonexistent/path/808-tools.cjs',
       });
 
       await expect(tools.exec('state', ['load'])).rejects.toThrow(808ToolsError);
@@ -109,16 +109,16 @@ describe('808Tools', () => {
         `process.stdout.write('Not JSON at all');`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
 
       try {
         await tools.exec('state', ['load']);
         expect.fail('Should have thrown');
       } catch (err) {
         expect(err).toBeInstanceOf(808ToolsError);
-        const gsdErr = err as Agent808ToolsError;
-        expect(gsdErr.message).toContain('Failed to parse');
-        expect(gsdErr.message).toContain('Not JSON at all');
+        const agent808Err = err as Agent808ToolsError;
+        expect(agent808Err.message).toContain('Failed to parse');
+        expect(agent808Err.message).toContain('Not JSON at all');
       }
     });
 
@@ -128,7 +128,7 @@ describe('808Tools', () => {
         `process.stdout.write('@file:/tmp/does-not-exist-${Date.now()}.json');`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
 
       await expect(tools.exec('state', ['load'])).rejects.toThrow(808ToolsError);
     });
@@ -141,7 +141,7 @@ describe('808Tools', () => {
 
       const tools = new Agent808Tools({
         projectDir: tmpDir,
-        gsdToolsPath: scriptPath,
+        agent808ToolsPath: scriptPath,
         timeoutMs: 500,
       });
 
@@ -150,8 +150,8 @@ describe('808Tools', () => {
         expect.fail('Should have thrown');
       } catch (err) {
         expect(err).toBeInstanceOf(808ToolsError);
-        const gsdErr = err as Agent808ToolsError;
-        expect(gsdErr.message).toContain('timed out');
+        const agent808Err = err as Agent808ToolsError;
+        expect(agent808Err.message).toContain('timed out');
       }
     }, 10_000);
   });
@@ -174,7 +174,7 @@ describe('808Tools', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.stateLoad();
 
       expect(result).toBe('phase=3\nstatus=executing');
@@ -190,7 +190,7 @@ describe('808Tools', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.commit('test message', ['file1.md', 'file2.md']);
 
       expect(result).toBe('f89ae07');
@@ -209,7 +209,7 @@ describe('808Tools', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.roadmapAnalyze();
 
       expect(result).toEqual({ phases: [] });
@@ -228,7 +228,7 @@ describe('808Tools', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.verifySummary('/path/to/SUMMARY.md');
 
       expect(result).toBe('passed');
@@ -251,7 +251,7 @@ describe('808Tools', () => {
         `process.stdout.write(${JSON.stringify(largeJson)});`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.exec('state', ['load']);
 
       expect(Array.isArray(result)).toBe(true);
@@ -296,7 +296,7 @@ describe('808Tools', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.initNewProject();
 
       expect(result.researcher_model).toBe('claude-sonnet-4-6');
@@ -312,26 +312,26 @@ describe('808Tools', () => {
         `process.stderr.write('init failed\\n'); process.exit(1);`,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
 
       await expect(tools.initNewProject()).rejects.toThrow(808ToolsError);
     });
   });
 
-  // ─── resolveGsdToolsPath() tests ────────────────────────────────────────
+  // ─── resolve808ToolsPath() tests ────────────────────────────────────────
 
-  describe('resolveGsdToolsPath()', () => {
+  describe('resolve808ToolsPath()', () => {
     it('returns repo-local path when it exists', async () => {
       const localBinDir = join(tmpDir, '.claude', '808', 'bin');
       await mkdir(localBinDir, { recursive: true });
       await writeFile(join(localBinDir, '808-tools.cjs'), '// stub');
 
-      const result = resolveGsdToolsPath(tmpDir);
+      const result = resolve808ToolsPath(tmpDir);
       expect(result).toBe(join(localBinDir, '808-tools.cjs'));
     });
 
     it('falls back to global path when repo-local does not exist', () => {
-      const result = resolveGsdToolsPath(tmpDir);
+      const result = resolve808ToolsPath(tmpDir);
       expect(result).toBe(
         join(homedir(), '.claude', '808', 'bin', '808-tools.cjs'),
       );
@@ -347,7 +347,7 @@ describe('808Tools', () => {
         { mode: 0o755 },
       );
 
-      // No explicit gsdToolsPath — should auto-resolve to local
+      // No explicit agent808ToolsPath — should auto-resolve to local
       const tools = new Agent808Tools({ projectDir: tmpDir });
       const result = await tools.exec('test', []);
       expect(result).toEqual({ source: 'local' });
@@ -371,7 +371,7 @@ describe('808Tools', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.configSet('workflow.auto_advance', 'true');
 
       expect(result).toBe('workflow.auto_advance=true');
@@ -387,7 +387,7 @@ describe('808Tools', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.configSet('mode', 'yolo');
 
       expect(result).toBe('mode=yolo');

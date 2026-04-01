@@ -24,8 +24,8 @@
   </defs>
 
   <!-- Window -->
-  <rect class="terminal-border" width="960" height="540" rx="12"/>
-  <rect class="terminal-bg" x="1" y="1" width="958" height="538" rx="11"/>
+  <rect class="terminal-border" width="960" height="510" rx="12"/>
+  <rect class="terminal-bg" x="1" y="1" width="958" height="508" rx="11"/>
 
   <!-- Title bar -->
   <rect class="title-bar" x="1" y="1" width="958" height="36" rx="11"/>
@@ -47,29 +47,29 @@
     <text class="text command" font-size="15" x="36" y="0">npx 808</text>
 
     <!-- Banner -->
-    <text font-size="14" y="48" xml:space="preserve" fill="url(#808-gradient)" >  █████╗       █████╗       █████╗ </text>
-    <text font-size="14" y="65" xml:space="preserve" fill="url(#808-gradient)" >██╔══██╗ ██╔══██╗ ██╔══██╗</text>
-    <text font-size="14" y="82" xml:space="preserve" fill="url(#808-gradient)" >╚█████╔╝ ██║      ██║ ╚█████╔╝</text>
-    <text font-size="14" y="99" xml:space="preserve" fill="url(#808-gradient)">██╔══██╗ ██║      ██║ ██╔══██╗</text>
-    <text font-size="14" y="116" xml:space="preserve" fill="url(#808-gradient)">╚█████╔╝ ╚█████╔╝ ╚█████╔╝</text>
-    <text font-size="14" y="133" xml:space="preserve" fill="url(#808-gradient)">  ╚════╝       ╚════╝       ╚════╝ </text>
+    <text font-family="monospace" font-size="14" y="48" xml:space="preserve" fill="url(#808-gradient)" > █████╗   █████╗   █████╗ </text>
+    <text font-family="monospace" font-size="14" y="62" xml:space="preserve" fill="url(#808-gradient)" >██╔══██╗ ██╔══██╗ ██╔══██╗</text>
+    <text font-family="monospace" font-size="14" y="76" xml:space="preserve" fill="url(#808-gradient)" >╚█████╔╝ ██║  ██║ ╚█████╔╝</text>
+    <text font-family="monospace" font-size="14" y="90" xml:space="preserve" fill="url(#808-gradient)" >██╔══██╗ ██║  ██║ ██╔══██╗</text>
+    <text font-family="monospace" font-size="14" y="104" xml:space="preserve" fill="url(#808-gradient)">╚█████╔╝ ╚█████╔╝ ╚█████╔╝</text>
+    <text font-family="monospace" font-size="14" y="118" xml:space="preserve" fill="url(#808-gradient)"> ╚════╝   ╚════╝   ╚════╝ </text>
 
     <!-- Title and subtitle -->
-    <text class="text white" font-size="15" y="188">  808 <tspan class="dim">v1.0.1</tspan></text>
-    <text class="text white" font-size="15" y="212">  A meta-prompting, context engineering and spec-driven</text>
-    <text class="text white" font-size="15" y="232">  development system with multi-agent verification.</text>
-    <text class="text white" font-size="15" y="252"><tspan fill="#565f89">  Built on GSD-CC by TÂCHES.</tspan></text>
+    <text class="text white" font-size="15" y="158">  808 <tspan class="dim">v1.0.1</tspan></text>
+    <text class="text white" font-size="15" y="182">  A meta-prompting, context engineering and spec-driven</text>
+    <text class="text white" font-size="15" y="202">  development system with multi-agent verification.</text>
+    <text class="text white" font-size="15" y="222"><tspan fill="#565f89">  Built on GSD-CC by TÂCHES.</tspan></text>
 
     <!-- Install output -->
-    <text class="text" font-size="15" y="300"><tspan class="green">  ✓</tspan><tspan class="white"> Installed commands/808</tspan></text>
-    <text class="text" font-size="15" y="324"><tspan class="green">  ✓</tspan><tspan class="white"> Installed 808</tspan></text>
+    <text class="text" font-size="15" y="270"><tspan class="green">  ✓</tspan><tspan class="white"> Installed commands/808</tspan></text>
+    <text class="text" font-size="15" y="294"><tspan class="green">  ✓</tspan><tspan class="white"> Installed 808</tspan></text>
 
     <!-- Done message -->
-    <text class="text" font-size="15" y="372"><tspan class="green">  Done!</tspan><tspan class="white"> Run </tspan><tspan class="cyan">/808:help</tspan><tspan class="white"> to get started.</tspan></text>
+    <text class="text" font-size="15" y="342"><tspan class="green">  Done!</tspan><tspan class="white"> Run </tspan><tspan class="cyan">/808:help</tspan><tspan class="white"> to get started.</tspan></text>
 
     <!-- New prompt -->
-    <text class="text prompt" font-size="15" y="420">~</text>
-    <text class="text dim" font-size="15" x="16" y="420">$</text>
-    <text class="text white" font-size="15" x="36" y="420">▌</text>
+    <text class="text prompt" font-size="15" y="390">~</text>
+    <text class="text dim" font-size="15" x="16" y="390">$</text>
+    <text class="text white" font-size="15" x="36" y="390">▌</text>
   </g>
 </svg>

@@ -6,7 +6,7 @@ const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { runGsdTools, createTempProject, cleanup } = require('./helpers.cjs');
+const { run808Tools, createTempProject, cleanup } = require('./helpers.cjs');
 
 describe('generate-claude-md', () => {
   let tmpDir;
@@ -25,7 +25,7 @@ describe('generate-claude-md', () => {
       '# Test Project\n\n## What This Is\n\nA small test project.\n'
     );
 
-    const result = runGsdTools('generate-claude-md', tmpDir);
+    const result = run808Tools('generate-claude-md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -49,7 +49,7 @@ describe('generate-claude-md', () => {
     );
     fs.writeFileSync(path.join(tmpDir, 'CLAUDE.md'), '## Local Notes\n\nKeep this intro.\n');
 
-    const result = runGsdTools('generate-claude-md', tmpDir);
+    const result = run808Tools('generate-claude-md', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);

@@ -10,7 +10,7 @@ const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
-const { runGsdTools, createTempProject, cleanup } = require('./helpers.cjs');
+const { run808Tools, createTempProject, cleanup } = require('./helpers.cjs');
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -39,14 +39,14 @@ describe('agent-skills command', () => {
 
   test('returns empty when no config exists', () => {
     // No config.json at all
-    const result = runGsdTools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     // Should succeed with empty output (no skills configured)
     assert.strictEqual(result.output, '');
   });
 
   test('returns empty when config has no agent_skills section', () => {
     writeConfig(tmpDir, { model_profile: 'balanced' });
-    const result = runGsdTools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     assert.strictEqual(result.output, '');
   });
 
@@ -56,7 +56,7 @@ describe('agent-skills command', () => {
         '808-executor': ['skills/test-skill'],
       },
     });
-    const result = runGsdTools(['agent-skills', '808-planner'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-planner'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     assert.strictEqual(result.output, '');
   });
 
@@ -72,7 +72,7 @@ describe('agent-skills command', () => {
       },
     });
 
-    const result = runGsdTools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     assert.ok(result.success, `Command failed: ${result.error}`);
     assert.ok(result.output.includes('<agent_skills>'), 'Should contain <agent_skills> tag');
     assert.ok(result.output.includes('</agent_skills>'), 'Should contain closing tag');
@@ -90,7 +90,7 @@ describe('agent-skills command', () => {
       },
     });
 
-    const result = runGsdTools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     assert.ok(result.success, `Command failed: ${result.error}`);
     assert.ok(result.output.includes('skills/my-skill/SKILL.md'), 'Should contain skill path');
   });
@@ -109,7 +109,7 @@ describe('agent-skills command', () => {
       },
     });
 
-    const result = runGsdTools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     assert.ok(result.success, `Command failed: ${result.error}`);
     assert.ok(result.output.includes('skills/skill-a/SKILL.md'), 'Should contain first skill');
     assert.ok(result.output.includes('skills/skill-b/SKILL.md'), 'Should contain second skill');
@@ -122,7 +122,7 @@ describe('agent-skills command', () => {
       },
     });
 
-    const result = runGsdTools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     // Should not crash — returns empty output (the missing skill is skipped)
     assert.ok(result.success, 'Command should succeed even with missing skill paths');
     // Should not include the missing skill in the output
@@ -137,13 +137,13 @@ describe('agent-skills command', () => {
       },
     });
 
-    const result = runGsdTools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills', '808-executor'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     // Should not include traversal path in output
     assert.ok(!result.output.includes('/etc/passwd'), 'Should not include traversal path');
   });
 
   test('returns empty when no agent type argument provided', () => {
-    const result = runGsdTools(['agent-skills'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools(['agent-skills'], tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     // Should succeed with empty output — no agent type means no skills to return
     assert.ok(result.success, 'Command should succeed');
     const parsed = JSON.parse(result.output);
@@ -165,7 +165,7 @@ describe('config-ensure-section with agent_skills', () => {
   });
 
   test('new configs include agent_skills key', () => {
-    const result = runGsdTools('config-ensure-section', tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    const result = run808Tools('config-ensure-section', tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -182,7 +182,7 @@ describe('config-set agent_skills', () => {
   beforeEach(() => {
     tmpDir = createTempProject();
     // Ensure config exists first
-    runGsdTools('config-ensure-section', tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
+    run808Tools('config-ensure-section', tmpDir, { HOME: tmpDir, USERPROFILE: tmpDir });
   });
 
   afterEach(() => {
@@ -190,7 +190,7 @@ describe('config-set agent_skills', () => {
   });
 
   test('can set agent_skills via dot notation', () => {
-    const result = runGsdTools(
+    const result = run808Tools(
       ['config-set', 'agent_skills.808-executor', '["skills/my-skill"]'],
       tmpDir,
       { HOME: tmpDir, USERPROFILE: tmpDir }

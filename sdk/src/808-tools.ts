@@ -33,17 +33,17 @@ const DEFAULT_TIMEOUT_MS = 30_000;
 
 export class Agent808Tools {
   private readonly projectDir: string;
-  private readonly gsdToolsPath: string;
+  private readonly agent808ToolsPath: string;
   private readonly timeoutMs: number;
 
   constructor(opts: {
     projectDir: string;
-    gsdToolsPath?: string;
+    agent808ToolsPath?: string;
     timeoutMs?: number;
   }) {
     this.projectDir = opts.projectDir;
-    this.gsdToolsPath =
-      opts.gsdToolsPath ?? resolveGsdToolsPath(opts.projectDir);
+    this.agent808ToolsPath =
+      opts.agent808ToolsPath ?? resolve808ToolsPath(opts.projectDir);
     this.timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 
@@ -288,7 +288,7 @@ export class Agent808Tools {
  * Resolve 808-tools.cjs path with repo-local fallback.
  * Probe order: repo-local → global home directory.
  */
-export function resolveGsdToolsPath(projectDir: string): string {
+export function resolve808ToolsPath(projectDir: string): string {
   const localPath = join(projectDir, '.claude', '808', 'bin', '808-tools.cjs');
   if (existsSync(localPath)) return localPath;
   return join(homedir(), '.claude', '808', 'bin', '808-tools.cjs');

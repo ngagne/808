@@ -325,7 +325,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.initPhaseOp('5');
 
       expect(result.phase_found).toBe(true);
@@ -346,7 +346,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.initPhaseOp('7') as { received_args: string[] };
 
       expect(result.received_args).toContain('init');
@@ -371,7 +371,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.configGet('model_profile');
 
       expect(result).toBe('balanced');
@@ -390,7 +390,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.configGet('nonexistent_key');
 
       expect(result).toBeNull();
@@ -412,7 +412,7 @@ describe('808Tools typed methods', () => {
         `,
       );
 
-      const tools = new Agent808Tools({ projectDir: tmpDir, gsdToolsPath: scriptPath });
+      const tools = new Agent808Tools({ projectDir: tmpDir, agent808ToolsPath: scriptPath });
       const result = await tools.stateBeginPhase('3');
 
       expect(result).toBe('ok');
