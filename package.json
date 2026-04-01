@@ -1,5 +1,5 @@
 {
-  "name": "808",
+  "name": "agent-808",
   "version": "1.0.0",
   "description": "Spec-driven multi-agent development framework built on GSD by TÂCHES, enabling parallel execution and consensus-based verification across security, SRE, performance, architecture, and standards for greenfield and brownfield systems.",
   "bin": {

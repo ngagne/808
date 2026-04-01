@@ -10,7 +10,10 @@
       "Bash(npm run *)",
       "Bash(npx *)",
       "Bash(./node_modules/.bin/tsc *)",
-      "Bash(npm *)"
+      "Bash(npm *)",
+      "Bash(node *)",
+      "Bash(ls *)",
+      "Bash(which *)"
     ]
   },
   "$version": 3
