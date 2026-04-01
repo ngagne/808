@@ -171,7 +171,7 @@ Then verify `.planning/phases/` no longer contains old milestone directories bef
 
 If `phase_dir_count > 0` but `phase_archive_path` is missing:
 - Stop and explain that reset numbering is unsafe without a completed milestone archive target.
-- Tell the user to complete/archive the previous milestone first, then rerun `/808:new-milestone --reset-phase-numbers ${808_WS}`.
+- Tell the user to complete/archive the previous milestone first, then rerun `/808:new-milestone --reset-phase-numbers ${AGENT_808_WS}`.
 
 ## 8. Research Decision
 
@@ -459,11 +459,11 @@ node "$HOME/.claude/808/bin/808-tools.cjs" commit "docs: create milestone v[X.Y]
 
 **Phase [N]: [Phase Name]** — [Goal]
 
-`/808:discuss-phase [N] ${808_WS}` — gather context and clarify approach
+`/808:discuss-phase [N] ${AGENT_808_WS}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
-Also: `/808:plan-phase [N] ${808_WS}` — skip discussion, plan directly
+Also: `/808:plan-phase [N] ${AGENT_808_WS}` — skip discussion, plan directly
 ```
 
 </process>
@@ -480,7 +480,7 @@ Also: `/808:plan-phase [N] ${808_WS}` — skip discussion, plan directly
 - [ ] User feedback incorporated (if any)
 - [ ] Phase numbering mode respected (continued or reset)
 - [ ] All commits made (if planning docs committed)
-- [ ] User knows next step: `/808:discuss-phase [N] ${808_WS}`
+- [ ] User knows next step: `/808:discuss-phase [N] ${AGENT_808_WS}`
 
 **Atomic commits:** Each phase commits its artifacts immediately.
 </success_criteria>

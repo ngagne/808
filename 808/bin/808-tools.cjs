@@ -230,7 +230,7 @@ async function main() {
   }
 
   // Optional workstream override for parallel milestone work.
-  // Priority: --ws flag > 808_WORKSTREAM env var > active-workstream file > null (flat mode)
+  // Priority: --ws flag > AGENT_808_WORKSTREAM env var > active-workstream file > null (flat mode)
   const wsEqArg = args.find(arg => arg.startsWith('--ws='));
   const wsIdx = args.indexOf('--ws');
   let ws = null;
@@ -242,8 +242,8 @@ async function main() {
     ws = args[wsIdx + 1];
     if (!ws || ws.startsWith('--')) error('Missing value for --ws');
     args.splice(wsIdx, 2);
-  } else if (process.env.808_WORKSTREAM) {
-    ws = process.env.808_WORKSTREAM.trim();
+  } else if (process.env.AGENT_808_WORKSTREAM) {
+    ws = process.env.AGENT_808_WORKSTREAM.trim();
   } else {
     ws = getActiveWorkstream(cwd);
   }
@@ -253,7 +253,7 @@ async function main() {
   }
   // Set env var so all modules (planningDir, planningPaths) auto-resolve workstream paths
   if (ws) {
-    process.env.808_WORKSTREAM = ws;
+    process.env.AGENT_808_WORKSTREAM = ws;
   }
 
   const rawIndex = args.indexOf('--raw');

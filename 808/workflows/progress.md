@@ -185,8 +185,8 @@ Track: `outstanding_debt` — `summary.total_items` from the audit.
 | {phase} | {filename} | {pending_count} pending, {skipped_count} skipped, {blocked_count} blocked |
 | {phase} | {filename} | human_needed — {count} items |
 
-Review: `/808:audit-uat ${808_WS}` — full cross-phase audit
-Resume testing: `/808:verify-work {phase} ${808_WS}` — retest specific phase
+Review: `/808:audit-uat ${AGENT_808_WS}` — full cross-phase audit
+Resume testing: `/808:verify-work {phase} ${AGENT_808_WS}` — retest specific phase
 ```
 
 This is a WARNING, not a blocker — routing proceeds normally. The debt is visible so the user can make an informed choice.
@@ -215,7 +215,7 @@ Read its `<objective>` section.
 
 **{phase}-{plan}: [Plan Name]** — [objective summary from PLAN.md]
 
-`/808:execute-phase {phase} ${808_WS}`
+`/808:execute-phase {phase} ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -245,7 +245,7 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
 <sub>✓ Context gathered, ready to plan</sub>
 
-`/808:plan-phase {phase-number} ${808_WS}`
+`/808:plan-phase {phase-number} ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -284,15 +284,15 @@ PHASE_HAS_UI=$(echo "$PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true" ||
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
 
-`/808:discuss-phase {phase} ${808_WS}` — gather context and clarify approach
+`/808:discuss-phase {phase} ${AGENT_808_WS}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:plan-phase {phase} ${808_WS}` — skip discussion, plan directly
-- `/808:list-phase-assumptions {phase} ${808_WS}` — see Claude's assumptions
+- `/808:plan-phase {phase} ${AGENT_808_WS}` — skip discussion, plan directly
+- `/808:list-phase-assumptions {phase} ${AGENT_808_WS}` — see Claude's assumptions
 
 ---
 ```
@@ -310,15 +310,15 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 **{phase_num}-UAT.md** has {N} gaps requiring fixes.
 
-`/808:plan-phase {phase} --gaps ${808_WS}`
+`/808:plan-phase {phase} --gaps ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:execute-phase {phase} ${808_WS}` — execute phase plans
-- `/808:verify-work {phase} ${808_WS}` — run more UAT testing
+- `/808:execute-phase {phase} ${AGENT_808_WS}` — execute phase plans
+- `/808:verify-work {phase} ${AGENT_808_WS}` — run more UAT testing
 
 ---
 ```
@@ -336,15 +336,15 @@ UAT.md exists with `status: partial` — testing session ended before all items 
 
 **{phase_num}-UAT.md** has {N} unresolved tests (pending, blocked, or skipped).
 
-`/808:verify-work {phase} ${808_WS}` — resume testing from where you left off
+`/808:verify-work {phase} ${AGENT_808_WS}` — resume testing from where you left off
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:audit-uat ${808_WS}` — full cross-phase UAT audit
-- `/808:execute-phase {phase} ${808_WS}` — execute phase plans
+- `/808:audit-uat ${AGENT_808_WS}` — full cross-phase UAT audit
+- `/808:execute-phase {phase} ${AGENT_808_WS}` — execute phase plans
 
 ---
 ```
@@ -417,15 +417,15 @@ NEXT_HAS_UI=$(echo "$NEXT_PHASE_SECTION" | grep -qi "UI hint.*yes" && echo "true
 
 **Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
 
-`/808:discuss-phase {Z+1} ${808_WS}` — gather context and clarify approach
+`/808:discuss-phase {Z+1} ${AGENT_808_WS}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:plan-phase {Z+1} ${808_WS}` — skip discussion, plan directly
-- `/808:verify-work {Z} ${808_WS}` — user acceptance test before continuing
+- `/808:plan-phase {Z+1} ${AGENT_808_WS}` — skip discussion, plan directly
+- `/808:verify-work {Z} ${AGENT_808_WS}` — user acceptance test before continuing
 
 ---
 ```
@@ -445,14 +445,14 @@ All {N} phases finished!
 
 **Complete Milestone** — archive and prepare for next
 
-`/808:complete-milestone ${808_WS}`
+`/808:complete-milestone ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:verify-work ${808_WS}` — user acceptance test before completing milestone
+- `/808:verify-work ${AGENT_808_WS}` — user acceptance test before completing milestone
 
 ---
 ```
@@ -476,7 +476,7 @@ Ready to plan the next milestone.
 
 **Start Next Milestone** — questioning → research → requirements → roadmap
 
-`/808:new-milestone ${808_WS}`
+`/808:new-milestone ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -488,10 +488,10 @@ Ready to plan the next milestone.
 <step name="edge_cases">
 **Handle edge cases:**
 
-- Phase complete but next phase not planned → offer `/808:plan-phase [next] ${808_WS}`
+- Phase complete but next phase not planned → offer `/808:plan-phase [next] ${AGENT_808_WS}`
 - All work complete → offer milestone completion
 - Blockers present → highlight before offering to continue
-- Handoff file exists → mention it, offer `/808:resume-work ${808_WS}`
+- Handoff file exists → mention it, offer `/808:resume-work ${AGENT_808_WS}`
   </step>
 
 </process>

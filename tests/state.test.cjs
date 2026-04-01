@@ -347,7 +347,7 @@ describe('state json command', () => {
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
-    assert.strictEqual(output.808_state_version, '1.0', 'should have version 1.0');
+    assert.strictEqual(output.agent_808_state_version, '1.0', 'should have version 1.0');
     assert.strictEqual(output.current_phase, '05', 'current phase extracted');
     assert.strictEqual(output.current_phase_name, 'Deployment', 'phase name extracted');
     assert.strictEqual(output.current_plan, '05-03', 'current plan extracted');
@@ -362,7 +362,7 @@ describe('state json command', () => {
     fs.writeFileSync(
       path.join(tmpDir, '.planning', 'STATE.md'),
       `---
-808_state_version: 1.0
+agent_808_state_version: 1.0
 current_phase: 03
 status: paused
 stopped_at: Plan 2 of Phase 3
@@ -379,7 +379,7 @@ stopped_at: Plan 2 of Phase 3
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
-    assert.strictEqual(output.808_state_version, '1.0', 'version from frontmatter');
+    assert.strictEqual(output.agent_808_state_version, '1.0', 'version from frontmatter');
     assert.strictEqual(output.current_phase, '03', 'phase from frontmatter');
     assert.strictEqual(output.status, 'paused', 'status from frontmatter');
     assert.strictEqual(output.stopped_at, 'Plan 2 of Phase 3', 'stopped_at from frontmatter');
@@ -439,7 +439,7 @@ describe('STATE.md frontmatter sync', () => {
 
     const content = fs.readFileSync(path.join(tmpDir, '.planning', 'STATE.md'), 'utf-8');
     assert.ok(content.startsWith('---\n'), 'should start with frontmatter delimiter');
-    assert.ok(content.includes('808_state_version: 1.0'), 'should have version field');
+    assert.ok(content.includes('agent_808_state_version: 1.0'), 'should have version field');
     assert.ok(content.includes('current_phase: 02'), 'frontmatter should have current phase');
     assert.ok(content.includes('**Current Phase:** 02'), 'body field should be preserved');
     assert.ok(content.includes('**Status:** Executing Plan 1'), 'updated field in body');

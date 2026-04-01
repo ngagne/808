@@ -226,9 +226,9 @@ If "Run discuss-phase first":
   does not work correctly in nested subcontexts (#1009). Instead, display the command
   and exit so the user runs it as a top-level command:
   ```
-  Run this command first, then re-run /808:plan-phase {X} ${808_WS}:
+  Run this command first, then re-run /808:plan-phase {X} ${AGENT_808_WS}:
 
-  /808:discuss-phase {X} ${808_WS}
+  /808:discuss-phase {X} ${AGENT_808_WS}
   ```
   **Exit the plan-phase workflow. Do not continue.**
 
@@ -405,7 +405,7 @@ Otherwise use AskUserQuestion:
 - header: "UI Design Contract"
 - question: "Phase {N} has frontend indicators but no UI-SPEC.md. Generate a design contract before planning?"
 - options:
-  - "Generate UI-SPEC first" → Display: "Run `/808:ui-phase {N} ${808_WS}` then re-run `/808:plan-phase {N} ${808_WS}`". Exit workflow.
+  - "Generate UI-SPEC first" → Display: "Run `/808:ui-phase {N} ${AGENT_808_WS}` then re-run `/808:plan-phase {N} ${AGENT_808_WS}`". Exit workflow.
   - "Continue without UI-SPEC" → Continue to step 6.
   - "Not a frontend phase" → Continue to step 6.
 
@@ -453,7 +453,7 @@ VALIDATION_EXISTS=$(ls "${PHASE_DIR}"/*-VALIDATION.md 2>/dev/null | head -1)
 ```
 
 If missing and Nyquist is still enabled/applicable — ask user:
-1. Re-run: `/808:plan-phase {PHASE} --research ${808_WS}`
+1. Re-run: `/808:plan-phase {PHASE} --research ${AGENT_808_WS}`
 2. Disable Nyquist with the exact command:
    `node "$HOME/.claude/808/bin/808-tools.cjs" config-set workflow.nyquist_validation false`
 3. Continue anyway (plans fail Dimension 8)
@@ -751,7 +751,7 @@ Plans ready. Launching execute-phase...
 
 Launch execute-phase using the Skill tool to avoid nested Task sessions (which cause runtime freezes due to deep agent nesting):
 ```
-Skill(skill="808:execute-phase", args="${PHASE} --auto --no-transition ${808_WS}")
+Skill(skill="808:execute-phase", args="${PHASE} --auto --no-transition ${AGENT_808_WS}")
 ```
 
 The `--no-transition` flag tells execute-phase to return status after verification instead of chaining further. This keeps the auto-advance chain flat — each phase runs at the same nesting level rather than spawning deeper Task agents.
@@ -765,14 +765,14 @@ The `--no-transition` flag tells execute-phase to return status after verificati
 
   Auto-advance pipeline finished.
 
-  Next: /808:discuss-phase ${NEXT_PHASE} --auto ${808_WS}
+  Next: /808:discuss-phase ${NEXT_PHASE} --auto ${AGENT_808_WS}
   ```
 - **GAPS FOUND / VERIFICATION FAILED** → Display result, stop chain:
   ```
   Auto-advance stopped: Execution needs review.
 
   Review the output above and continue manually:
-  /808:execute-phase ${PHASE} ${808_WS}
+  /808:execute-phase ${PHASE} ${AGENT_808_WS}
   ```
 
 **If neither `--auto` nor config enabled:**
@@ -803,7 +803,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 **Execute Phase {X}** — run all {N} plans
 
-/808:execute-phase {X} ${808_WS}
+/808:execute-phase {X} ${AGENT_808_WS}
 
 <sub>/clear first → fresh context window</sub>
 

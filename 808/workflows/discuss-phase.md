@@ -143,7 +143,7 @@ Parse JSON for: `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phas
 ```
 Phase [X] not found in roadmap.
 
-Use /808:progress ${808_WS} to see available phases.
+Use /808:progress ${AGENT_808_WS} to see available phases.
 ```
 Exit workflow.
 
@@ -190,7 +190,7 @@ Check `has_plans` and `plan_count` from init. **If `has_plans` is true:**
 - header: "Plans exist"
 - question: "Phase [X] already has {plan_count} plan(s) created without user context. Your decisions here won't affect existing plans unless you replan."
 - options:
-  - "Continue and replan after" — Capture context, then run /808:plan-phase {X} ${808_WS} to replan
+  - "Continue and replan after" — Capture context, then run /808:plan-phase {X} ${AGENT_808_WS} to replan
   - "View existing plans" — Show plans before deciding
   - "Cancel" — Skip discuss-phase
 
@@ -873,15 +873,15 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 **Phase ${PHASE}: [Name]** — [Goal from ROADMAP.md]
 
-`/808:plan-phase ${PHASE} ${808_WS}`
+`/808:plan-phase ${PHASE} ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:plan-phase ${PHASE} --skip-research ${808_WS}` — plan without research
-- `/808:ui-phase ${PHASE} ${808_WS}` — generate UI design contract before planning (if phase has frontend work)
+- `/808:plan-phase ${PHASE} --skip-research ${AGENT_808_WS}` — plan without research
+- `/808:ui-phase ${PHASE} ${AGENT_808_WS}` — generate UI design contract before planning (if phase has frontend work)
 - Review/edit CONTEXT.md before continuing
 
 ---
@@ -992,7 +992,7 @@ Context captured. Launching plan-phase...
 
 Launch plan-phase using the Skill tool to avoid nested Task sessions (which cause runtime freezes due to deep agent nesting — see #686):
 ```
-Skill(skill="808:plan-phase", args="${PHASE} --auto ${808_WS}")
+Skill(skill="808:plan-phase", args="${PHASE} --auto ${AGENT_808_WS}")
 ```
 
 This keeps the auto-advance chain flat — discuss, plan, and execute all run at the same nesting level rather than spawning increasingly deep Task agents.
@@ -1006,23 +1006,23 @@ This keeps the auto-advance chain flat — discuss, plan, and execute all run at
 
   Auto-advance pipeline finished: discuss → plan → execute
 
-  Next: /808:discuss-phase ${NEXT_PHASE} --auto ${808_WS}
+  Next: /808:discuss-phase ${NEXT_PHASE} --auto ${AGENT_808_WS}
   <sub>/clear first → fresh context window</sub>
   ```
 - **PLANNING COMPLETE** → Planning done, execution didn't complete:
   ```
   Auto-advance partial: Planning complete, execution did not finish.
-  Continue: /808:execute-phase ${PHASE} ${808_WS}
+  Continue: /808:execute-phase ${PHASE} ${AGENT_808_WS}
   ```
 - **PLANNING INCONCLUSIVE / CHECKPOINT** → Stop chain:
   ```
   Auto-advance stopped: Planning needs input.
-  Continue: /808:plan-phase ${PHASE} ${808_WS}
+  Continue: /808:plan-phase ${PHASE} ${AGENT_808_WS}
   ```
 - **GAPS FOUND** → Stop chain:
   ```
   Auto-advance stopped: Gaps found during execution.
-  Continue: /808:plan-phase ${PHASE} --gaps ${808_WS}
+  Continue: /808:plan-phase ${PHASE} --gaps ${AGENT_808_WS}
   ```
 
 **If neither `--auto` nor config enabled:**

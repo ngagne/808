@@ -460,8 +460,8 @@ Apply the same "incomplete" filtering rules as earlier:
 
 Selected wave finished successfully. This phase still has incomplete plans, so phase-level verification and completion were intentionally skipped.
 
-/808:execute-phase {phase} ${808_WS}                # Continue remaining waves
-/808:execute-phase {phase} --wave {next} ${808_WS}  # Run the next wave explicitly
+/808:execute-phase {phase} ${AGENT_808_WS}                # Continue remaining waves
+/808:execute-phase {phase} --wave {next} ${AGENT_808_WS}  # Run the next wave explicitly
 ```
 
 **If no incomplete plans remain after the selected wave finishes:**
@@ -611,7 +611,7 @@ grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 |--------|--------|
 | `passed` | → update_roadmap |
 | `human_needed` | Present items for human testing, get approval or feedback |
-| `gaps_found` | Present gap summary, offer `/808:plan-phase {phase} --gaps ${808_WS}` |
+| `gaps_found` | Present gap summary, offer `/808:plan-phase {phase} --gaps ${AGENT_808_WS}` |
 
 **If human_needed:**
 
@@ -688,15 +688,15 @@ Items saved to `{phase_num}-HUMAN-UAT.md` — they will appear in `/808:progress
 ---
 ## ▶ Next Up
 
-`/808:plan-phase {X} --gaps ${808_WS}`
+`/808:plan-phase {X} --gaps ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 Also: `cat {phase_dir}/{phase_num}-VERIFICATION.md` — full report
-Also: `/808:verify-work {X} ${808_WS}` — manual testing first
+Also: `/808:verify-work {X} ${AGENT_808_WS}` — manual testing first
 ```
 
-Gap closure cycle: `/808:plan-phase {X} --gaps ${808_WS}` reads VERIFICATION.md → creates gap plans with `gap_closure: true` → user runs `/808:execute-phase {X} --gaps-only ${808_WS}` → verifier re-runs.
+Gap closure cycle: `/808:plan-phase {X} --gaps ${AGENT_808_WS}` reads VERIFICATION.md → creates gap plans with `gap_closure: true` → user runs `/808:execute-phase {X} --gaps-only ${AGENT_808_WS}` → verifier re-runs.
 </step>
 
 <step name="update_roadmap">
@@ -810,10 +810,10 @@ Read and follow `~/.claude/808/workflows/transition.md`, passing through the `--
 ```
 ## ✓ Phase {X}: {Name} Complete
 
-/808:progress ${808_WS} — see updated roadmap
-/808:discuss-phase {next} ${808_WS} — discuss next phase before planning
-/808:plan-phase {next} ${808_WS} — plan next phase
-/808:execute-phase {next} ${808_WS} — execute next phase
+/808:progress ${AGENT_808_WS} — see updated roadmap
+/808:discuss-phase {next} ${AGENT_808_WS} — discuss next phase before planning
+/808:plan-phase {next} ${AGENT_808_WS} — plan next phase
+/808:execute-phase {next} ${AGENT_808_WS} — execute next phase
 ```
 
 Only suggest the commands listed above. Do not invent or hallucinate command names.

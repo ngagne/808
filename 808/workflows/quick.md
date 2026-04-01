@@ -717,7 +717,7 @@ Commit: ${commit_hash}
 
 ---
 
-Ready for next task: /808:quick ${808_WS}
+Ready for next task: /808:quick ${AGENT_808_WS}
 ```
 
 **If NOT `$FULL_MODE`:**
@@ -734,7 +734,7 @@ Commit: ${commit_hash}
 
 ---
 
-Ready for next task: /808:quick ${808_WS}
+Ready for next task: /808:quick ${AGENT_808_WS}
 ```
 
 </process>

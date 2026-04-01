@@ -200,11 +200,11 @@ What would you like to do?
 [Primary action based on state - e.g.:]
 1. Resume interrupted agent [if interrupted agent found]
    OR
-1. Execute phase (/808:execute-phase {phase} ${808_WS})
+1. Execute phase (/808:execute-phase {phase} ${AGENT_808_WS})
    OR
-1. Discuss Phase 3 context (/808:discuss-phase 3 ${808_WS}) [if CONTEXT.md missing]
+1. Discuss Phase 3 context (/808:discuss-phase 3 ${AGENT_808_WS}) [if CONTEXT.md missing]
    OR
-1. Plan Phase 3 (/808:plan-phase 3 ${808_WS}) [if CONTEXT.md exists or discuss option declined]
+1. Plan Phase 3 (/808:plan-phase 3 ${AGENT_808_WS}) [if CONTEXT.md exists or discuss option declined]
 
 [Secondary options:]
 2. Review current phase status
@@ -235,7 +235,7 @@ Based on user selection, route to appropriate workflow:
 
   **{phase}-{plan}: [Plan Name]** — [objective from PLAN.md]
 
-  `/808:execute-phase {phase} ${808_WS}`
+  `/808:execute-phase {phase} ${AGENT_808_WS}`
 
   <sub>`/clear` first → fresh context window</sub>
 
@@ -249,15 +249,15 @@ Based on user selection, route to appropriate workflow:
 
   **Phase [N]: [Name]** — [Goal from ROADMAP.md]
 
-  `/808:plan-phase [phase-number] ${808_WS}`
+  `/808:plan-phase [phase-number] ${AGENT_808_WS}`
 
   <sub>`/clear` first → fresh context window</sub>
 
   ---
 
   **Also available:**
-  - `/808:discuss-phase [N] ${808_WS}` — gather context first
-  - `/808:research-phase [N] ${808_WS}` — investigate unknowns
+  - `/808:discuss-phase [N] ${AGENT_808_WS}` — gather context first
+  - `/808:research-phase [N] ${AGENT_808_WS}` — investigate unknowns
 
   ---
   ```

@@ -541,14 +541,14 @@ function withPlanningLock(cwd, fn) {
 
 /**
  * Get the .planning directory path, workstream-aware.
- * When a workstream is active (via explicit ws arg or 808_WORKSTREAM env var),
+ * When a workstream is active (via explicit ws arg or AGENT_808_WORKSTREAM env var),
  * returns `.planning/workstreams/{ws}/`. Otherwise returns `.planning/`.
  *
  * @param {string} cwd - project root
- * @param {string} [ws] - explicit workstream name; if omitted, checks 808_WORKSTREAM env var
+ * @param {string} [ws] - explicit workstream name; if omitted, checks AGENT_808_WORKSTREAM env var
  */
 function planningDir(cwd, ws) {
-  if (ws === undefined) ws = process.env.808_WORKSTREAM || null;
+  if (ws === undefined) ws = process.env.AGENT_808_WORKSTREAM || null;
   if (!ws) return path.join(cwd, '.planning');
   return path.join(cwd, '.planning', 'workstreams', ws);
 }

@@ -41,7 +41,7 @@ SUMMARY_FILES=$(ls "${PHASE_DIR}"/*-SUMMARY.md 2>/dev/null)
 
 - **State A** (`VALIDATION_FILE` non-empty): Audit existing
 - **State B** (`VALIDATION_FILE` empty, `SUMMARY_FILES` non-empty): Reconstruct from artifacts
-- **State C** (`SUMMARY_FILES` empty): Exit — "Phase {N} not executed. Run /808:execute-phase {N} ${808_WS} first."
+- **State C** (`SUMMARY_FILES` empty): Exit — "Phase {N} not executed. Run /808:execute-phase {N} ${AGENT_808_WS} first."
 
 ## 2. Discovery
 
@@ -144,14 +144,14 @@ node "$HOME/.claude/808/bin/808-tools.cjs" commit "docs(phase-${PHASE}): add/upd
 ```
 808 > PHASE {N} IS NYQUIST-COMPLIANT
 All requirements have automated verification.
-▶ Next: /808:audit-milestone ${808_WS}
+▶ Next: /808:audit-milestone ${AGENT_808_WS}
 ```
 
 **Partial:**
 ```
 808 > PHASE {N} VALIDATED (PARTIAL)
 {M} automated, {K} manual-only.
-▶ Retry: /808:validate-phase {N} ${808_WS}
+▶ Retry: /808:validate-phase {N} ${AGENT_808_WS}
 ```
 
 Display `/clear` reminder.

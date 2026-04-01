@@ -30,28 +30,28 @@ If no subcommand given, default to `list`.
 ## Step 2: Execute Operation
 
 ### list
-Run: `node "$808_TOOLS" workstream list --raw --cwd "$CWD"`
+Run: `node "$AGENT_808_TOOLS" workstream list --raw --cwd "$CWD"`
 Display the workstreams in a table format showing name, status, current phase, and progress.
 
 ### create
-Run: `node "$808_TOOLS" workstream create <name> --raw --cwd "$CWD"`
+Run: `node "$AGENT_808_TOOLS" workstream create <name> --raw --cwd "$CWD"`
 After creation, display the new workstream path and suggest next steps:
 - `/808:new-milestone --ws <name>` to set up the milestone
 
 ### status
-Run: `node "$808_TOOLS" workstream status <name> --raw --cwd "$CWD"`
+Run: `node "$AGENT_808_TOOLS" workstream status <name> --raw --cwd "$CWD"`
 Display detailed phase breakdown and state information.
 
 ### switch
-Run: `node "$808_TOOLS" workstream set <name> --raw --cwd "$CWD"`
-Also set `808_WORKSTREAM` env var for the current session.
+Run: `node "$AGENT_808_TOOLS" workstream set <name> --raw --cwd "$CWD"`
+Also set `AGENT_808_WORKSTREAM` env var for the current session.
 
 ### progress
-Run: `node "$808_TOOLS" workstream progress --raw --cwd "$CWD"`
+Run: `node "$AGENT_808_TOOLS" workstream progress --raw --cwd "$CWD"`
 Display a progress overview across all workstreams.
 
 ### complete
-Run: `node "$808_TOOLS" workstream complete <name> --raw --cwd "$CWD"`
+Run: `node "$AGENT_808_TOOLS" workstream complete <name> --raw --cwd "$CWD"`
 Archive the workstream to milestones/.
 
 ### resume
@@ -60,4 +60,4 @@ Set the workstream as active and suggest `/808:resume-work --ws <name>`.
 ## Step 3: Display Results
 
 Format the JSON output from 808-tools into a human-readable display.
-Include the `${808_WS}` flag in any routing suggestions.
+Include the `${AGENT_808_WORKSTREAM}` flag in any routing suggestions.

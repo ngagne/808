@@ -124,10 +124,10 @@ describe('convertClaudeToWindsurfMarkdown', () => {
     assert.ok(result.includes('StrReplace('), 'Edit -> StrReplace');
   });
 
-  test('replaces $ARGUMENTS with {{808_ARGS}}', () => {
+  test('replaces $ARGUMENTS with {{AGENT_808_ARGS}}', () => {
     const input = 'Pass $ARGUMENTS to the command.';
     const result = convertClaudeToWindsurfMarkdown(input);
-    assert.ok(result.includes('{{808_ARGS}}'), '$ARGUMENTS replaced');
+    assert.ok(result.includes('{{AGENT_808_ARGS}}'), '$ARGUMENTS replaced');
   });
 
   test('removes classifyHandoffIfNeeded workarounds', () => {

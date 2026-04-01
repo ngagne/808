@@ -22,7 +22,7 @@ const {
   strip808FromCodexConfig,
   mergeCodexConfig,
   install,
-  808_CODEX_MARKER,
+  AGENT_808_CODEX_MARKER,
   CODEX_AGENT_SANDBOX,
 } = require('../bin/install.js');
 
@@ -87,7 +87,7 @@ describe('getCodexSkillAdapterHeader', () => {
   test('includes correct invocation syntax', () => {
     const result = getCodexSkillAdapterHeader('808-plan-phase');
     assert.ok(result.includes('`$808-plan-phase`'), 'has $skillName invocation');
-    assert.ok(result.includes('{{808_ARGS}}'), 'has 808_ARGS variable');
+    assert.ok(result.includes('{{AGENT_808_ARGS}}'), 'has AGENT_808_ARGS variable');
   });
 
   test('section B maps AskUserQuestion parameters', () => {
@@ -263,7 +263,7 @@ describe('generateCodexConfigBlock', () => {
 
   test('starts with 808 marker', () => {
     const result = generateCodexConfigBlock(agents);
-    assert.ok(result.startsWith(808_CODEX_MARKER), 'starts with marker');
+    assert.ok(result.startsWith(AGENT_808_CODEX_MARKER), 'starts with marker');
   });
 
   test('does not include feature flags or agents table header', () => {
@@ -297,18 +297,18 @@ describe('generateCodexConfigBlock', () => {
 
 describe('strip808FromCodexConfig', () => {
   test('returns null for 808-only config', () => {
-    const content = `${808_CODEX_MARKER}\n[features]\nmulti_agent = true\n`;
+    const content = `${AGENT_808_CODEX_MARKER}\n[features]\nmulti_agent = true\n`;
     const result = strip808FromCodexConfig(content);
     assert.strictEqual(result, null, 'returns null when 808-only');
   });
 
   test('preserves user content before marker', () => {
-    const content = `[model]\nname = "o3"\n\n${808_CODEX_MARKER}\n[features]\nmulti_agent = true\n`;
+    const content = `[model]\nname = "o3"\n\n${AGENT_808_CODEX_MARKER}\n[features]\nmulti_agent = true\n`;
     const result = strip808FromCodexConfig(content);
     assert.ok(result.includes('[model]'), 'preserves user section');
     assert.ok(result.includes('name = "o3"'), 'preserves user values');
     assert.ok(!result.includes('multi_agent'), 'removes 808 content');
-    assert.ok(!result.includes(808_CODEX_MARKER), 'removes marker');
+    assert.ok(!result.includes(AGENT_808_CODEX_MARKER), 'removes marker');
   });
 
   test('strips injected feature keys without marker', () => {
@@ -328,13 +328,13 @@ describe('strip808FromCodexConfig', () => {
 
   test('strips injected keys above marker on uninstall', () => {
     // Case 3 install injects keys into [features] AND appends marker block
-    const content = `[model]\nname = "o3"\n\n[features]\nmulti_agent = true\ndefault_mode_request_user_input = true\nsome_custom_flag = true\n\n${808_CODEX_MARKER}\n[agents]\nmax_threads = 4\n`;
+    const content = `[model]\nname = "o3"\n\n[features]\nmulti_agent = true\ndefault_mode_request_user_input = true\nsome_custom_flag = true\n\n${AGENT_808_CODEX_MARKER}\n[agents]\nmax_threads = 4\n`;
     const result = strip808FromCodexConfig(content);
     assert.ok(result.includes('[model]'), 'preserves user model section');
     assert.ok(result.includes('some_custom_flag = true'), 'preserves user feature');
     assert.ok(!result.includes('multi_agent'), 'strips injected multi_agent');
     assert.ok(!result.includes('default_mode_request_user_input'), 'strips injected request_user_input');
-    assert.ok(!result.includes(808_CODEX_MARKER), 'strips marker');
+    assert.ok(!result.includes(AGENT_808_CODEX_MARKER), 'strips marker');
   });
 
   test('removes [agents.808-*] sections', () => {
@@ -368,7 +368,7 @@ describe('mergeCodexConfig', () => {
 
     assert.ok(fs.existsSync(configPath), 'file created');
     const content = fs.readFileSync(configPath, 'utf8');
-    assert.ok(content.includes(808_CODEX_MARKER), 'has marker');
+    assert.ok(content.includes(AGENT_808_CODEX_MARKER), 'has marker');
     assert.ok(content.includes('[agents.808-executor]'), 'has agent');
     assert.ok(!content.includes('[features]'), 'no features section');
     assert.ok(!content.includes('multi_agent'), 'no multi_agent');
@@ -391,7 +391,7 @@ describe('mergeCodexConfig', () => {
     assert.ok(content.includes('Updated description'), 'has new description');
     assert.ok(content.includes('[agents.808-planner]'), 'has new agent');
     // Verify no duplicate markers
-    const markerCount = (content.match(new RegExp(808_CODEX_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+    const markerCount = (content.match(new RegExp(AGENT_808_CODEX_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     assert.strictEqual(markerCount, 1, 'exactly one marker');
   });
 
@@ -403,7 +403,7 @@ describe('mergeCodexConfig', () => {
 
     const content = fs.readFileSync(configPath, 'utf8');
     assert.ok(content.includes('[model]'), 'preserves user content');
-    assert.ok(content.includes(808_CODEX_MARKER), 'adds marker');
+    assert.ok(content.includes(AGENT_808_CODEX_MARKER), 'adds marker');
     assert.ok(content.includes('[agents.808-executor]'), 'has agent');
   });
 
@@ -417,7 +417,7 @@ describe('mergeCodexConfig', () => {
     assert.ok(content.includes('other_feature = true'), 'preserves existing feature');
     assert.ok(!content.includes('multi_agent'), 'does not inject multi_agent');
     assert.ok(!content.includes('default_mode_request_user_input'), 'does not inject request_user_input');
-    assert.ok(content.includes(808_CODEX_MARKER), 'adds marker for agents block');
+    assert.ok(content.includes(AGENT_808_CODEX_MARKER), 'adds marker for agents block');
     assert.ok(content.includes('[agents.808-executor]'), 'has agent');
   });
 
@@ -442,7 +442,7 @@ describe('mergeCodexConfig', () => {
 
     const content = fs.readFileSync(configPath, 'utf8');
     const agent808AgentCount = (content.match(/^\[agents\.808-executor\]\s*$/gm) || []).length;
-    const markerCount = (content.match(new RegExp(808_CODEX_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+    const markerCount = (content.match(new RegExp(AGENT_808_CODEX_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
 
     assert.ok(content.includes('[model]'), 'preserves user content');
     assert.ok(content.includes('[agents.custom-agent]'), 'preserves non-808 agent section');
@@ -475,13 +475,13 @@ describe('mergeCodexConfig', () => {
     assert.ok(content.includes('other_feature = true'), 'preserves user feature keys');
     assert.ok(content.includes('[agents.808-executor]'), 'has agent');
     // Verify no duplicate markers
-    const markerCount = (content.match(new RegExp(808_CODEX_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+    const markerCount = (content.match(new RegExp(AGENT_808_CODEX_MARKER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     assert.strictEqual(markerCount, 1, 'exactly one marker');
   });
 
   test('case 2 does not inject feature keys', () => {
     const configPath = path.join(tmpDir, 'config.toml');
-    const manualContent = '[features]\nother_feature = true\n\n' + 808_CODEX_MARKER + '\n[agents.808-old]\ndescription = "old"\n';
+    const manualContent = '[features]\nother_feature = true\n\n' + AGENT_808_CODEX_MARKER + '\n[agents.808-old]\ndescription = "old"\n';
     fs.writeFileSync(configPath, manualContent);
 
     mergeCodexConfig(configPath, sampleBlock);
@@ -507,7 +507,7 @@ describe('mergeCodexConfig', () => {
       'description = "old"',
       'config_file = "agents/808-executor.toml"',
       '',
-      808_CODEX_MARKER,
+      AGENT_808_CODEX_MARKER,
       '',
       '[agents.808-executor]',
       'description = "Executes plans"',
@@ -522,7 +522,7 @@ describe('mergeCodexConfig', () => {
     assert.ok(content.includes('child_agents_md = false'), 'preserves user feature keys');
     assert.ok(content.includes('[agents.808-executor]'), 'has agent from fresh block');
     // Verify the leaked [agents] table header above marker was stripped
-    const markerIndex = content.indexOf(808_CODEX_MARKER);
+    const markerIndex = content.indexOf(AGENT_808_CODEX_MARKER);
     const beforeMarker = content.substring(0, markerIndex);
     assert.ok(!beforeMarker.match(/^\[agents\]\s*$/m), 'no leaked [agents] above marker');
     assert.ok(!beforeMarker.includes('[agents.808-'), 'no leaked [agents.808-*] above marker');
@@ -541,7 +541,7 @@ describe('mergeCodexConfig', () => {
       'description = "stale"',
       'config_file = "agents/808-executor.toml"',
       '',
-      808_CODEX_MARKER,
+      AGENT_808_CODEX_MARKER,
       '',
       '[agents.808-executor]',
       'description = "Executes plans"',
@@ -554,7 +554,7 @@ describe('mergeCodexConfig', () => {
     mergeCodexConfig(configPath, sampleBlock);
 
     const content = fs.readFileSync(configPath, 'utf8');
-    const markerIndex = content.indexOf(808_CODEX_MARKER);
+    const markerIndex = content.indexOf(AGENT_808_CODEX_MARKER);
     const beforeMarker = content.slice(0, markerIndex);
 
     assert.ok(content.includes('child_agents_md = false'), 'preserves user feature keys');
@@ -577,7 +577,7 @@ describe('mergeCodexConfig', () => {
       'description = "stale"',
       'config_file = "agents/808-executor.toml"',
       '',
-      808_CODEX_MARKER,
+      AGENT_808_CODEX_MARKER,
       '',
       '[agents.808-executor]',
       'description = "Executes plans"',
@@ -590,7 +590,7 @@ describe('mergeCodexConfig', () => {
     mergeCodexConfig(configPath, sampleBlock);
 
     const content = fs.readFileSync(configPath, 'utf8');
-    const markerIndex = content.indexOf(808_CODEX_MARKER);
+    const markerIndex = content.indexOf(AGENT_808_CODEX_MARKER);
     const beforeMarker = content.slice(0, markerIndex);
 
     assert.ok(beforeMarker.includes('[agents]\r\ndefault = "custom-agent"\r\n'), 'preserves user-authored [agents] table');
@@ -623,7 +623,7 @@ describe('mergeCodexConfig', () => {
 
     const content = fs.readFileSync(configPath, 'utf8');
     assert.ok(content.includes('[model]\r\nname = "o3"\r\n'), 'preserves existing CRLF content');
-    assert.ok(content.includes(`${808_CODEX_MARKER}\r\n`), 'writes marker with CRLF');
+    assert.ok(content.includes(`${AGENT_808_CODEX_MARKER}\r\n`), 'writes marker with CRLF');
     assertUsesOnlyEol(content, '\r\n');
   });
 
@@ -635,7 +635,7 @@ describe('mergeCodexConfig', () => {
 
     const content = fs.readFileSync(configPath, 'utf8');
     assert.ok(content.includes('# first line wins\n[model]\r\nname = "o3"'), 'preserves the existing mixed-EOL model content');
-    assert.ok(content.includes(`\n\n${808_CODEX_MARKER}\n`), 'writes the managed block using the first newline style');
+    assert.ok(content.includes(`\n\n${AGENT_808_CODEX_MARKER}\n`), 'writes the managed block using the first newline style');
   });
 });
 
@@ -666,7 +666,7 @@ describe('installCodexConfig (integration)', () => {
     const configPath = path.join(tmpTarget, 'config.toml');
     assert.ok(fs.existsSync(configPath), 'config.toml exists');
     const config = fs.readFileSync(configPath, 'utf8');
-    assert.ok(config.includes(808_CODEX_MARKER), 'has 808 marker');
+    assert.ok(config.includes(AGENT_808_CODEX_MARKER), 'has 808 marker');
     assert.ok(config.includes('[agents.808-executor]'), 'has executor agent');
     assert.ok(!config.includes('multi_agent'), 'no feature flags');
 

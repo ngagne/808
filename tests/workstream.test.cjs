@@ -36,8 +36,8 @@ describe('planningDir workstream awareness via env var', () => {
 
   after(() => cleanup(tmpDir));
 
-  test('state json returns workstream-scoped state when 808_WORKSTREAM is set', () => {
-    const result = run808Tools(['state', 'json', '--raw'], tmpDir, { 808_WORKSTREAM: 'alpha' });
+  test('state json returns workstream-scoped state when AGENT_808_WORKSTREAM is set', () => {
+    const result = run808Tools(['state', 'json', '--raw'], tmpDir, { AGENT_808_WORKSTREAM: 'alpha' });
     assert.ok(result.success, `state json failed: ${result.error}`);
     const data = JSON.parse(result.output);
     assert.ok(data.status || data.current_phase !== undefined, 'should return state data');
@@ -46,7 +46,7 @@ describe('planningDir workstream awareness via env var', () => {
   test('state json reads from flat .planning when no workstream set', () => {
     // Clear active-workstream so no auto-detection
     try { fs.unlinkSync(path.join(tmpDir, '.planning', 'active-workstream')); } catch {}
-    const result = run808Tools(['state', 'json', '--raw'], tmpDir, { 808_WORKSTREAM: '' });
+    const result = run808Tools(['state', 'json', '--raw'], tmpDir, { AGENT_808_WORKSTREAM: '' });
     // Should fail or return empty state since flat .planning/ has no STATE.md
     assert.ok(!result.success || result.output.includes('not found') || result.output === '{}',
       'should read from flat .planning/');
@@ -54,13 +54,13 @@ describe('planningDir workstream awareness via env var', () => {
     fs.writeFileSync(path.join(tmpDir, '.planning', 'active-workstream'), 'alpha\n');
   });
 
-  test('--ws flag overrides 808_WORKSTREAM env var', () => {
+  test('--ws flag overrides AGENT_808_WORKSTREAM env var', () => {
     // Create a second workstream
     const betaDir = path.join(tmpDir, '.planning', 'workstreams', 'beta');
     fs.mkdirSync(path.join(betaDir, 'phases'), { recursive: true });
     fs.writeFileSync(path.join(betaDir, 'STATE.md'), '# State\n**Status:** Beta active\n');
 
-    const result = run808Tools(['state', 'json', '--raw', '--ws', 'beta'], tmpDir, { 808_WORKSTREAM: 'alpha' });
+    const result = run808Tools(['state', 'json', '--raw', '--ws', 'beta'], tmpDir, { AGENT_808_WORKSTREAM: 'alpha' });
     assert.ok(result.success, `state json --ws beta failed: ${result.error}`);
   });
 });
@@ -401,11 +401,11 @@ describe('path traversal rejection', () => {
     }
   });
 
-  describe('808_WORKSTREAM env var rejects traversal attempts', () => {
+  describe('AGENT_808_WORKSTREAM env var rejects traversal attempts', () => {
     for (const name of maliciousNames) {
-      test(`rejects 808_WORKSTREAM=${name}`, () => {
-        const result = run808Tools(['workstream', 'list', '--raw'], tmpDir, { 808_WORKSTREAM: name });
-        assert.ok(!result.success, `should reject 808_WORKSTREAM=${name}`);
+      test(`rejects AGENT_808_WORKSTREAM=${name}`, () => {
+        const result = run808Tools(['workstream', 'list', '--raw'], tmpDir, { AGENT_808_WORKSTREAM: name });
+        assert.ok(!result.success, `should reject AGENT_808_WORKSTREAM=${name}`);
         assert.ok(result.error.includes('Invalid workstream name'), `error should mention invalid name for: ${name}`);
       });
     }
@@ -429,7 +429,7 @@ describe('path traversal rejection', () => {
       test(`rejects poisoned file containing ${name}`, () => {
         // Write malicious name directly to the active-workstream file
         fs.writeFileSync(path.join(tmpDir, '.planning', 'active-workstream'), name + '\n');
-        const result = run808Tools(['workstream', 'get'], tmpDir, { 808_WORKSTREAM: '' });
+        const result = run808Tools(['workstream', 'get'], tmpDir, { AGENT_808_WORKSTREAM: '' });
         assert.ok(result.success, 'get should succeed');
         const data = JSON.parse(result.output);
         // getActiveWorkstream should return null for invalid names

@@ -405,7 +405,7 @@ In flat mode, go directly to **Route B**.
 
 ```bash
 # Only check if we're in workstream mode
-if [ -n "$808_WORKSTREAM" ]; then
+if [ -n "$AGENT_808_WORKSTREAM" ]; then
   WS_LIST=$(node "$HOME/.claude/808/bin/808-tools.cjs" workstream list --raw)
 fi
 ```
@@ -413,7 +413,7 @@ fi
 Parse the JSON result. The output has `{ mode, workstreams: [...] }`.
 Each workstream entry has: `name`, `status`, `current_phase`, `phase_count`, `completed_phases`.
 
-Filter out the current workstream (`$808_WORKSTREAM`) and any workstreams with
+Filter out the current workstream (`$AGENT_808_WORKSTREAM`) and any workstreams with
 status containing "milestone complete" or "archived" (case-insensitive).
 The remaining entries are **other active workstreams**.
 
@@ -446,7 +446,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Plan Phase [X+1] in detail
 ```
 
-Exit skill and invoke SlashCommand("/808:plan-phase [X+1] --auto ${808_WS}")
+Exit skill and invoke SlashCommand("/808:plan-phase [X+1] --auto ${AGENT_808_WS}")
 
 **If CONTEXT.md does NOT exist:**
 
@@ -458,7 +458,7 @@ Next: Phase [X+1] — [Name]
 ⚡ Auto-continuing: Discuss Phase [X+1] first
 ```
 
-Exit skill and invoke SlashCommand("/808:discuss-phase [X+1] --auto ${808_WS}")
+Exit skill and invoke SlashCommand("/808:discuss-phase [X+1] --auto ${AGENT_808_WS}")
 
 </if>
 
@@ -475,15 +475,15 @@ Exit skill and invoke SlashCommand("/808:discuss-phase [X+1] --auto ${808_WS}")
 
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 
-`/808:discuss-phase [X+1] ${808_WS}` — gather context and clarify approach
+`/808:discuss-phase [X+1] ${AGENT_808_WS}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:plan-phase [X+1] ${808_WS}` — skip discussion, plan directly
-- `/808:research-phase [X+1] ${808_WS}` — investigate unknowns
+- `/808:plan-phase [X+1] ${AGENT_808_WS}` — skip discussion, plan directly
+- `/808:research-phase [X+1] ${AGENT_808_WS}` — investigate unknowns
 
 ---
 ```
@@ -500,15 +500,15 @@ Exit skill and invoke SlashCommand("/808:discuss-phase [X+1] --auto ${808_WS}")
 **Phase [X+1]: [Name]** — [Goal from ROADMAP.md]
 <sub>✓ Context gathered, ready to plan</sub>
 
-`/808:plan-phase [X+1] ${808_WS}`
+`/808:plan-phase [X+1] ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/808:discuss-phase [X+1] ${808_WS}` — revisit context
-- `/808:research-phase [X+1] ${808_WS}` — investigate unknowns
+- `/808:discuss-phase [X+1] ${AGENT_808_WS}` — revisit context
+- `/808:research-phase [X+1] ${AGENT_808_WS}` — investigate unknowns
 
 ---
 ```
@@ -554,11 +554,11 @@ This workstream's phases are complete. Other workstreams are still active:
 
 Archive this workstream:
 
-`/808:workstreams complete {current_ws_name} ${808_WS}`
+`/808:workstreams complete {current_ws_name} ${AGENT_808_WS}`
 
 See overall milestone progress:
 
-`/808:workstreams progress ${808_WS}`
+`/808:workstreams progress ${AGENT_808_WS}`
 
 <sub>Milestone completion will be available once all workstreams finish.</sub>
 
@@ -593,7 +593,7 @@ Phase {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke SlashCommand("/808:complete-milestone {version} ${808_WS}")
+Exit skill and invoke SlashCommand("/808:complete-milestone {version} ${AGENT_808_WS}")
 
 </if>
 
@@ -610,7 +610,7 @@ Exit skill and invoke SlashCommand("/808:complete-milestone {version} ${808_WS}"
 
 **Complete Milestone {version}** — archive and prepare for next
 
-`/808:complete-milestone {version} ${808_WS}`
+`/808:complete-milestone {version} ${AGENT_808_WS}`
 
 <sub>`/clear` first → fresh context window</sub>
 

@@ -724,7 +724,7 @@ function buildStateFrontmatter(bodyContent, cwd) {
     normalizedStatus = 'executing';
   }
 
-  const fm = { 808_state_version: '1.0' };
+  const fm = { agent_808_state_version: '1.0' };
 
   if (milestone) fm.milestone = milestone;
   if (milestoneName) fm.milestone_name = milestoneName;

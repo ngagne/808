@@ -619,6 +619,7 @@ function convertClaudeToCopilotContent(content, isGlobal = false) {
   } else {
     c = c.replace(/\$HOME\/\.claude\//g, '.github/');
     c = c.replace(/~\/\.claude\//g, '.github/');
+    c = c.replace(/~\/\.claude$/g, '.github/');
   }
   c = c.replace(/\.\/\.claude\//g, './.github/');
   c = c.replace(/\.claude\//g, '.github/');
@@ -840,7 +841,7 @@ function convertClaudeToCursorMarkdown(content) {
   converted = converted.replace(/\bAskUserQuestion\b/g, 'conversational prompting');
   // Replace subagent_type from Claude to Cursor format
   converted = converted.replace(/subagent_type="general-purpose"/g, 'subagent_type="generalPurpose"');
-  converted = converted.replace(/\$ARGUMENTS\b/g, '{{808_ARGS}}');
+  converted = converted.replace(/\$ARGUMENTS\b/g, '{{AGENT_808_ARGS}}');
   // Replace project-level Claude conventions with Cursor equivalents
   converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`.cursor/rules/`');
   converted = converted.replace(/\.\/CLAUDE\.md/g, '.cursor/rules/');
@@ -859,8 +860,8 @@ function getCursorSkillAdapterHeader(skillName) {
   return `<cursor_skill_adapter>
 ## A. Skill Invocation
 - This skill is invoked when the user mentions \`${skillName}\` or describes a task matching this skill.
-- Treat all user text after the skill mention as \`{{808_ARGS}}\`.
-- If no arguments are present, treat \`{{808_ARGS}}\` as empty.
+- Treat all user text after the skill mention as \`{{AGENT_808_ARGS}}\`.
+- If no arguments are present, treat \`{{AGENT_808_ARGS}}\` as empty.
 
 ## B. User Prompting
 When the workflow needs user input, prompt the user conversationally:
@@ -958,7 +959,7 @@ function convertClaudeToWindsurfMarkdown(content) {
   converted = converted.replace(/\bAskUserQuestion\b/g, 'conversational prompting');
   // Replace subagent_type from Claude to Windsurf format
   converted = converted.replace(/subagent_type="general-purpose"/g, 'subagent_type="generalPurpose"');
-  converted = converted.replace(/\$ARGUMENTS\b/g, '{{808_ARGS}}');
+  converted = converted.replace(/\$ARGUMENTS\b/g, '{{AGENT_808_ARGS}}');
   // Replace project-level Claude conventions with Windsurf equivalents
   converted = converted.replace(/`\.\/CLAUDE\.md`/g, '`.windsurf/rules/`');
   converted = converted.replace(/\.\/CLAUDE\.md/g, '.windsurf/rules/');
@@ -977,8 +978,8 @@ function getWindsurfSkillAdapterHeader(skillName) {
   return `<windsurf_skill_adapter>
 ## A. Skill Invocation
 - This skill is invoked when the user mentions \`${skillName}\` or describes a task matching this skill.
-- Treat all user text after the skill mention as \`{{808_ARGS}}\`.
-- If no arguments are present, treat \`{{808_ARGS}}\` as empty.
+- Treat all user text after the skill mention as \`{{AGENT_808_ARGS}}\`.
+- If no arguments are present, treat \`{{AGENT_808_ARGS}}\` as empty.
 
 ## B. User Prompting
 When the workflow needs user input, prompt the user conversationally:
@@ -1045,7 +1046,7 @@ function convertSlashCommandsToCodexSkillMentions(content) {
 
 function convertClaudeToCodexMarkdown(content) {
   let converted = convertSlashCommandsToCodexSkillMentions(content);
-  converted = converted.replace(/\$ARGUMENTS\b/g, '{{808_ARGS}}');
+  converted = converted.replace(/\$ARGUMENTS\b/g, '{{AGENT_808_ARGS}}');
   // Runtime-neutral agent name replacement (#766)
   converted = neutralizeAgentReferences(converted, 'AGENTS.md');
   return converted;
@@ -1056,8 +1057,8 @@ function getCodexSkillAdapterHeader(skillName) {
   return `<codex_skill_adapter>
 ## A. Skill Invocation
 - This skill is invoked by mentioning \`${invocation}\`.
-- Treat all user text after \`${invocation}\` as \`{{808_ARGS}}\`.
-- If no arguments are present, treat \`{{808_ARGS}}\` as empty.
+- Treat all user text after \`${invocation}\` as \`{{AGENT_808_ARGS}}\`.
+- If no arguments are present, treat \`{{AGENT_808_ARGS}}\` as empty.
 
 ## B. AskUserQuestion → request_user_input Mapping
 808 workflows use \`AskUserQuestion\` (Claude Code syntax). Translate to Codex \`request_user_input\`:

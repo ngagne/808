@@ -25,8 +25,8 @@ const {
   convertClaudeCommandToCopilotSkill,
   convertClaudeAgentToCopilotAgent,
   copyCommandsAsCopilotSkills,
-  808_COPILOT_INSTRUCTIONS_MARKER,
-  808_COPILOT_INSTRUCTIONS_CLOSE_MARKER,
+  AGENT_808_COPILOT_INSTRUCTIONS_MARKER,
+  AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER,
   mergeCopilotInstructions,
   strip808FromCopilotInstructions,
   writeManifest,
@@ -789,7 +789,7 @@ describe('Copilot instructions merge/strip', () => {
   const agent808Content = '- Follow project conventions\n- Use structured workflows';
 
   function makeagent808Block(content) {
-    return 808_COPILOT_INSTRUCTIONS_MARKER + '\n' + content.trim() + '\n' + 808_COPILOT_INSTRUCTIONS_CLOSE_MARKER;
+    return AGENT_808_COPILOT_INSTRUCTIONS_MARKER + '\n' + content.trim() + '\n' + AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER;
   }
 
   describe('mergeCopilotInstructions', () => {
@@ -809,8 +809,8 @@ describe('Copilot instructions merge/strip', () => {
 
       assert.ok(fs.existsSync(filePath), 'file was created');
       const result = fs.readFileSync(filePath, 'utf8');
-      assert.ok(result.includes(808_COPILOT_INSTRUCTIONS_MARKER), 'has opening marker');
-      assert.ok(result.includes(808_COPILOT_INSTRUCTIONS_CLOSE_MARKER), 'has closing marker');
+      assert.ok(result.includes(AGENT_808_COPILOT_INSTRUCTIONS_MARKER), 'has opening marker');
+      assert.ok(result.includes(AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER), 'has closing marker');
       assert.ok(result.includes('Follow project conventions'), 'has 808 content');
     });
 
@@ -840,10 +840,10 @@ describe('Copilot instructions merge/strip', () => {
 
       assert.ok(result.includes('# My Custom Instructions'), 'original content preserved');
       assert.ok(result.includes('Do things my way.'), 'original text preserved');
-      assert.ok(result.includes(808_COPILOT_INSTRUCTIONS_MARKER), '808 block appended');
+      assert.ok(result.includes(AGENT_808_COPILOT_INSTRUCTIONS_MARKER), '808 block appended');
       assert.ok(result.includes('Follow project conventions'), '808 content appended');
       // Verify separator exists
-      assert.ok(result.includes('Do things my way.\n\n' + 808_COPILOT_INSTRUCTIONS_MARKER),
+      assert.ok(result.includes('Do things my way.\n\n' + AGENT_808_COPILOT_INSTRUCTIONS_MARKER),
         'double newline separator before 808 block');
     });
 
@@ -858,8 +858,8 @@ describe('Copilot instructions merge/strip', () => {
 
       assert.ok(!result.includes('Old instructions'), 'old content removed');
       assert.ok(result.includes('Updated instructions'), 'new content present');
-      assert.ok(result.includes(808_COPILOT_INSTRUCTIONS_MARKER), 'has opening marker');
-      assert.ok(result.includes(808_COPILOT_INSTRUCTIONS_CLOSE_MARKER), 'has closing marker');
+      assert.ok(result.includes(AGENT_808_COPILOT_INSTRUCTIONS_MARKER), 'has opening marker');
+      assert.ok(result.includes(AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER), 'has closing marker');
     });
 
     test('preserves user content before and after markers', () => {
@@ -877,7 +877,7 @@ describe('Copilot instructions merge/strip', () => {
       assert.ok(result.includes('Follow project conventions'), 'new 808 content between markers');
       // Verify ordering: before → 808 → after
       const setupIdx = result.indexOf('# My Setup');
-      const markerIdx = result.indexOf(808_COPILOT_INSTRUCTIONS_MARKER);
+      const markerIdx = result.indexOf(AGENT_808_COPILOT_INSTRUCTIONS_MARKER);
       const notesIdx = result.indexOf('# My Notes');
       assert.ok(setupIdx < markerIdx, 'user setup comes before 808 block');
       assert.ok(markerIdx < notesIdx, '808 block comes before user notes');
@@ -899,8 +899,8 @@ describe('Copilot instructions merge/strip', () => {
       assert.ok(result !== null, 'does not return null');
       assert.ok(result.includes('# My Setup'), 'user content preserved');
       assert.ok(result.includes('Custom rules here.'), 'user text preserved');
-      assert.ok(!result.includes(808_COPILOT_INSTRUCTIONS_MARKER), 'opening marker removed');
-      assert.ok(!result.includes(808_COPILOT_INSTRUCTIONS_CLOSE_MARKER), 'closing marker removed');
+      assert.ok(!result.includes(AGENT_808_COPILOT_INSTRUCTIONS_MARKER), 'opening marker removed');
+      assert.ok(!result.includes(AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER), 'closing marker removed');
       assert.ok(!result.includes('808 stuff'), '808 content removed');
     });
 
@@ -911,7 +911,7 @@ describe('Copilot instructions merge/strip', () => {
       assert.ok(result !== null, 'does not return null');
       assert.ok(result.includes('# My Notes'), 'user content after preserved');
       assert.ok(result.includes('Personal notes.'), 'user text after preserved');
-      assert.ok(!result.includes(808_COPILOT_INSTRUCTIONS_MARKER), 'opening marker removed');
+      assert.ok(!result.includes(AGENT_808_COPILOT_INSTRUCTIONS_MARKER), 'opening marker removed');
       assert.ok(!result.includes('808 stuff'), '808 content removed');
     });
 
@@ -923,7 +923,7 @@ describe('Copilot instructions merge/strip', () => {
       assert.ok(result.includes('# Before'), 'content before preserved');
       assert.ok(result.includes('# After'), 'content after preserved');
       assert.ok(!result.includes('808 middle'), '808 content removed');
-      assert.ok(!result.includes(808_COPILOT_INSTRUCTIONS_MARKER), 'markers removed');
+      assert.ok(!result.includes(AGENT_808_COPILOT_INSTRUCTIONS_MARKER), 'markers removed');
     });
 
     test('returns original content when no markers found', () => {
@@ -972,9 +972,9 @@ describe('Copilot uninstall skill removal', () => {
 
   test('cleans 808 section from copilot-instructions.md on uninstall', () => {
     const content = '# My Setup\n\nMy custom rules.\n\n' +
-      808_COPILOT_INSTRUCTIONS_MARKER + '\n' +
+      AGENT_808_COPILOT_INSTRUCTIONS_MARKER + '\n' +
       '- 808 managed content\n' +
-      808_COPILOT_INSTRUCTIONS_CLOSE_MARKER + '\n';
+      AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER + '\n';
 
     const result = strip808FromCopilotInstructions(content);
 
@@ -982,13 +982,13 @@ describe('Copilot uninstall skill removal', () => {
     assert.ok(result.includes('# My Setup'), 'user content preserved');
     assert.ok(result.includes('My custom rules.'), 'user text preserved');
     assert.ok(!result.includes('808 managed content'), '808 content removed');
-    assert.ok(!result.includes(808_COPILOT_INSTRUCTIONS_MARKER), 'markers removed');
+    assert.ok(!result.includes(AGENT_808_COPILOT_INSTRUCTIONS_MARKER), 'markers removed');
   });
 
   test('deletes copilot-instructions.md when 808-only on uninstall', () => {
-    const content = 808_COPILOT_INSTRUCTIONS_MARKER + '\n' +
+    const content = AGENT_808_COPILOT_INSTRUCTIONS_MARKER + '\n' +
       '- Only 808 content\n' +
-      808_COPILOT_INSTRUCTIONS_CLOSE_MARKER + '\n';
+      AGENT_808_COPILOT_INSTRUCTIONS_CLOSE_MARKER + '\n';
 
     const result = strip808FromCopilotInstructions(content);
 
