@@ -1,7 +1,7 @@
 {
   "name": "808",
   "version": "1.30.0",
-  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by TÂCHES.",
+  "description": "Spec-driven multi-agent development framework built on GSD by TÂCHES, enabling parallel execution and consensus-based verification across security, SRE, performance, architecture, and standards for greenfield and brownfield systems.",
   "bin": {
     "808": "bin/install.js"
   },

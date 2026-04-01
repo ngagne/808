@@ -1,8 +1,8 @@
 # 808
 
-**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini CLI, Codex, Copilot, Cursor, Windsurf, and Antigravity.**
+**Spec-driven multi-agent development framework built on GSD by TÂCHES, enabling parallel execution and consensus-based verification across security, SRE, performance, architecture, and standards for greenfield and brownfield systems.**
 
-**Solves context rot — the quality degradation that happens as Claude fills its context window.**
+**Solves context rot — the quality degradation that happens as agents fill their context window.**
 
 ```bash
 npx 808@latest
@@ -20,7 +20,7 @@ npx 808@latest
 
 Vibecoding has a bad reputation. You describe what you want, AI generates code, and you get inconsistent garbage that falls apart at scale.
 
-808 fixes that. It's the context engineering layer that makes Claude Code reliable. Describe your idea, let the system extract everything it needs to know, and let Claude Code get to work.
+808 fixes that. It's the context engineering layer that makes agents reliable. Describe your idea, let the system extract everything it needs to know, and let the agent get to work.
 
 ---
 
