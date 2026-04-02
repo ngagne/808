@@ -360,7 +360,164 @@ test -f "${PHASE_DIR}/${PADDED_PHASE}-VALIDATION.md" && echo "VALIDATION_CREATED
 
 **If not found:** Warn and continue — plans may fail Dimension 8.
 
-## 5.6. UI Design Contract Gate
+## 5.6. API Schema Design Gate (Design-First)
+
+> Skip if `workflow.api_schema_first` is explicitly `false` in `.planning/config.json`. If absent, treat as enabled.
+
+**Design-First Principle:** When a phase modifies or creates API surfaces (REST, GraphQL, AsyncAPI, gRPC, etc.), the API schema should be updated to reflect the target state *before* implementation planning. This catches API design-level issues early, enables parallel frontend/backend work, and avoids costly refactors.
+
+```bash
+API_SCHEMA_CFG=$(node "$HOME/.claude/808/bin/808-tools.cjs" config-get workflow.api_schema_first 2>/dev/null || echo "true")
+```
+
+**If `API_SCHEMA_CFG` is `false`:** Skip to step 5.7.
+
+**Detect API-related phases:**
+
+```bash
+PHASE_SECTION=$(node "$HOME/.claude/808/bin/808-tools.cjs" roadmap get-phase "${PHASE}" 2>/dev/null)
+echo "$PHASE_SECTION" | grep -iE "API|endpoint|route|controller|GraphQL|REST|AsyncAPI|OpenAPI|Swagger|gRPC|WebSocket|event|pubsub|schema|contract|integration" > /dev/null 2>&1
+HAS_API=$?
+```
+
+**If `HAS_API` is 0 (API indicators found):**
+
+Check for existing API schema artifacts:
+```bash
+API_SCHEMA_FILES=$(ls "${PHASE_DIR}"/*-API-SPEC.md "${PHASE_DIR}"/*-OPENAPI.md "${PHASE_DIR}"/*-GRAPHQL-SPEC.md "${PHASE_DIR}"/*-ASYNC-API.md 2>/dev/null | head -1)
+```
+
+**If API schema file found:** Set `API_SPEC_PATH=$API_SCHEMA_FILES`. Display: `Using API design contract: ${API_SPEC_PATH}`. Continue to step 5.7.
+
+**If no API schema file found:**
+
+If `TEXT_MODE` is true, present as a plain-text numbered list:
+```
+Phase {N} has API indicators but no API schema spec. Design-first approach recommended:
+
+1. Generate API-SPEC first — Define API contract before planning implementation
+2. Continue without API-SPEC — Plan implementation directly (not recommended)
+3. Not an API phase — Skip API schema gate
+
+Enter number:
+```
+
+Otherwise use AskUserQuestion:
+- header: "API Design-First"
+- question: "Phase {N} has API indicators but no API schema spec. Design-first approach recommended."
+- options:
+  - "Generate API-SPEC first" → Continue to API schema generation below.
+  - "Continue without API-SPEC" → Continue to step 5.7.
+  - "Not an API phase" → Continue to step 5.7.
+
+**If user selects "Generate API-SPEC first":**
+
+Display banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 808 ► API SCHEMA DESIGN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Design-first: Define API contract before implementation planning.
+```
+
+**Determine API type from phase description:**
+
+```bash
+# Detect API type from phase section keywords
+if echo "$PHASE_SECTION" | grep -qiE "GraphQL|graphql|schema|typedef"; then
+  API_TYPE="graphql"
+elif echo "$PHASE_SECTION" | grep -qiE "AsyncAPI|event|pubsub|message|queue"; then
+  API_TYPE="asyncapi"
+elif echo "$PHASE_SECTION" | grep -qiE "gRPC|protobuf"; then
+  API_TYPE="grpc"
+else
+  API_TYPE="openapi"  # Default to REST/OpenAPI
+fi
+```
+
+**Spawn 808-api-designer agent:**
+
+```bash
+API_DESIGNER_MODEL=$(node "$HOME/.claude/808/bin/808-tools.cjs" resolve-model 808-planner --raw)
+AGENT_SKILLS_API_DESIGNER=$(node "$HOME/.claude/808/bin/808-tools.cjs" agent-skills 808-api-designer 2>/dev/null)
+```
+
+API schema prompt:
+
+```markdown
+<objective>
+Design the API schema for Phase {phase_number}: {phase_name}
+Answer: "What should the API contract look like in the target state?"
+</objective>
+
+<files_to_read>
+- {context_path} (USER DECISIONS from /808:discuss-phase)
+- {requirements_path} (Project requirements)
+- {research_path} (Technical Research — includes API patterns if researched)
+- {state_path} (Project decisions and existing API conventions)
+</files_to_read>
+
+${AGENT_SKILLS_API_DESIGNER}
+
+<additional_context>
+**Phase description:** {phase_description}
+**Phase requirement IDs (MUST address):** {phase_req_ids}
+**API Type:** {API_TYPE} (OpenAPI/Swagger | GraphQL | AsyncAPI | gRPC)
+
+**Design-First Principles:**
+- Define the *target state* API contract, not the current state
+- Focus on developer experience and API ergonomics
+- Consider versioning strategy if this modifies existing APIs
+- Identify breaking changes vs backward-compatible additions
+- Document error responses and edge cases
+
+**Output Format:**
+- For REST: OpenAPI 3.0 spec (YAML or markdown with OpenAPI blocks)
+- For GraphQL: Schema typedefs with resolver signatures
+- For AsyncAPI: AsyncAPI 2.x spec with channel definitions
+- For gRPC: Protocol buffer definitions
+
+**Project instructions:** Read ./CLAUDE.md if exists — follow project-specific API guidelines
+**Existing API patterns:** Check existing API specs in the project for consistency
+</additional_context>
+
+<output>
+Write to: ${PHASE_DIR}/${PADDED_PHASE}-API-SPEC.md
+</output>
+```
+
+```
+Task(
+  prompt=api_design_prompt,
+  subagent_type="808-api-designer",
+  model="{API_DESIGNER_MODEL}",
+  description="Design API schema for Phase {phase}"
+)
+```
+
+**Handle API Designer Return:**
+
+- **`## API DESIGN COMPLETE`:** Display confirmation, set `API_SPEC_PATH=${PHASE_DIR}/${PADDED_PHASE}-API-SPEC.md`
+- **`## API DESIGN BLOCKED`:** Display blocker, offer: 1) Provide more context, 2) Skip API spec, 3) Abort
+
+**If API spec created:**
+
+Commit (if `commit_docs`):
+```bash
+node "$HOME/.claude/808/bin/808-tools.cjs" commit "docs(phase-${PHASE}): add API schema design" --files "${API_SPEC_PATH}"
+```
+
+Display:
+```
+✓ API schema designed: ${API_SPEC_PATH}
+
+This contract will guide implementation planning and enable parallel frontend work.
+```
+
+**If `HAS_API` is 1 (no API indicators):** Skip silently to step 5.7.
+
+## 5.7. UI Design Contract Gate
 
 > Skip if `workflow.ui_phase` is explicitly `false` AND `workflow.ui_safety_gate` is explicitly `false` in `.planning/config.json`. If keys are absent, treat as enabled.
 
@@ -488,6 +645,7 @@ Planner prompt:
 - {uat_path} (UAT Gaps - if --gaps)
 - {reviews_path} (Cross-AI Review Feedback - if --reviews)
 - {UI_SPEC_PATH} (UI Design Contract — visual/interaction specs, if exists)
+- {API_SPEC_PATH} (API Schema — contract definition, if exists)
 </files_to_read>
 
 ${AGENT_SKILLS_PLANNER}
@@ -587,6 +745,7 @@ Checker prompt:
 - {requirements_path} (Requirements)
 - {context_path} (USER DECISIONS from /808:discuss-phase)
 - {research_path} (Technical Research — includes Validation Architecture)
+- {API_SPEC_PATH} (API Schema — verify plans implement the contract correctly, if exists)
 </files_to_read>
 
 ${AGENT_SKILLS_CHECKER}
@@ -795,6 +954,7 @@ Output this markdown directly (not as a code block):
 | 2    | 03     | [objective]  |
 
 Research: {Completed | Used existing | Skipped}
+API Schema: {Designed | Used existing | Skipped | Not an API phase}
 Verification: {Passed | Passed with override | Skipped}
 
 ───────────────────────────────────────────────────────────────
@@ -849,10 +1009,13 @@ If freezes persist, try `--skip-research` to reduce the agent chain from 3 to 2 
 - [ ] CONTEXT.md loaded early (step 4) and passed to ALL agents
 - [ ] Research completed (unless --skip-research or --gaps or exists)
 - [ ] 808-phase-researcher spawned with CONTEXT.md
+- [ ] API schema designed (if API phase and design-first enabled)
+- [ ] 808-api-designer spawned with CONTEXT.md (if API phase)
+- [ ] API-SPEC.md passed to planner and checker
 - [ ] Existing plans checked
-- [ ] 808-planner spawned with CONTEXT.md + RESEARCH.md
+- [ ] 808-planner spawned with CONTEXT.md + RESEARCH.md + API-SPEC.md
 - [ ] Plans created (PLANNING COMPLETE or CHECKPOINT handled)
-- [ ] 808-plan-checker spawned with CONTEXT.md
+- [ ] 808-plan-checker spawned with CONTEXT.md + API-SPEC.md
 - [ ] Verification passed OR user override OR max iterations with user decision
 - [ ] User sees status between agent spawns
 - [ ] User knows next steps

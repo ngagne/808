@@ -20,6 +20,7 @@ Model profiles control which Claude model each 808 agent uses. This allows balan
 | 808-plan-checker | sonnet | sonnet | haiku | inherit |
 | 808-integration-checker | sonnet | sonnet | haiku | inherit |
 | 808-nyquist-auditor | sonnet | sonnet | haiku | inherit |
+| 808-api-designer | opus | sonnet | sonnet | inherit |
 
 ## Profile Philosophy
 

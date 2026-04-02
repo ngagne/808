@@ -22,6 +22,7 @@ const MODEL_PROFILES = {
   '808-ui-researcher': { quality: 'opus', balanced: 'sonnet', budget: 'haiku' },
   '808-ui-checker': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
   '808-ui-auditor': { quality: 'sonnet', balanced: 'sonnet', budget: 'haiku' },
+  '808-api-designer': { quality: 'opus', balanced: 'sonnet', budget: 'sonnet' },
 };
 const VALID_PROFILES = Object.keys(MODEL_PROFILES['808-planner']);
 
