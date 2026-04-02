@@ -79,6 +79,7 @@ function cmdInitExecutePhase(cwd, phase, raw) {
     // Models
     executor_model: resolveModelInternal(cwd, '808-executor'),
     verifier_model: resolveModelInternal(cwd, '808-verifier'),
+    security_reviewer_model: resolveModelInternal(cwd, '808-security-reviewer'),
 
     // Config flags
     commit_docs: config.commit_docs,
@@ -89,6 +90,7 @@ function cmdInitExecutePhase(cwd, phase, raw) {
     phase_branch_template: config.phase_branch_template,
     milestone_branch_template: config.milestone_branch_template,
     verifier_enabled: config.verifier,
+    security_reviewer_enabled: config.security_reviewer,
 
     // Phase info
     phase_found: !!phaseInfo,
@@ -421,9 +423,11 @@ function cmdInitQuick(cwd, description, raw) {
     executor_model: resolveModelInternal(cwd, '808-executor'),
     checker_model: resolveModelInternal(cwd, '808-plan-checker'),
     verifier_model: resolveModelInternal(cwd, '808-verifier'),
+    security_reviewer_model: resolveModelInternal(cwd, '808-security-reviewer'),
 
     // Config
     commit_docs: config.commit_docs,
+    security_reviewer_enabled: config.security_reviewer,
     branch_name: quickBranchName,
 
     // Quick task info

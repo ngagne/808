@@ -15,6 +15,7 @@ Model profiles control which Claude model each 808 agent uses. This allows balan
 | 808-debugger | opus | sonnet | sonnet | inherit |
 | 808-codebase-mapper | sonnet | haiku | haiku | inherit |
 | 808-verifier | sonnet | sonnet | haiku | inherit |
+| 808-security-reviewer | opus | sonnet | sonnet | inherit |
 | 808-plan-checker | sonnet | sonnet | haiku | inherit |
 | 808-integration-checker | sonnet | sonnet | haiku | inherit |
 | 808-nyquist-auditor | sonnet | sonnet | haiku | inherit |
@@ -128,6 +129,12 @@ Executors follow explicit PLAN.md instructions. The plan already contains the re
 
 **Why Sonnet (not Haiku) for verifiers in balanced?**
 Verification requires goal-backward reasoning - checking if code *delivers* what the phase promised, not just pattern matching. Sonnet handles this well; Haiku may miss subtle gaps.
+
+**Why Opus for 808-security-reviewer in quality?**
+Security review requires expert-level pattern recognition, threat modeling, and understanding of attack vectors. Opus provides deeper security knowledge and better identification of subtle vulnerabilities like injection patterns, authentication flaws, and cryptographic weaknesses.
+
+**Why Sonnet for 808-security-reviewer in balanced?**
+Security review with Sonnet still provides strong vulnerability detection for common issues (OWASP Top 10, hardcoded secrets, missing validation). Suitable for most development workflows where critical security audits are done by human experts.
 
 **Why Haiku for 808-codebase-mapper?**
 Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.

@@ -33,6 +33,7 @@ Always use the exact name from this list — do not fall back to 'general-purpos
 
 - 808-executor — Executes plan tasks, commits, creates SUMMARY.md
 - 808-verifier — Verifies phase completion, checks quality gates
+- 808-security-reviewer — Security expert review for vulnerabilities and OWASP compliance
 - 808-planner — Creates detailed plans from phase scope
 - 808-phase-researcher — Researches technical approaches for a phase
 - 808-plan-checker — Reviews plan quality before execution
@@ -66,7 +67,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 AGENT_SKILLS=$(node "$HOME/.claude/808/bin/808-tools.cjs" agent-skills 808-executor 2>/dev/null)
 ```
 
-Parse JSON for: `executor_model`, `verifier_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`.
+Parse JSON for: `executor_model`, `verifier_model`, `security_reviewer_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `security_reviewer_enabled`.
 
 **If `phase_found` is false:** Error — phase directory not found.
 **If `plan_count` is 0:** Error — no plans found in phase.
@@ -697,6 +698,108 @@ Also: `/808:verify-work {X} ${AGENT_808_WS}` — manual testing first
 ```
 
 Gap closure cycle: `/808:plan-phase {X} --gaps ${AGENT_808_WS}` reads VERIFICATION.md → creates gap plans with `gap_closure: true` → user runs `/808:execute-phase {X} --gaps-only ${AGENT_808_WS}` → verifier re-runs.
+</step>
+
+<step name="security_review">
+**Security review (if enabled):** Spawn security expert subagent to review phase deliverables for vulnerabilities.
+
+```bash
+SECURITY_REVIEWER_SKILLS=$(node "$HOME/.claude/808/bin/808-tools.cjs" agent-skills 808-security-reviewer 2>/dev/null)
+```
+
+**Check if enabled:**
+```bash
+if [ "$security_reviewer_enabled" = "true" ]; then
+  # Spawn security reviewer
+fi
+```
+
+```
+Task(
+  prompt="Security review of phase {phase_number} deliverables.
+Phase directory: {phase_dir}
+Phase goal: {goal from ROADMAP.md}
+Phase requirement IDs: {phase_req_ids}
+Review codebase for vulnerabilities, OWASP Top 10 compliance, and security best practices.
+Cross-reference with VERIFICATION.md findings if it exists.
+Create SECURITY-REVIEW.md report.
+${SECURITY_REVIEWER_SKILLS}",
+  subagent_type="808-security-reviewer",
+  model="{security_reviewer_model}"
+)
+```
+
+**Read security review status:**
+```bash
+grep "^status:" "$PHASE_DIR"/*-SECURITY-REVIEW.md 2>/dev/null | cut -d: -f2 | tr -d ' '
+```
+
+| Status | Action |
+|--------|--------|
+| `passed` | → update_roadmap (no critical findings) |
+| `findings_found` | Present findings to user with severity breakdown |
+| `human_needed` | Present items requiring security expert review |
+
+**If findings_found:**
+```
+## ⚠ Phase {X}: {Name} — Security Findings Identified
+
+**Status:** {N} findings ({critical} critical, {high} high, {medium} medium, {low} low)
+**Report:** {phase_dir}/{phase_num}-SECURITY-REVIEW.md
+
+### Critical Findings (Fix Immediately)
+{List critical findings from SECURITY-REVIEW.md}
+
+### High Severity Findings (Fix Within 1 Week)
+{List high findings}
+
+---
+## ▶ Recommended Actions
+
+1. **Address critical findings before deployment**
+   - Create gap closure plans for critical/high findings
+   - `/808:plan-phase {X} --gaps ${AGENT_808_WS}`
+
+2. **Review full security report**
+   - `cat {phase_dir}/{phase_num}-SECURITY-REVIEW.md`
+
+3. **Consider security expert review**
+   - For cryptographic design, threat modeling, compliance certification
+```
+
+**If human_needed:**
+```
+## 🔒 Phase {X}: {Name} — Security Expert Review Required
+
+**Status:** Automated checks passed, {N} items need security specialist review
+**Report:** {phase_dir}/{phase_num}-SECURITY-REVIEW.md
+
+### Items Requiring Expert Review
+{From SECURITY-REVIEW.md human_verification section}
+
+These items need assessment by a security professional:
+- Cryptographic design validation
+- Threat modeling
+- Compliance certification (SOC 2, HIPAA, PCI-DSS)
+- Penetration testing
+
+Proceed to roadmap update? (yes / review findings first)
+```
+
+**If passed:**
+```
+## ✓ Phase {X}: {Name} — Security Review Passed
+
+**Status:** No critical or high severity findings
+**Report:** {phase_dir}/{phase_num}-SECURITY-REVIEW.md
+
+Security review completed successfully. Phase deliverables meet security standards.
+```
+
+**Integration with verification:**
+- Security reviewer reads VERIFICATION.md if it exists
+- Security findings may explain verification gaps (e.g., stub = missing validation)
+- Both reports complement each other: VERIFICATION.md = functionality, SECURITY-REVIEW.md = security
 </step>
 
 <step name="update_roadmap">
