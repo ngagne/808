@@ -2,6 +2,17 @@
 Extract implementation decisions that downstream agents need. Analyze the phase to identify gray areas, let the user choose what to discuss, then deep-dive each selected area until satisfied.
 
 You are a thinking partner, not an interviewer. The user is the visionary — you are the builder. Your job is to capture decisions that will guide research and planning, not to figure out implementation yourself.
+
+**Non-Functional Requirements (NFR) and SRE Best Practices:**
+In addition to functional requirements, discuss and capture decisions around:
+- **Reliability:** Error handling, retries, timeouts, circuit breakers, fallback strategies
+- **Observability:** Logging, metrics, tracing, alerting requirements
+- **Performance:** Latency targets, throughput expectations, caching strategies
+- **Scalability:** Horizontal/vertical scaling approach, load balancing, statelessness
+- **Security:** Authentication, authorization, input validation, data protection
+- **Operational Excellence:** Deployment strategy, rollback procedures, feature flags
+
+These NFR/SRE decisions ensure the verify phase has clear requirements to validate against.
 </purpose>
 
 <downstream_awareness>
@@ -78,6 +89,7 @@ Gray areas are **implementation decisions the user cares about** — things that
    - Something users RUN → invocation, output, behavior modes matter
    - Something users READ → structure, tone, depth, flow matter
    - Something being ORGANIZED → criteria, grouping, handling exceptions matter
+   - Something that RUNS IN PRODUCTION → reliability, observability, performance, security matter (NFR/SRE)
 3. **Generate phase-specific gray areas** — Not generic categories, but concrete decisions for THIS phase
 
 **Don't use generic category labels** (UI, UX, Behavior). Generate specific gray areas:
@@ -96,6 +108,19 @@ Phase: "API documentation"
 → Structure/navigation, Code examples depth, Versioning approach, Interactive elements
 ```
 
+**NFR/SRE Gray Areas** (when phase delivers production functionality):
+
+Always consider these NFR/SRE dimensions when identifying gray areas:
+
+| Dimension | Example Gray Areas |
+|-----------|-------------------|
+| **Reliability** | Error handling strategy, Retry policy, Timeout values, Circuit breaker thresholds, Fallback behavior |
+| **Observability** | What to log, Metrics to track, Alert thresholds, Trace coverage |
+| **Performance** | Latency targets, Caching strategy, Query optimization, Connection pooling |
+| **Scalability** | Horizontal vs vertical scaling, State management, Load distribution |
+| **Security** | AuthN/AuthZ approach, Input validation, Data encryption, Rate limiting |
+| **Operations** | Deployment strategy, Feature flags, Rollback approach, Kill switches |
+
 **The key question:** What decisions would change the outcome that the user should weigh in on?
 
 **Claude handles these (don't ask):**
@@ -103,6 +128,14 @@ Phase: "API documentation"
 - Architecture patterns
 - Performance optimization
 - Scope (roadmap defines this)
+
+**NFR/SRE defaults** (when user defers to Claude):
+If the user says "you decide" on NFR/SRE matters, apply SRE best practices from:
+- `~/.claude/808/references/reliability-checklist.md`
+- `~/.claude/808/references/resilience-patterns.md`
+- `~/.claude/808/references/sla-slo-guidelines.md`
+
+Document these Claude-decided NFR/SRE choices in CONTEXT.md under "Claude's Discretion" with a note that SRE best practices were applied.
 </gray_area_identification>
 
 <answer_validation>
@@ -361,6 +394,32 @@ Analyze the phase to identify gray areas worth discussing. **Use both `prior_dec
 
 3. **Gray areas by category** — For each relevant category (UI, UX, Behavior, Empty States, Content), identify 1-2 specific ambiguities that would change implementation. **Annotate with code context where relevant** (e.g., "You already have a Card component" or "No existing pattern for this").
 
+3b. **NFR/SRE considerations** — If the phase delivers production functionality, identify relevant NFR/SRE gray areas:
+
+   **Reliability questions to consider:**
+   - Does this phase interact with external services? → Retry policy, timeout values, circuit breaker needs
+   - Does it handle critical data? → Error handling, rollback strategy, idempotency
+   - Is it user-facing? → Degraded mode behavior, fallback responses
+
+   **Observability questions:**
+   - What operations should be logged? → Audit trail, debugging, compliance
+   - What metrics matter? → Success rate, latency, throughput
+   - What should trigger alerts? → Error thresholds, latency SLOs
+
+   **Performance/Scalability:**
+   - Expected load? → Caching strategy, connection pooling, query optimization
+   - Growth expectations? → Horizontal scaling approach, statelessness
+
+   **Security:**
+   - Handles sensitive data? → Encryption, access control, input validation
+   - User-facing API? → Rate limiting, authentication requirements
+
+   **Operations:**
+   - Should it be feature-flagged? → Kill switch needs, gradual rollout
+   - Deployment complexity? → Migration strategy, rollback approach
+
+   Generate 1-3 NFR/SRE gray areas specific to this phase. For infrastructure-only phases (refactoring, documentation), note "NFR/SRE: Not applicable — no production functionality changes".
+
 4. **Skip assessment** — If no meaningful gray areas exist (pure infrastructure, clear-cut implementation, or all already decided in prior phases), the phase may not need discussion.
 
 **Advisor Mode Detection:**
@@ -403,6 +462,10 @@ Gray areas:
 - Behavior: Loading pattern — ALREADY DECIDED: infinite scroll (Phase 4)
 - Empty State: What shows when no posts exist — EmptyState component exists in ui/
 - Content: What metadata displays (time, author, reactions count)
+NFR/SRE:
+- Reliability: API error handling (show cached posts or error message?)
+- Observability: Feed load metrics, error tracking
+- Performance: Image lazy loading, post count per load
 ```
 </step>
 
@@ -477,6 +540,24 @@ For "Organize photo library" (organization task):
 ☐ Duplicate handling — Keep best, keep all, or prompt each time?
 ☐ Naming convention — Original names, dates, or descriptive?
 ☐ Folder structure — Flat, nested by year, or by category?
+```
+
+For "User Authentication" (production feature with NFR/SRE considerations):
+```
+☐ Session management — Short-lived JWT + refresh tokens, or long-lived sessions?
+☐ Error handling — Show specific errors (user not found) or generic (invalid credentials)?
+☐ Rate limiting — Per-IP, per-user, or per-endpoint? Thresholds?
+☐ Logging — What auth events to log? (success, failure, lockout)
+☐ Fallback — What happens when OAuth provider is down?
+```
+
+For "Payment Processing API" (critical production service):
+```
+☐ Idempotency — How to prevent duplicate charges? (idempotency keys, dedup window)
+☐ Retry policy — Which errors retry? (network timeout yes, 402/declined no)
+☐ Circuit breaker — When to stop calling payment provider?
+☐ Observability — Transaction tracing, success rate alerts, latency monitoring
+☐ Compliance — PCI scope reduction, audit logging requirements
 ```
 
 Continue to discuss_areas with selected areas (or advisor_research if ADVISOR_MODE is true).
@@ -774,12 +855,58 @@ mkdir -p ".planning/phases/${padded_phase}-${phase_slug}"
 ### Claude's Discretion
 [Areas where user said "you decide" — note that Claude has flexibility here]
 
+**NFR/SRE decisions** (if user deferred to Claude):
+- [Area where Claude decided] — Applied SRE best practices from reliability-checklist.md
+  - Specific decision made (e.g., "5s timeout, 3 retries with exponential backoff")
+
 ### Folded Todos
 [If any todos were folded into scope from the cross_reference_todos step, list them here.
 Each entry should include the todo title, original problem, and how it fits this phase's scope.
 If no todos were folded: omit this subsection entirely.]
 
 </decisions>
+
+<nfr_sre>
+## Non-Functional Requirements (NFR) and SRE Decisions
+
+**MANDATORY section for production functionality phases.** Omit only for infrastructure-only phases (refactoring, documentation).
+
+Capture all NFR/SRE decisions from the discussion:
+
+### Reliability
+- **Error handling:** [Strategy decided]
+- **Retry policy:** [Timeouts, retry limits, backoff approach]
+- **Circuit breaker:** [Thresholds, fallback behavior]
+- **Fallback/degradation:** [Degraded mode behavior]
+
+### Observability
+- **Logging:** [What to log, log levels, sensitive data handling]
+- **Metrics:** [Key metrics to track]
+- **Alerting:** [Alert thresholds, notification routing]
+- **Tracing:** [Trace coverage requirements]
+
+### Performance
+- **Latency targets:** [p50, p95, p99 targets if discussed]
+- **Caching:** [Caching strategy, invalidation approach]
+- **Resource limits:** [Connection pools, query timeouts]
+
+### Scalability
+- **Scaling approach:** [Horizontal/vertical, statelessness requirements]
+- **Load handling:** [Rate limiting, backpressure]
+
+### Security
+- **Authentication:** [AuthN approach]
+- **Authorization:** [AuthZ approach]
+- **Data protection:** [Encryption, input validation]
+
+### Operations
+- **Deployment:** [Strategy, migration approach]
+- **Feature flags:** [Kill switches, gradual rollout]
+- **Rollback:** [Rollback strategy]
+
+[If no NFR/SRE decisions were made: "No NFR/SRE decisions — apply SRE best practices from ~/.claude/808/references/"]
+
+</nfr_sre>
 
 <canonical_refs>
 ## Canonical References
@@ -1043,6 +1170,9 @@ Route to `confirm_creation` step (existing behavior — show manual next steps).
 - CONTEXT.md captures actual decisions, not vague vision
 - CONTEXT.md includes canonical_refs section with full file paths to every spec/ADR/doc downstream agents need (MANDATORY — never omit)
 - CONTEXT.md includes code_context section with reusable assets and patterns
+- CONTEXT.md includes `<nfr_sre>` section with NFR/SRE decisions (MANDATORY for production functionality phases)
+- NFR/SRE considerations discussed for production functionality (reliability, observability, performance, security, operations)
+- SRE best practices applied when user deferred to Claude (from reliability-checklist.md, resilience-patterns.md, sla-slo-guidelines.md)
 - Deferred ideas preserved for future phases
 - STATE.md updated with session info
 - User knows next steps
