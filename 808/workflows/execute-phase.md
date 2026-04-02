@@ -34,6 +34,7 @@ Always use the exact name from this list — do not fall back to 'general-purpos
 - 808-executor — Executes plan tasks, commits, creates SUMMARY.md
 - 808-verifier — Verifies phase completion, checks quality gates
 - 808-security-reviewer — Security expert review for vulnerabilities and OWASP compliance
+- 808-sre-reviewer — SRE expert review for reliability and operational excellence
 - 808-planner — Creates detailed plans from phase scope
 - 808-phase-researcher — Researches technical approaches for a phase
 - 808-plan-checker — Reviews plan quality before execution
@@ -67,7 +68,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 AGENT_SKILLS=$(node "$HOME/.claude/808/bin/808-tools.cjs" agent-skills 808-executor 2>/dev/null)
 ```
 
-Parse JSON for: `executor_model`, `verifier_model`, `security_reviewer_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `security_reviewer_enabled`.
+Parse JSON for: `executor_model`, `verifier_model`, `security_reviewer_model`, `sre_reviewer_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `security_reviewer_enabled`, `sre_reviewer_enabled`.
 
 **If `phase_found` is false:** Error — phase directory not found.
 **If `plan_count` is 0:** Error — no plans found in phase.
@@ -800,6 +801,110 @@ Security review completed successfully. Phase deliverables meet security standar
 - Security reviewer reads VERIFICATION.md if it exists
 - Security findings may explain verification gaps (e.g., stub = missing validation)
 - Both reports complement each other: VERIFICATION.md = functionality, SECURITY-REVIEW.md = security
+</step>
+
+<step name="sre_review">
+**SRE review (if enabled):** Spawn SRE expert subagent to review phase deliverables for reliability and operational excellence.
+
+```bash
+SRE_REVIEWER_SKILLS=$(node "$HOME/.claude/808/bin/808-tools.cjs" agent-skills 808-sre-reviewer 2>/dev/null)
+```
+
+**Check if enabled:**
+```bash
+if [ "$sre_reviewer_enabled" = "true" ]; then
+  # Spawn SRE reviewer
+fi
+```
+
+```
+Task(
+  prompt="SRE review of phase {phase_number} deliverables.
+Phase directory: {phase_dir}
+Phase goal: {goal from ROADMAP.md}
+Phase requirement IDs: {phase_req_ids}
+Review codebase for reliability, resilience, observability, and operational readiness.
+Focus on: retries/timeouts, circuit breakers, failover mechanisms, graceful degradation, and the four golden signals.
+Cross-reference with VERIFICATION.md and SECURITY-REVIEW.md if they exist.
+Create SRE-REVIEW.md report.
+${SRE_REVIEWER_SKILLS}",
+  subagent_type="808-sre-reviewer",
+  model="{sre_reviewer_model}"
+)
+```
+
+**Read SRE review status:**
+```bash
+grep "^status:" "$PHASE_DIR"/*-SRE-REVIEW.md 2>/dev/null | cut -d: -f2 | tr -d ' '
+```
+
+| Status | Action |
+|--------|--------|
+| `passed` | → update_roadmap (no critical reliability findings) |
+| `findings_found` | Present findings to user with severity breakdown |
+| `human_needed` | Present items requiring SRE expert review |
+
+**If findings_found:**
+```
+## ⚠ Phase {X}: {Name} — Reliability Findings Identified
+
+**Status:** {N} findings ({critical} critical, {high} high, {medium} medium, {low} low)
+**Report:** {phase_dir}/{phase_num}-SRE-REVIEW.md
+
+### Critical Findings (Fix Before Production)
+{List critical findings from SRE-REVIEW.md}
+
+### High Severity Findings (Fix Within Sprint)
+{List high findings}
+
+---
+## ▶ Recommended Actions
+
+1. **Address critical findings before deployment**
+   - Create gap closure plans for critical/high findings
+   - `/808:plan-phase {X} --gaps ${AGENT_808_WS}`
+
+2. **Review full SRE report**
+   - `cat {phase_dir}/{phase_num}-SRE-REVIEW.md`
+
+3. **Consider SRE expert review**
+   - For capacity planning, SLO design, incident response setup
+```
+
+**If human_needed:**
+```
+## 🔧 Phase {X}: {Name} — SRE Expert Review Required
+
+**Status:** Automated checks passed, {N} items need SRE specialist review
+**Report:** {phase_dir}/{phase_num}-SRE-REVIEW.md
+
+### Items Requiring Expert Review
+{From SRE-REVIEW.md human_verification section}
+
+These items need assessment by an SRE professional:
+- Capacity planning and scaling strategy
+- SLO target setting and error budget policy
+- Incident response and on-call rotation design
+- Complex distributed system failure mode analysis
+
+Proceed to roadmap update? (yes / review findings first)
+```
+
+**If passed:**
+```
+## ✓ Phase {X}: {Name} — SRE Review Passed
+
+**Status:** No critical reliability findings
+**Report:** {phase_dir}/{phase_num}-SRE-REVIEW.md
+
+SRE review completed successfully. Phase deliverables meet reliability standards.
+```
+
+**Integration with other reviews:**
+- SRE reviewer reads VERIFICATION.md and SECURITY-REVIEW.md if they exist
+- SRE findings may explain verification gaps (e.g., missing timeout = hanging requests)
+- Security and SRE reviews complement each other: SECURITY-REVIEW.md = security vulnerabilities, SRE-REVIEW.md = reliability gaps
+- Both should be reviewed together before production deployment
 </step>
 
 <step name="update_roadmap">

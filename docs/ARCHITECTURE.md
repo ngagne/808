@@ -134,7 +134,7 @@ Specialized agent definitions with frontmatter specifying:
 - `tools` — Allowed tool access (Read, Write, Edit, Bash, Grep, Glob, WebSearch, etc.)
 - `color` — Terminal output color for visual distinction
 
-**Total agents:** 17
+**Total agents:** 18
 
 ### References (`808/references/*.md`)
 
@@ -228,7 +228,7 @@ Orchestrator (workflow .md)
 | **Planners** | 808-planner, 808-roadmapper | Sequential |
 | **Checkers** | 808-plan-checker, 808-integration-checker, 808-ui-checker, 808-nyquist-auditor | Sequential (verification loop, max 3 iterations) |
 | **Executors** | 808-executor | Parallel within waves, sequential across waves |
-| **Verifiers** | 808-verifier, 808-security-reviewer | Sequential (after all executors complete — verifier first, then security reviewer) |
+| **Verifiers** | 808-verifier, 808-security-reviewer, 808-sre-reviewer | Sequential (after all executors complete — verifier first, then security reviewer, then SRE reviewer) |
 | **Mappers** | 808-codebase-mapper | 4 parallel (tech, arch, quality, concerns) |
 | **Debuggers** | 808-debugger | Sequential (interactive) |
 | **Auditors** | 808-ui-auditor | Sequential |
@@ -312,7 +312,8 @@ execute-phase
     ├── Executor per plan → code + atomic commits
     ├── SUMMARY.md per plan
     ├── Verifier → VERIFICATION.md
-    └── Security Reviewer → SECURITY-REVIEW.md (if enabled)
+    ├── Security Reviewer → SECURITY-REVIEW.md (if enabled)
+    └── SRE Reviewer → SRE-REVIEW.md (if enabled)
     │
     ▼
 verify-work → UAT.md (user acceptance testing)
@@ -400,6 +401,7 @@ Equivalent paths for other runtimes:
 │       ├── XX-YY-SUMMARY.md    # Execution outcomes
 │       ├── XX-VERIFICATION.md  # Post-execution verification
 │       ├── XX-SECURITY-REVIEW.md  # Security review (if enabled)
+│       ├── XX-SRE-REVIEW.md    # SRE reliability review (if enabled)
 │       ├── XX-VALIDATION.md    # Nyquist test coverage mapping
 │       ├── XX-UI-SPEC.md       # UI design contract (from ui-phase)
 │       ├── XX-UI-REVIEW.md     # Visual audit scores (from ui-review)

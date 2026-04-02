@@ -16,6 +16,7 @@ Model profiles control which Claude model each 808 agent uses. This allows balan
 | 808-codebase-mapper | sonnet | haiku | haiku | inherit |
 | 808-verifier | sonnet | sonnet | haiku | inherit |
 | 808-security-reviewer | opus | sonnet | sonnet | inherit |
+| 808-sre-reviewer | opus | sonnet | sonnet | inherit |
 | 808-plan-checker | sonnet | sonnet | haiku | inherit |
 | 808-integration-checker | sonnet | sonnet | haiku | inherit |
 | 808-nyquist-auditor | sonnet | sonnet | haiku | inherit |
@@ -135,6 +136,12 @@ Security review requires expert-level pattern recognition, threat modeling, and 
 
 **Why Sonnet for 808-security-reviewer in balanced?**
 Security review with Sonnet still provides strong vulnerability detection for common issues (OWASP Top 10, hardcoded secrets, missing validation). Suitable for most development workflows where critical security audits are done by human experts.
+
+**Why Opus for 808-sre-reviewer in quality?**
+SRE review requires deep understanding of distributed systems failure modes, resilience patterns, and operational best practices. Opus provides better recognition of subtle reliability gaps like missing timeouts, inadequate retry logic, and observability blind spots.
+
+**Why Sonnet for 808-sre-reviewer in balanced?**
+SRE review with Sonnet provides strong reliability assessment for common patterns (timeout configuration, retry logic, circuit breakers, basic observability). Suitable for most development workflows where detailed capacity planning and SLO design are done by human SREs.
 
 **Why Haiku for 808-codebase-mapper?**
 Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.
