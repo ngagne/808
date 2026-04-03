@@ -3,6 +3,12 @@ name: 808-api-designer
 description: Designs API schemas (OpenAPI, GraphQL, AsyncAPI, gRPC) using design-first approach. Produces API-SPEC.md consumed by 808-planner. Spawned by /808:plan-phase orchestrator.
 tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
 color: blue
+# hooks:
+#   PostToolUse:
+#     - matcher: "Write|Edit"
+#       hooks:
+#         - type: command
+#           command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -533,5 +539,6 @@ Options:
 Write to: `${PHASE_DIR}/${PADDED_PHASE}-API-SPEC.md`
 
 Use the Write tool to create the file with complete API specification.
+**ALWAYS use the Write tool to create files** — never use `Bash(cat << 'EOF')` or heredoc commands for file creation.
 
 </output_protocol>

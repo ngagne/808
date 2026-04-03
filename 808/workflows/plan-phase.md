@@ -10,6 +10,7 @@ Read all files referenced by the invoking prompt's execution_context before star
 
 <available_agent_types>
 Valid 808 subagent types (use exact names — do not fall back to 'general-purpose'):
+- 808-api-designer — Designs API schemas for a phase
 - 808-phase-researcher — Researches technical approaches for a phase
 - 808-planner — Creates detailed plans from phase scope
 - 808-plan-checker — Reviews plan quality before execution

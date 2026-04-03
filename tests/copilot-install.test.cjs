@@ -1163,6 +1163,7 @@ describe('E2E: Copilot full install verification', () => {
     const agent808Agents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md')).sort();
     const expected = [
       '808-advisor-researcher.agent.md',
+      '808-api-designer.agent.md',
       '808-assumptions-analyzer.agent.md',
       '808-codebase-mapper.agent.md',
       '808-debugger.agent.md',
@@ -1175,6 +1176,8 @@ describe('E2E: Copilot full install verification', () => {
       '808-project-researcher.agent.md',
       '808-research-synthesizer.agent.md',
       '808-roadmapper.agent.md',
+      '808-security-reviewer.agent.md',
+      '808-sre-reviewer.agent.md',
       '808-ui-auditor.agent.md',
       '808-ui-checker.agent.md',
       '808-ui-researcher.agent.md',
