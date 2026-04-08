@@ -7,7 +7,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- **API Designer Agent** (`agents/808-api-designer.md`) - Specialized agent for API design and contract definition
+
+### Changed
+
+### Fixed
+
+## [1.1.1] - 2026-04-07
+
+### Changed
+- **Installation Commands** - Updated all README examples from `npx 808` to `npx agent-808` to match npm package name
+- **Settings** - Added `git commit *` to allowed auto-approval commands
 - **Security Reviewer Agent** (`agents/808-security-reviewer.md`) - Automated security review capabilities
 - **SRE Reviewer Agent** (`agents/808-sre-reviewer.md`) - Site Reliability Engineering review functionality
 - **Security Review Template** (`808/templates/security-review.md`) - Structured security review process template

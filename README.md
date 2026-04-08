@@ -5,7 +5,7 @@
 **Solves context rot — the quality degradation that happens as agents fill their context window.**
 
 ```bash
-npx 808@latest
+npx agent-808@latest
 ```
 
 **Works on Mac, Windows, and Linux.**
@@ -33,7 +33,7 @@ People who want to describe what they want and have it built correctly — witho
 ## Getting Started
 
 ```bash
-npx 808@latest
+npx agent-808@latest
 ```
 
 The installer prompts you to choose:
@@ -55,7 +55,7 @@ Verify with:
 808 evolves fast. Update periodically:
 
 ```bash
-npx 808@latest
+npx agent-808@latest
 ```
 
 <details>
@@ -63,37 +63,37 @@ npx 808@latest
 
 ```bash
 # Claude Code
-npx 808 --claude --global   # Install to ~/.claude/
-npx 808 --claude --local    # Install to ./.claude/
+npx agent-808 --claude --global   # Install to ~/.claude/
+npx agent-808 --claude --local    # Install to ./.claude/
 
 # OpenCode (open source, free models)
-npx 808 --opencode --global # Install to ~/.config/opencode/
+npx agent-808 --opencode --global # Install to ~/.config/opencode/
 
 # Gemini CLI
-npx 808 --gemini --global   # Install to ~/.gemini/
+npx agent-808 --gemini --global   # Install to ~/.gemini/
 
 # Codex (skills-first)
-npx 808 --codex --global    # Install to ~/.codex/
-npx 808 --codex --local     # Install to ./.codex/
+npx agent-808 --codex --global    # Install to ~/.codex/
+npx agent-808 --codex --local     # Install to ./.codex/
 
 # Copilot (GitHub Copilot CLI)
-npx 808 --copilot --global  # Install to ~/.github/
-npx 808 --copilot --local   # Install to ./.github/
+npx agent-808 --copilot --global  # Install to ~/.github/
+npx agent-808 --copilot --local   # Install to ./.github/
 
 # Cursor CLI
-npx 808 --cursor --global      # Install to ~/.cursor/
-npx 808 --cursor --local       # Install to ./.cursor/
+npx agent-808 --cursor --global      # Install to ~/.cursor/
+npx agent-808 --cursor --local       # Install to ./.cursor/
 
 # Windsurf (Codeium, VS Code-based)
-npx 808 --windsurf --global    # Install to ~/.windsurf/
-npx 808 --windsurf --local     # Install to ./.windsurf/
+npx agent-808 --windsurf --global    # Install to ~/.windsurf/
+npx agent-808 --windsurf --local     # Install to ./.windsurf/
 
 # Antigravity (Google, skills-first, Gemini-based)
-npx 808 --antigravity --global # Install to ~/.gemini/antigravity/
-npx 808 --antigravity --local  # Install to ./.agent/
+npx agent-808 --antigravity --global # Install to ~/.gemini/antigravity/
+npx agent-808 --antigravity --local  # Install to ./.agent/
 
 # All runtimes
-npx 808 --all --global      # Install to all directories
+npx agent-808 --all --global      # Install to all directories
 ```
 
 Use `--global` (`-g`) or `--local` (`-l`) to skip the location prompt.
@@ -718,18 +718,18 @@ This prevents Claude from reading these files entirely, regardless of what comma
 
 **Commands not working as expected?**
 - Run `/808:help` to verify installation
-- Re-run `npx 808` to reinstall
+- Re-run `npx agent-808` to reinstall
 
 **Updating to the latest version?**
 ```bash
-npx 808@latest
+npx agent-808@latest
 ```
 
 **Using Docker or containerized environments?**
 
 If file reads fail with tilde paths (`~/.claude/...`), set `CLAUDE_CONFIG_DIR` before installing:
 ```bash
-CLAUDE_CONFIG_DIR=/home/youruser/.claude npx 808 --global
+CLAUDE_CONFIG_DIR=/home/youruser/.claude npx agent-808 --global
 ```
 This ensures absolute paths are used instead of `~` which may not expand correctly in containers.
 
@@ -739,24 +739,24 @@ To remove 808 completely:
 
 ```bash
 # Global installs
-npx 808 --claude --global --uninstall
-npx 808 --opencode --global --uninstall
-npx 808 --gemini --global --uninstall
-npx 808 --codex --global --uninstall
-npx 808 --copilot --global --uninstall
-npx 808 --cursor --global --uninstall
-npx 808 --windsurf --global --uninstall
-npx 808 --antigravity --global --uninstall
+npx agent-808 --claude --global --uninstall
+npx agent-808 --opencode --global --uninstall
+npx agent-808 --gemini --global --uninstall
+npx agent-808 --codex --global --uninstall
+npx agent-808 --copilot --global --uninstall
+npx agent-808 --cursor --global --uninstall
+npx agent-808 --windsurf --global --uninstall
+npx agent-808 --antigravity --global --uninstall
 
 # Local installs (current project)
-npx 808 --claude --local --uninstall
-npx 808 --opencode --local --uninstall
-npx 808 --gemini --local --uninstall
-npx 808 --codex --local --uninstall
-npx 808 --copilot --local --uninstall
-npx 808 --cursor --local --uninstall
-npx 808 --windsurf --local --uninstall
-npx 808 --antigravity --local --uninstall
+npx agent-808 --claude --local --uninstall
+npx agent-808 --opencode --local --uninstall
+npx agent-808 --gemini --local --uninstall
+npx agent-808 --codex --local --uninstall
+npx agent-808 --copilot --local --uninstall
+npx agent-808 --cursor --local --uninstall
+npx agent-808 --windsurf --local --uninstall
+npx agent-808 --antigravity --local --uninstall
 ```
 
 This removes all 808 commands, agents, hooks, and settings while preserving your other configurations.
@@ -765,7 +765,7 @@ This removes all 808 commands, agents, hooks, and settings while preserving your
 
 ## Community Ports
 
-OpenCode, Gemini CLI, and Codex are now natively supported via `npx 808`.
+OpenCode, Gemini CLI, and Codex are now natively supported via `npx agent-808`.
 
 These community ports pioneered multi-runtime support:
 

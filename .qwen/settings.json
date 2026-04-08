@@ -13,7 +13,8 @@
       "Bash(npm *)",
       "Bash(node *)",
       "Bash(ls *)",
-      "Bash(which *)"
+      "Bash(which *)",
+      "Bash(git commit *)"
     ]
   },
   "$version": 3
