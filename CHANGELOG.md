@@ -7,20 +7,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.2.1] - 2026-04-11
+
+### Added
 - **Adversarial Reviewer Agent** (`agents/808-adversarial-reviewer.md`) — Adversarial code review using GPT-5.3-Codex to challenge design decisions, question assumptions, and identify architectural blind spots
 - **Adversarial Review Template** (`808/templates/adversarial-review.md`) — Structured adversarial review report template with design decision challenges, pattern analysis, complexity assessment, hidden assumptions, and second-order effects
 - **Adversarial Review Guide** (`808/references/adversarial-review-guide.md`) — Comprehensive adversarial review patterns including questioning frameworks (first principles, inversion, scale extremes, failure modes), cognitive bias detection, trade-off analysis, and code examples
-- **Phase Execution Flow Diagram** — Mermaid flowchart in README showing full phase execution flow from discuss through verification with optional review stages
+- **Phase Execution Flow Diagram** — SVG-rendered flowchart in README showing full phase execution flow from discuss through verification with optional review stages (security, SRE, adversarial)
 - **Execute Phase Workflow** — Integrated adversarial reviewer step after SRE review, with status handling (passed/challenges_found/human_needed)
 - **Model Profile** — Added `808-adversarial-reviewer` using GPT-5.3-Codex consistently across quality, balanced, and budget profiles
 
 ### Changed
-- **README.md** — Replaced mermaid code block with rendered SVG image for NPM compatibility; generated PNG for broader viewer support
+- **README.md** — Replaced ASCII wave diagram with rendered SVG image for NPM compatibility; generated PNG for broader viewer support
 - **Architecture Documentation** — Updated agent count (19), verifier orchestration order, and file system layout to include adversarial review artifacts
 - **Configuration** — Added `adversarial_reviewer` workflow toggle to config template (defaults enabled)
 
 ### Fixed
 - **Adversarial Reviewer Model** — Corrected model assignment from Opus/Sonnet to GPT-5.3-Codex across all profiles
+- **Copilot Install Test** — Added adversarial-reviewer to expected agent list in unit tests
 - **README Diagram Readability** — Changed mermaid diagram from light pastel backgrounds to dark backgrounds with white text for better contrast
 
 ## [1.1.1] - 2026-04-07
