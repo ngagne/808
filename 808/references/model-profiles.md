@@ -17,7 +17,7 @@ Model profiles control which Claude model each 808 agent uses. This allows balan
 | 808-verifier | sonnet | sonnet | haiku | inherit |
 | 808-security-reviewer | opus | sonnet | sonnet | inherit |
 | 808-sre-reviewer | opus | sonnet | sonnet | inherit |
-| 808-adversarial-reviewer | opus | sonnet | sonnet | inherit |
+| 808-adversarial-reviewer | gpt-5.3-codex | gpt-5.3-codex | gpt-5.3-codex | inherit |
 | 808-plan-checker | sonnet | sonnet | haiku | inherit |
 | 808-integration-checker | sonnet | sonnet | haiku | inherit |
 | 808-nyquist-auditor | sonnet | sonnet | haiku | inherit |
@@ -145,11 +145,8 @@ SRE review requires deep understanding of distributed systems failure modes, res
 **Why Sonnet for 808-sre-reviewer in balanced?**
 SRE review with Sonnet provides strong reliability assessment for common patterns (timeout configuration, retry logic, circuit breakers, basic observability). Suitable for most development workflows where detailed capacity planning and SLO design are done by human SREs.
 
-**Why Opus for 808-adversarial-reviewer in quality?**
-Adversarial review requires deep reasoning about design trade-offs, ability to identify subtle architectural flaws, and constructive challenge of fundamental assumptions. Opus provides better critical thinking for complex trade-off analysis, hidden assumption detection, and second-order effect prediction.
-
-**Why Sonnet for 808-adversarial-reviewer in balanced?**
-Adversarial review with Sonnet provides strong design critique for common patterns (over-engineering detection, alternative approach identification, maintainability assessment). Suitable for most development workflows where major architectural decisions are reviewed by human architects.
+**Why GPT-5.3-Codex for 808-adversarial-reviewer across all profiles?**
+Adversarial review requires deep reasoning about design trade-offs, ability to identify subtle architectural flaws, and constructive challenge of fundamental assumptions. GPT-5.3-Codex provides strong critical thinking for complex trade-off analysis, hidden assumption detection, and second-order effect prediction. This model is used consistently across quality, balanced, and budget profiles since adversarial review quality degrades significantly with weaker models.
 
 **Why Haiku for 808-codebase-mapper?**
 Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.
