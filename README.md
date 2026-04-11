@@ -257,43 +257,7 @@ Plans are grouped into "waves" based on dependencies. Within each wave, plans ru
 
 Each phase moves through discussion, planning, execution, verification, and optional review stages. The system orchestrates specialized agents at each step, keeping your main context lean while work happens in fresh agent contexts.
 
-```mermaid
-flowchart TD
-    A[discuss-phase] -->|CONTEXT.md| B[ui-phase optional]
-    B -->|UI-SPEC.md| C[plan-phase]
-
-    subgraph plan-phase
-        C -->|RESEARCH.md| D[Phase Researcher]
-        C -->|PLAN.md files| E[Planner]
-        E <-->|verify loop max 3x| F[Plan Checker]
-    end
-
-    plan-phase --> G[execute-phase]
-
-    subgraph execute-phase
-        G -->|dependency grouping| H[Wave Analysis]
-        H -->|parallel| I[Executor per plan]
-        I -->|code + atomic commits| J[SUMMARY.md per plan]
-    end
-
-    execute-phase --> K[Verifier]
-    K -->|VERIFICATION.md| L[Security Reviewer optional]
-    L -->|SECURITY-REVIEW.md| M[SRE Reviewer optional]
-    M -->|SRE-REVIEW.md| N[Adversarial Reviewer optional]
-    N -->|ADVERSARIAL-REVIEW.md| O[verify-work]
-
-    O -->|UAT.md| P[ui-review optional]
-    P -->|UI-REVIEW.md| Q[phase complete]
-
-    classDef stage fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
-    classDef optional fill:#ef6c00,stroke:#e65100,stroke-width:1px,stroke-dasharray: 5 5,color:#fff
-    classDef artifact fill:#6a1b9a,stroke:#4a148c,stroke-width:1px,color:#fff
-    classDef review fill:#c2185b,stroke:#880e4f,stroke-width:2px,color:#fff
-
-    class A,B,C,G,K,O,P stage
-    class B,L,M,N,P optional
-    class D,E,F,H,I,J review
-```
+![Phase Execution Flow](assets/phase-execution-flow.svg)
 
 **Why waves matter:**
 - Independent plans → Same wave → Run in parallel
