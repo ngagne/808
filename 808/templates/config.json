@@ -7,6 +7,7 @@
     "verifier": true,
     "security_reviewer": true,
     "sre_reviewer": true,
+    "adversarial_reviewer": true,
     "auto_advance": false,
     "nyquist_validation": true,
     "discuss_mode": "discuss",

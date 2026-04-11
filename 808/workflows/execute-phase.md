@@ -35,6 +35,7 @@ Always use the exact name from this list — do not fall back to 'general-purpos
 - 808-verifier — Verifies phase completion, checks quality gates
 - 808-security-reviewer — Security expert review for vulnerabilities and OWASP compliance
 - 808-sre-reviewer — SRE expert review for reliability and operational excellence
+- 808-adversarial-reviewer — Adversarial review challenging design decisions and assumptions
 - 808-planner — Creates detailed plans from phase scope
 - 808-phase-researcher — Researches technical approaches for a phase
 - 808-plan-checker — Reviews plan quality before execution
@@ -68,7 +69,7 @@ if [[ "$INIT" == @file:* ]]; then INIT=$(cat "${INIT#@file:}"); fi
 AGENT_SKILLS=$(node "$HOME/.claude/808/bin/808-tools.cjs" agent-skills 808-executor 2>/dev/null)
 ```
 
-Parse JSON for: `executor_model`, `verifier_model`, `security_reviewer_model`, `sre_reviewer_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `security_reviewer_enabled`, `sre_reviewer_enabled`.
+Parse JSON for: `executor_model`, `verifier_model`, `security_reviewer_model`, `sre_reviewer_model`, `adversarial_reviewer_model`, `commit_docs`, `parallelization`, `branching_strategy`, `branch_name`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `phase_slug`, `plans`, `incomplete_plans`, `plan_count`, `incomplete_count`, `state_exists`, `roadmap_exists`, `phase_req_ids`, `security_reviewer_enabled`, `sre_reviewer_enabled`, `adversarial_reviewer_enabled`.
 
 **If `phase_found` is false:** Error — phase directory not found.
 **If `plan_count` is 0:** Error — no plans found in phase.
@@ -905,6 +906,112 @@ SRE review completed successfully. Phase deliverables meet reliability standards
 - SRE findings may explain verification gaps (e.g., missing timeout = hanging requests)
 - Security and SRE reviews complement each other: SECURITY-REVIEW.md = security vulnerabilities, SRE-REVIEW.md = reliability gaps
 - Both should be reviewed together before production deployment
+</step>
+
+<step name="adversarial_review">
+**Adversarial review (if enabled):** Spawn adversarial expert subagent to challenge design decisions and identify blind spots.
+
+```bash
+ADVERSARIAL_REVIEWER_SKILLS=$(node "$HOME/.claude/808/bin/808-tools.cjs" agent-skills 808-adversarial-reviewer 2>/dev/null)
+```
+
+**Check if enabled:**
+```bash
+if [ "$adversarial_reviewer_enabled" = "true" ]; then
+  # Spawn adversarial reviewer
+fi
+```
+
+```
+Task(
+  prompt="Adversarial review of phase {phase_number} deliverables.
+Phase directory: {phase_dir}
+Phase goal: {goal from ROADMAP.md}
+Phase requirement IDs: {phase_req_ids}
+Challenge design decisions, question assumptions, and identify architectural blind spots.
+Focus on: over-engineering, pattern misapplication, hidden assumptions, second-order effects, and maintainability.
+Cross-reference with VERIFICATION.md, SECURITY-REVIEW.md, and SRE-REVIEW.md if they exist.
+Create ADVERSARIAL-REVIEW.md report.
+${ADVERSARIAL_REVIEWER_SKILLS}",
+  subagent_type="808-adversarial-reviewer",
+  model="{adversarial_reviewer_model}"
+)
+```
+
+**Read adversarial review status:**
+```bash
+grep "^status:" "$PHASE_DIR"/*-ADVERSARIAL-REVIEW.md 2>/dev/null | cut -d: -f2 | tr -d ' '
+```
+
+| Status | Action |
+|--------|--------|
+| `passed` | → update_roadmap (no critical challenges) |
+| `challenges_found` | Present challenges to user with severity breakdown |
+| `human_needed` | Present items requiring expert design review |
+
+**If challenges_found:**
+```
+## ⚠ Phase {X}: {Name} — Adversarial Challenges Identified
+
+**Status:** {N} challenges ({critical} critical, {high} high, {medium} medium, {low} low)
+**Score:** {N}/{M} design decisions sound
+**Report:** {phase_dir}/{phase_num}-ADVERSARIAL-REVIEW.md
+
+### Critical Challenges (Reconsider Approach)
+{List critical challenges from ADVERSARIAL-REVIEW.md}
+
+### High Severity Challenges (Strongly Consider Alternatives)
+{List high challenges}
+
+---
+## ▶ Recommended Actions
+
+1. **Review critical challenges before proceeding**
+   - May require architectural reconsideration
+   - `/808:plan-phase {X} --gaps ${AGENT_808_WS}` if redesign needed
+
+2. **Review full adversarial report**
+   - `cat {phase_dir}/{phase_num}-ADVERSARIAL-REVIEW.md`
+
+3. **Consider expert review for major decisions**
+   - For architectural pivots, technology changes, paradigm shifts
+```
+
+**If human_needed:**
+```
+## 🤔 Phase {X}: {Name} — Expert Design Review Required
+
+**Status:** Automated challenges passed, {N} items need specialist review
+**Report:** {phase_dir}/{phase_num}-ADVERSARIAL-REVIEW.md
+
+### Items Requiring Expert Review
+{From ADVERSARIAL-REVIEW.md human_verification section}
+
+These items need assessment by a domain expert:
+- Major architectural decision validation
+- Technology stack change evaluation
+- Fundamental paradigm shift consideration
+- Complex trade-off analysis
+
+Proceed to roadmap update? (yes / review challenges first)
+```
+
+**If passed:**
+```
+## ✓ Phase {X}: {Name} — Adversarial Review Passed
+
+**Status:** No critical challenges found
+**Score:** {N}/{M} design decisions sound
+**Report:** {phase_dir}/{phase_num}-ADVERSARIAL-REVIEW.md
+
+Adversarial review completed successfully. Design decisions well-justified and alternatives considered.
+```
+
+**Integration with other reviews:**
+- Adversarial reviewer reads VERIFICATION.md, SECURITY-REVIEW.md, and SRE-REVIEW.md if they exist
+- Adversarial findings may explain other review findings (e.g., design flaw causes security vulnerability)
+- Complements other reviews: ADVERSARIAL-REVIEW.md = design quality, others = specific concerns
+- Review all reports together before production deployment for comprehensive quality assessment
 </step>
 
 <step name="update_roadmap">

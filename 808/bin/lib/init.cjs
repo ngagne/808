@@ -81,6 +81,7 @@ function cmdInitExecutePhase(cwd, phase, raw) {
     verifier_model: resolveModelInternal(cwd, '808-verifier'),
     security_reviewer_model: resolveModelInternal(cwd, '808-security-reviewer'),
     sre_reviewer_model: resolveModelInternal(cwd, '808-sre-reviewer'),
+    adversarial_reviewer_model: resolveModelInternal(cwd, '808-adversarial-reviewer'),
 
     // Config flags
     commit_docs: config.commit_docs,
@@ -93,6 +94,7 @@ function cmdInitExecutePhase(cwd, phase, raw) {
     verifier_enabled: config.verifier,
     security_reviewer_enabled: config.security_reviewer,
     sre_reviewer_enabled: config.sre_reviewer,
+    adversarial_reviewer_enabled: config.adversarial_reviewer,
 
     // Phase info
     phase_found: !!phaseInfo,
@@ -427,11 +429,13 @@ function cmdInitQuick(cwd, description, raw) {
     verifier_model: resolveModelInternal(cwd, '808-verifier'),
     security_reviewer_model: resolveModelInternal(cwd, '808-security-reviewer'),
     sre_reviewer_model: resolveModelInternal(cwd, '808-sre-reviewer'),
+    adversarial_reviewer_model: resolveModelInternal(cwd, '808-adversarial-reviewer'),
 
     // Config
     commit_docs: config.commit_docs,
     security_reviewer_enabled: config.security_reviewer,
     sre_reviewer_enabled: config.sre_reviewer,
+    adversarial_reviewer_enabled: config.adversarial_reviewer,
     branch_name: quickBranchName,
 
     // Quick task info
