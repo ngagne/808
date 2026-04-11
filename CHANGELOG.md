@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Model Profile** — Added `808-adversarial-reviewer` using GPT-5.3-Codex consistently across quality, balanced, and budget profiles
 
 ### Changed
-- **README.md** — Replaced ASCII wave diagram with mermaid flowchart showing complete phase execution flow including all review stages
+- **README.md** — Replaced mermaid code block with rendered SVG image for NPM compatibility; generated PNG for broader viewer support
 - **Architecture Documentation** — Updated agent count (19), verifier orchestration order, and file system layout to include adversarial review artifacts
 - **Configuration** — Added `adversarial_reviewer` workflow toggle to config template (defaults enabled)
 
