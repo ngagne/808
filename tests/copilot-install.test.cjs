@@ -1162,6 +1162,7 @@ describe('E2E: Copilot full install verification', () => {
     const files = fs.readdirSync(agentsDir);
     const agent808Agents = files.filter(f => f.startsWith('808-') && f.endsWith('.agent.md')).sort();
     const expected = [
+      '808-adversarial-reviewer.agent.md',
       '808-advisor-researcher.agent.md',
       '808-api-designer.agent.md',
       '808-assumptions-analyzer.agent.md',
