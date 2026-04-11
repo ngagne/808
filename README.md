@@ -253,25 +253,46 @@ Walk away, come back to completed work with clean git history.
 
 Plans are grouped into "waves" based on dependencies. Within each wave, plans run in parallel. Waves run sequentially.
 
-```shell
-┌────────────────────────────────────────────────────────────────────┐
-│  PHASE EXECUTION                                                   │
-├────────────────────────────────────────────────────────────────────┤
-│                                                                    │
-│  WAVE 1 (parallel)          WAVE 2 (parallel)          WAVE 3      │
-│  ┌─────────┐ ┌─────────┐    ┌─────────┐ ┌─────────┐    ┌─────────┐ │
-│  │ Plan 01 │ │ Plan 02 │ →  │ Plan 03 │ │ Plan 04 │ →  │ Plan 05 │ │
-│  │         │ │         │    │         │ │         │    │         │ │
-│  │ User    │ │ Product │    │ Orders  │ │ Cart    │    │ Checkout│ │
-│  │ Model   │ │ Model   │    │ API     │ │ API     │    │ UI      │ │
-│  └─────────┘ └─────────┘    └─────────┘ └─────────┘    └─────────┘ │
-│       │           │              ↑           ↑              ↑      │
-│       └───────────┴──────────────┴───────────┘              │      │
-│              Dependencies: Plan 03 needs Plan 01            │      │
-│                          Plan 04 needs Plan 02              │      │
-│                          Plan 05 needs Plans 03 + 04        │      │
-│                                                                    │
-└────────────────────────────────────────────────────────────────────┘
+### Phase Execution Flow
+
+Each phase moves through discussion, planning, execution, verification, and optional review stages. The system orchestrates specialized agents at each step, keeping your main context lean while work happens in fresh agent contexts.
+
+```mermaid
+flowchart TD
+    A[discuss-phase] -->|CONTEXT.md| B[ui-phase optional]
+    B -->|UI-SPEC.md| C[plan-phase]
+    
+    subgraph plan-phase
+        C -->|RESEARCH.md| D[Phase Researcher]
+        C -->|PLAN.md files| E[Planner]
+        E <-->|verify loop max 3x| F[Plan Checker]
+    end
+    
+    plan-phase --> G[execute-phase]
+    
+    subgraph execute-phase
+        G -->|dependency grouping| H[Wave Analysis]
+        H -->|parallel| I[Executor per plan]
+        I -->|code + atomic commits| J[SUMMARY.md per plan]
+    end
+    
+    execute-phase --> K[Verifier]
+    K -->|VERIFICATION.md| L[Security Reviewer optional]
+    L -->|SECURITY-REVIEW.md| M[SRE Reviewer optional]
+    M -->|SRE-REVIEW.md| N[Adversarial Reviewer optional]
+    N -->|ADVERSARIAL-REVIEW.md| O[verify-work]
+    
+    O -->|UAT.md| P[ui-review optional]
+    P -->|UI-REVIEW.md| Q[phase complete]
+    
+    classDef stage fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    classDef optional fill:#fff3e0,stroke:#f57c00,stroke-width:1px,stroke-dasharray: 5 5
+    classDef artifact fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px
+    classDef review fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class A,B,C,G,K,O,P stage
+    class B,L,M,N,P optional
+    class D,E,F,H,I,J review
 ```
 
 **Why waves matter:**
