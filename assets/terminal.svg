@@ -44,7 +44,7 @@
     <!-- Prompt line -->
     <text class="text prompt" font-size="15" y="0">~</text>
     <text class="text dim" font-size="15" x="16" y="0">$</text>
-    <text class="text command" font-size="15" x="36" y="0">npx 808</text>
+    <text class="text command" font-size="15" x="36" y="0">npx agent-808</text>
 
     <!-- Banner -->
     <text font-family="monospace" font-size="14" y="48" xml:space="preserve" fill="url(#808-gradient)" > █████╗   █████╗   █████╗ </text>

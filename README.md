@@ -261,35 +261,35 @@ Each phase moves through discussion, planning, execution, verification, and opti
 flowchart TD
     A[discuss-phase] -->|CONTEXT.md| B[ui-phase optional]
     B -->|UI-SPEC.md| C[plan-phase]
-    
+
     subgraph plan-phase
         C -->|RESEARCH.md| D[Phase Researcher]
         C -->|PLAN.md files| E[Planner]
         E <-->|verify loop max 3x| F[Plan Checker]
     end
-    
+
     plan-phase --> G[execute-phase]
-    
+
     subgraph execute-phase
         G -->|dependency grouping| H[Wave Analysis]
         H -->|parallel| I[Executor per plan]
         I -->|code + atomic commits| J[SUMMARY.md per plan]
     end
-    
+
     execute-phase --> K[Verifier]
     K -->|VERIFICATION.md| L[Security Reviewer optional]
     L -->|SECURITY-REVIEW.md| M[SRE Reviewer optional]
     M -->|SRE-REVIEW.md| N[Adversarial Reviewer optional]
     N -->|ADVERSARIAL-REVIEW.md| O[verify-work]
-    
+
     O -->|UAT.md| P[ui-review optional]
     P -->|UI-REVIEW.md| Q[phase complete]
-    
-    classDef stage fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
-    classDef optional fill:#fff3e0,stroke:#f57c00,stroke-width:1px,stroke-dasharray: 5 5
-    classDef artifact fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px
-    classDef review fill:#fce4ec,stroke:#c2185b,stroke-width:2px
-    
+
+    classDef stage fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
+    classDef optional fill:#ef6c00,stroke:#e65100,stroke-width:1px,stroke-dasharray: 5 5,color:#fff
+    classDef artifact fill:#6a1b9a,stroke:#4a148c,stroke-width:1px,color:#fff
+    classDef review fill:#c2185b,stroke:#880e4f,stroke-width:2px,color:#fff
+
     class A,B,C,G,K,O,P stage
     class B,L,M,N,P optional
     class D,E,F,H,I,J review
